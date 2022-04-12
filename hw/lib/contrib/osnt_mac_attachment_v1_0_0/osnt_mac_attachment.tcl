@@ -183,6 +183,7 @@ set_property value_validation_type list [ipx::get_user_parameters C_S_AXIS_TUSER
 set_property value_validation_list 128 [ipx::get_user_parameters C_S_AXIS_TUSER_WIDTH -of_objects [ipx::current_core]]
 set_property value_validation_type list [ipx::get_user_parameters C_DEFAULT_VALUE_ENABLE -of_objects [ipx::current_core]]
 set_property value_validation_list {0 1} [ipx::get_user_parameters C_DEFAULT_VALUE_ENABLE -of_objects [ipx::current_core]]
+set_property value_validation_list 64 [ipx::get_user_parameters TIMESTAMP_WIDTH -of_objects [ipx::current_core]]
 
 # Add Ports
 ipx::remove_all_port [ipx::current_core]

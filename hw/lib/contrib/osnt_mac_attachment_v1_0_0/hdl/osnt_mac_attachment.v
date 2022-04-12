@@ -45,7 +45,8 @@ module osnt_mac_attachment #(
     parameter C_BASEADDR                = 32'h00000000,
     parameter C_DEFAULT_VALUE_ENABLE    = 1,
     parameter C_DEFAULT_SRC_PORT        = 0,
-    parameter C_DEFAULT_DST_PORT        = 0
+    parameter C_DEFAULT_DST_PORT        = 0,
+    parameter TIMESTAMP_WIDTH		= 64
 ) (
   // 10GE block clk & rst 
   input                                 clk156,
@@ -109,10 +110,10 @@ module osnt_mac_attachment #(
   output                                    S_AXI_WREADY,
   output     [1 :0]                         S_AXI_BRESP,
   output                                    S_AXI_BVALID,
-  output                                    S_AXI_AWREADY
+  output                                    S_AXI_AWREADY,
 
   // OSNT signals 
-  //input	     [63 : 0]			   stamp_counter
+  input	     [TIMESTAMP_WIDTH-1 : 0]        stamp_counter
 
  );
 
@@ -173,8 +174,17 @@ module osnt_mac_attachment #(
  wire                                            areset_tx_fifo_extended; 	
 
  // OSNT timestamp signals
- reg [63:0]					stamp_counter;
- wire[63:0]					stamp_counter_w; 
+ wire [TIMESTAMP_WIDTH-1:0]			stamp_counter_cmac; 
+
+    // stamp_counter in CMAC clock	
+    xpm_cdc_array_single # (
+             .WIDTH(TIMESTAMP_WIDTH)
+    ) i1 ( 
+             .src_clk  (axis_aclk),
+             .src_in   (stamp_counter),
+             .dest_clk (clk156),
+             .dest_out (stamp_counter_cmac)
+    );
 
 
    // FIFO36_72 primitive rst extension rx
@@ -234,7 +244,7 @@ module osnt_mac_attachment #(
     .rx_good_frame                        (rx_good_frame),
 
     // OSNT info
-    .stamp_counter			 (stamp_counter_w)  
+    .stamp_counter			 (stamp_counter_cmac)  
    ); 
    
    //--------------------------------------------------------------------------
@@ -444,7 +454,6 @@ module osnt_mac_attachment #(
     assign mac_reset_registers = mac_reset_reg[4];
     assign mac_reset_tables    = mac_reset_reg[8];
 
-    assign stamp_counter_w = stamp_counter;
     //------------------------------------------------------------
     // MAC interface statistics
     //------------------------------------------------------------
@@ -452,10 +461,8 @@ module osnt_mac_attachment #(
         if (~mac_resetn_sync | mac_reset_registers) begin
             rx_mac_pktin_reg <= #1    `REG_RXMACPKT_DEFAULT;
             tx_mac_pktin_reg <= #1    `REG_TXMACPKT_DEFAULT;
-	    stamp_counter <= 0;
         end
         else begin
-	    stamp_counter <= stamp_counter + 1;	
             rx_mac_pktin_reg[`REG_RXMACPKT_WIDTH-2:0] <= #1 clear_counters | rx_mac_pktin_reg_clear ? 'h0 :
                   rx_mac_pktin_reg[`REG_RXMACPKT_WIDTH-2:0] + (m_axis_mac_tvalid && m_axis_mac_tlast);
             rx_mac_pktin_reg[`REG_RXMACPKT_WIDTH-1] <= #1 clear_counters | rx_mac_pktin_reg_clear ? 1'h0 :
