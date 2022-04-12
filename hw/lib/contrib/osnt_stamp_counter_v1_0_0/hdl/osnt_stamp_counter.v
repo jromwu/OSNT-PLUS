@@ -36,7 +36,7 @@ module osnt_stamp_counter
 	input                                         ACLK,
 	input                                         ARESETN,
 
-	output	[TIMESTAMP_WIDTH-1:0]		      STAMP_COUNTER
+	output reg	[TIMESTAMP_WIDTH-1:0]         STAMP_COUNTER
 );
 
 
