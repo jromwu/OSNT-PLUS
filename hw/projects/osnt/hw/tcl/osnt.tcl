@@ -42,6 +42,7 @@ set_param synth.elaboration.rodinMoreOptions "rt::set_parameter max_loop_limit 2
 # Design Parameters on NF_DATAPATH
 #####################################
 set datapath_width_bit    1024
+set timestamp_width_bit   64
 set datapath_freq_mhz     250
 #####################################
 # Project Settings
@@ -125,6 +126,12 @@ set_property CONFIG.NUM_CMAC_PORT 2 [get_ips xilinx_shell_ip]
 set_property generate_synth_checkpoint false [get_files xilinx_shell_ip.xci]
 reset_target all [get_ips xilinx_shell_ip]
 generate_target all [get_ips xilinx_shell_ip]
+
+create_ip -name osnt_stamp_counter -vendor NetFPGA -library NetFPGA -module_name osnt_stamp_counter_ip
+set_property CONFIG.TIMESTAMP_WIDTH ${timestamp_width_bit} [get_ips osnt_stamp_counter_ip]
+set_property generate_synth_checkpoint false [get_files osnt_stamp_counter_ip.xci]
+reset_target all [get_ips osnt_stamp_counter_ip]
+generate_target all [get_ips osnt_stamp_counter_ip]
 
 create_ip -name osnt_mac_attachment -vendor NetFPGA -library NetFPGA -module_name osnt_mac_attachment_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_mac_attachment_ip]
