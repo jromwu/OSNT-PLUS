@@ -210,6 +210,10 @@
   wire activity_trans_log;
   wire barrier_req_trans;
 
+ // timestamp signal
+ wire [63:0] stamp_counter;
+
+
   //---------------------------------------------------------------------
   // Misc 
   //---------------------------------------------------------------------
@@ -503,6 +507,12 @@
 		.m_axis_pipe_tready    (axis_dma_i_tready)
 	);
 
+	osnt_stamp_counter_ip u_osnt_stamp_counter_0 (
+		.ACLK		       (clk_200),
+		.ARESETN	       (sys_rst_n_c),
+		.STAMP_COUNTER	       (stamp_counter)
+	);
+
 	osnt_mac_attachment_ip u_nf_attachment_0 (
 		// 10GE block clk & rst 
 		.clk156                (clk_200),  
@@ -542,7 +552,9 @@
 		.m_axis_pipe_tlast     (axis_i_0_tlast),
 		.m_axis_pipe_tuser     (axis_i_0_tuser),
 		.m_axis_pipe_tvalid    (axis_i_0_tvalid),
-		.m_axis_pipe_tready    (axis_i_0_tready)
+		.m_axis_pipe_tready    (axis_i_0_tready),
+
+		.stamp_counter	       (stamp_counter)
 	);
 
 	osnt_mac_attachment_ip u_nf_attachment_1 (
@@ -584,7 +596,9 @@
 		.m_axis_pipe_tlast     (axis_i_1_tlast),
 		.m_axis_pipe_tuser     (axis_i_1_tuser),
 		.m_axis_pipe_tvalid    (axis_i_1_tvalid),
-		.m_axis_pipe_tready    (axis_i_1_tready)
+		.m_axis_pipe_tready    (axis_i_1_tready),
+
+		.stamp_counter         (stamp_counter)
 	);
 
 	axi_crossbar_0 u_interconnect(
