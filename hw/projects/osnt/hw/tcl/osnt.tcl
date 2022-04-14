@@ -78,7 +78,7 @@ set_property ip_repo_paths ${repo_dir} [current_fileset]
 #####################################
 add_files -fileset constraints -norecurse ${project_constraints}
 if {[string match $board_name "au280"]} {
-	add_files -fileset constraints -norecurse ${public_repo_dir}/common/constraints/au280_timing.tcl
+	add_files -fileset constraints -norecurse ./constraints/au280_timing.tcl
 } elseif {[string match $board_name "au200"]} {
 	add_files -fileset constraints -norecurse ${public_repo_dir}/common/constraints/au200_vcu1525_timing.tcl
 	add_files -fileset constraints -norecurse ./constraints/au200_vcu1525_user_timing.tcl
@@ -337,8 +337,8 @@ reset_target all [get_ips clk_wiz_1]
 generate_target all [get_ips clk_wiz_1]
 
 read_verilog     "./hdl/nf_datapath.v"
-read_verilog -sv "${public_repo_dir}/common/hdl/top_wrapper.sv"
-read_verilog -sv "${public_repo_dir}/common/hdl/nf_attachment.sv"
+read_verilog -sv "./hdl/top_wrapper.sv"
+read_verilog -sv "./hdl/osnt_attachment.sv"
 read_verilog     "${public_repo_dir}/common/hdl/top.v"
 
 #Setting Synthesis options
