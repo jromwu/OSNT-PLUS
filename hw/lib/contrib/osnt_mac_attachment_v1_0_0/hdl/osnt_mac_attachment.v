@@ -174,14 +174,16 @@ module osnt_mac_attachment #(
  wire                                            areset_tx_fifo_extended; 	
 
  // OSNT timestamp signals
- wire [TIMESTAMP_WIDTH-1:0]			stamp_counter_cmac; 
+ reg [TIMESTAMP_WIDTH-1:0]			 stamp_counter_reg;
+ wire [TIMESTAMP_WIDTH-1:0]			 stamp_counter_w;
+ wire [TIMESTAMP_WIDTH-1:0]			 stamp_counter_cmac; 
 
     // stamp_counter in CMAC clock	
     xpm_cdc_array_single # (
              .WIDTH(TIMESTAMP_WIDTH)
     ) i1 ( 
              .src_clk  (axis_aclk),
-             .src_in   (stamp_counter),
+             .src_in   (stamp_counter_w),
              .dest_clk (clk156),
              .dest_out (stamp_counter_cmac)
     );
@@ -462,7 +464,7 @@ module osnt_mac_attachment #(
             rx_mac_pktin_reg <= #1    `REG_RXMACPKT_DEFAULT;
             tx_mac_pktin_reg <= #1    `REG_TXMACPKT_DEFAULT;
         end
-        else begin
+        else begin	
             rx_mac_pktin_reg[`REG_RXMACPKT_WIDTH-2:0] <= #1 clear_counters | rx_mac_pktin_reg_clear ? 'h0 :
                   rx_mac_pktin_reg[`REG_RXMACPKT_WIDTH-2:0] + (m_axis_mac_tvalid && m_axis_mac_tlast);
             rx_mac_pktin_reg[`REG_RXMACPKT_WIDTH-1] <= #1 clear_counters | rx_mac_pktin_reg_clear ? 1'h0 :
@@ -475,9 +477,12 @@ module osnt_mac_attachment #(
                   > {(`REG_TXMACPKT_WIDTH-1){1'b1}} ? 1'b1 : tx_mac_pktin_reg[`REG_TXMACPKT_WIDTH-1];
         end
     end
+ 
+    assign stamp_counter_w = stamp_counter_reg;
 
     always @ (posedge axis_aclk) begin
         if (~resetn_sync | reset_registers) begin
+	    stamp_counter_reg  <= 0;	
             id_reg             <= #1    `REG_ID_DEFAULT;
             version_reg        <= #1    `REG_VERSION_DEFAULT;
             ip2cpu_flip_reg    <= #1    `REG_FLIP_DEFAULT;
@@ -488,6 +493,7 @@ module osnt_mac_attachment #(
             tx_conv_pktin_reg  <= #1    `REG_TXCONVPKT_DEFAULT;
         end
         else begin
+	    stamp_counter_reg <= stamp_counter;	
             rx_queue_pktin_reg[`REG_RXQPKT_WIDTH-2:0] <= #1 clear_counters | rx_queue_pktin_reg_clear ? 'h0 :
                   rx_queue_pktin_reg[`REG_RXQPKT_WIDTH-2:0] + (m_axis_fifo_tvalid && m_axis_fifo_tready && m_axis_fifo_tlast);
             rx_queue_pktin_reg[`REG_RXQPKT_WIDTH-1] <= #1 clear_counters | rx_queue_pktin_reg_clear ? 1'h0 :
