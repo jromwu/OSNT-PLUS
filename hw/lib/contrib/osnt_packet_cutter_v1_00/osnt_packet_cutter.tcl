@@ -28,17 +28,22 @@
 
 # Set variables.
 set design              osnt_packet_cutter
+set top                 osnt_packet_cutter
 set ip_version          1.00
 set ip_version_display  v1_00
+set proj_dir            ./ip_proj
 
 # Call common setting for ips
 source ../osnt_lib/osnt_ip_set_common.tcl
 
-# Project setting.
-create_project -name ${design} -force -dir "./${project_dir}" -part ${device} -ip
-
+#####################################
+# Project Settings
+#####################################
+create_project -name ${design} -force -dir "./${proj_dir}" -part ${device} -ip
 set_property source_mgmt_mode All [current_project]  
-set_property top ${design} [current_fileset]
+set_property top ${top} [current_fileset]
+set_property ip_repo_paths $::env(NFPLUS_FOLDER)/hw/lib/  [current_fileset]
+update_ip_catalog
 
 # IP build.
 read_verilog "./hdl/verilog/osnt_packet_cutter.v"

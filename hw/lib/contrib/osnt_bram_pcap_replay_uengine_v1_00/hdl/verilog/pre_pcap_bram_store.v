@@ -29,8 +29,8 @@
 
 module pre_pcap_bram_store
 #(
-   parameter   C_M_AXIS_DATA_WIDTH  = 256,
-   parameter   C_S_AXIS_DATA_WIDTH  = 256,
+   parameter   C_M_AXIS_DATA_WIDTH  = 512,
+   parameter   C_S_AXIS_DATA_WIDTH  = 512,
    parameter   C_M_AXIS_TUSER_WIDTH = 128,
    parameter   C_S_AXIS_TUSER_WIDTH = 128
 )
