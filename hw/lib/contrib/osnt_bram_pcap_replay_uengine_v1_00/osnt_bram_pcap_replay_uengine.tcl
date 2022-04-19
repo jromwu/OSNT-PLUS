@@ -62,7 +62,7 @@ set_property -dict {
    CONFIG.S_TDATA_NUM_BYTES {16}
    CONFIG.TUSER_BITS_PER_BYTE {8}
    CONFIG.HAS_TLAST {1}
-   CONFIG.HAS_TKEEP {1}] [get_ips ${sub_ip_name}]
+   CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
 set_property CONFIG.M_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
 generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]

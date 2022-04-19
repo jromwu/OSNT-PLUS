@@ -31,7 +31,7 @@ set_property   library              ${lib_name}                      [ipx::curre
 set_property   version              ${ip_version}                    [ipx::current_core]
 set_property   display_name         ${design}_${ip_version_display}  [ipx::current_core]
 set_property   description          ${design}_${ip_version_display}  [ipx::current_core]
-set_property   taxonomy             ${lib_name}                      [ipx::current_core]
+set_property   taxonomy             {{/NetFPGA/Generic}}             [ipx::current_core]
 set_property   vendor_display_name  ${lib_name}                      [ipx::current_core]
 set_property   company_url          ${url_path}                      [ipx::current_core]
 set_property   supported_families   ${fpga_family}                   [ipx::current_core]

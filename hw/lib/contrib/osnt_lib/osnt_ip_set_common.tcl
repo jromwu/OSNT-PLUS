@@ -29,5 +29,5 @@
 set   device         $::env(DEVICE)
 set   fpga_family    {{virtexuplus} {Production} {virtexuplushbm} {Production}}
 set   project_dir    ./project
-set   lib_name       OSNT-PLUS-NetFPGA
-set   url_path       www.netfpga.org
+set   lib_name       NetFPGA
+set   url_path       http://www.netfpga.org
