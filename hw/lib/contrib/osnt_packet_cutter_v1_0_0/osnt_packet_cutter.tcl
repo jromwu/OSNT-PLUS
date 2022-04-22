@@ -1,7 +1,6 @@
 #
 # Copyright (c) 2016 University of Cambridge
 # Copyright (c) 2016 Jong Hun Han
-# Copyright (c) 2022 Yuta Tokusashi
 # All rights reserved.
 #
 # This software was developed by University of Cambridge Computer Laboratory
@@ -28,8 +27,8 @@
 
 
 # Set variables.
-set design              osnt_extract_metadata
-set top                 osnt_extract_metadata
+set design              osnt_packet_cutter
+set top                 osnt_packet_cutter
 set ip_version          1.00
 set ip_version_display  v1_00
 set proj_dir            ./ip_proj
@@ -41,15 +40,15 @@ source ../osnt_lib/osnt_ip_set_common.tcl
 # Project Settings
 #####################################
 create_project -name ${design} -force -dir "./${proj_dir}" -part ${device} -ip
-set_property source_mgmt_mode All [current_project]
+set_property source_mgmt_mode All [current_project]  
 set_property top ${top} [current_fileset]
 set_property ip_repo_paths $::env(NFPLUS_FOLDER)/hw/lib/  [current_fileset]
 update_ip_catalog
 
 # IP build.
-read_verilog "./hdl/verilog/osnt_extract_metadata.v"
-read_verilog "./hdl/verilog/extract_metadata.v"
-read_verilog "./hdl/verilog/extract_metadata_cpu_regs.v"
+read_verilog "./hdl/verilog/osnt_packet_cutter.v"
+read_verilog "./hdl/verilog/packet_cutter_cpu_regs_defines.v"
+read_verilog "./hdl/verilog/packet_cutter.v"
 
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
@@ -61,9 +60,9 @@ ipx::package_project
 # Call common properties of ips
 source ../osnt_lib/osnt_ip_property_common.tcl
 
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axi -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m_axis -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces S_AXI -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces M_AXIS -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces S_AXIS -of_objects [ipx::current_core]]
 
 ipx::infer_user_parameters [ipx::current_core]
 ipx::check_integrity [ipx::current_core]

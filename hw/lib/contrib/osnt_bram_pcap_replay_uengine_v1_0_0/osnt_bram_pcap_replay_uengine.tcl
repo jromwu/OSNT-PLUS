@@ -1,7 +1,6 @@
 #
-# Copyright (c) 2016 University of Cambridge
-# Copyright (c) 2016 Jong Hun Han
-# Copyright (c) 2022 Yuta Tokusashi
+# Copyright (c) 2016-2017 University of Cambridge
+# Copyright (c) 2016-2017 Jong Hun Han
 # All rights reserved.
 #
 # This software was developed by University of Cambridge Computer Laboratory
@@ -28,8 +27,8 @@
 
 
 # Set variables.
-set design              osnt_extract_metadata
-set top                 osnt_extract_metadata
+set design              osnt_bram_pcap_replay_uengine
+set top                 osnt_bram_pcap_replay_uengine
 set ip_version          1.00
 set ip_version_display  v1_00
 set proj_dir            ./ip_proj
@@ -41,20 +40,41 @@ source ../osnt_lib/osnt_ip_set_common.tcl
 # Project Settings
 #####################################
 create_project -name ${design} -force -dir "./${proj_dir}" -part ${device} -ip
-set_property source_mgmt_mode All [current_project]
+set_property source_mgmt_mode All [current_project]  
 set_property top ${top} [current_fileset]
 set_property ip_repo_paths $::env(NFPLUS_FOLDER)/hw/lib/  [current_fileset]
 update_ip_catalog
 
-# IP build.
-read_verilog "./hdl/verilog/osnt_extract_metadata.v"
-read_verilog "./hdl/verilog/extract_metadata.v"
-read_verilog "./hdl/verilog/extract_metadata_cpu_regs.v"
+set sub_ip_name  "bram_fifo_conv_256to128_0"
+create_ip -name axis_dwidth_converter -vendor xilinx.com -library ip -module_name $sub_ip_name -dir ./${proj_dir}
+set_property -dict {
+   CONFIG.M_TDATA_NUM_BYTES {16}
+   CONFIG.TUSER_BITS_PER_BYTE {8}
+   CONFIG.HAS_TLAST {1}
+   CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
+set_property CONFIG.S_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
+generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
+set sub_ip_name  "bram_fifo_conv_128to256_0"
+create_ip -name axis_dwidth_converter -vendor xilinx.com -library ip -module_name ${sub_ip_name} -dir ./${proj_dir}
+set_property -dict {
+   CONFIG.S_TDATA_NUM_BYTES {16}
+   CONFIG.TUSER_BITS_PER_BYTE {8}
+   CONFIG.HAS_TLAST {1}
+   CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
+set_property CONFIG.M_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
+generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+
+read_verilog "./hdl/verilog/bram_pcap_replay_uengine_cpu_regs.v"
+read_verilog "./hdl/verilog/osnt_bram_pcap_replay_uengine.v"
+read_verilog "./hdl/verilog/pre_pcap_bram_store.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
 
 update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1
 
 ipx::package_project
 
@@ -62,7 +82,8 @@ ipx::package_project
 source ../osnt_lib/osnt_ip_property_common.tcl
 
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axi -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m0_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m1_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axis -of_objects [ipx::current_core]]
 
 ipx::infer_user_parameters [ipx::current_core]
