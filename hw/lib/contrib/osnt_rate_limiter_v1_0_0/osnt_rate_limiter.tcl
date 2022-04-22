@@ -64,13 +64,9 @@ ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axi -of_objects [ipx::
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m0_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m1_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m2_axis -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m3_axis -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m4_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s0_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s1_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s2_axis -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s3_axis -of_objects [ipx::current_core]]
-ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s4_axis -of_objects [ipx::current_core]]
 
 ipx::infer_user_parameters [ipx::current_core]
 ipx::check_integrity [ipx::current_core]
