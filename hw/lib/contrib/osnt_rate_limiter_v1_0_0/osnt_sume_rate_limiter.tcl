@@ -34,7 +34,7 @@ set ip_version_display  v1_0
 set proj_dir            ./ip_proj
 
 # Call common setting for ips
-source ../lib/osnt_ip_set_common.tcl
+source ../osnt_lib/osnt_ip_set_common.tcl
 
 #####################################
 # Project Settings
