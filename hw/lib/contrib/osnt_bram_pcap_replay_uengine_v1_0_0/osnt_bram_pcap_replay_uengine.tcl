@@ -67,16 +67,11 @@ set_property CONFIG.M_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
 generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
-read_verilog "./hdl/verilog/bram_pcap_replay_uengine_cpu_regs_defines.v"
 read_verilog "./hdl/verilog/bram_pcap_replay_uengine_cpu_regs.v"
 read_verilog "./hdl/verilog/osnt_bram_pcap_replay_uengine.v"
 read_verilog "./hdl/verilog/pre_pcap_bram_store.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
-
-read_verilog "../osnt_lib/hdl/axi_lite_regs.v"
-read_verilog "../osnt_lib/hdl/ipif_regs.v"
-read_verilog "../osnt_lib/hdl/sume_axi_ipif.v"
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
