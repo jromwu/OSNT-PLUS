@@ -27,7 +27,7 @@
 
 
 all: clean
-	vivado -mode tcl -source osnt_sume_rate_limiter.tcl
+	vivado -mode tcl -source osnt_rate_limiter.tcl
 
 clean:
 	rm -rf vivado*.* *.xml xgui/ .Xil* pro* ip* xsim* xvlog* web*

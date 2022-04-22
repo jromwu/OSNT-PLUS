@@ -46,7 +46,7 @@ set_property ip_repo_paths $::env(NFPLUS_FOLDER)/hw/lib/  [current_fileset]
 update_ip_catalog
 
 # IP build.
-read_verilog "./hdl/verilog/osnt_sume_rate_limiter.v"
+read_verilog "./hdl/verilog/osnt_rate_limiter.v"
 read_verilog "./hdl/verilog/rate_limiter_simple.v"
 read_verilog "./hdl/verilog/rate_limiter_cpu_regs.v"
 
@@ -58,7 +58,7 @@ update_compile_order -fileset sources_1
 ipx::package_project
 
 # Call common properties of ips
-source ../lib/osnt_ip_property_common.tcl
+source ../osnt_lib/osnt_ip_property_common.tcl
 
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axi -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m0_axis -of_objects [ipx::current_core]]
