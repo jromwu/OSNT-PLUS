@@ -97,7 +97,7 @@ cores:
 	@echo "//\tLibrary cores created.";
 	@echo "/////////////////////////////////////////";
 
-osnt:
+osnt-cores:
 	make -C $(LIB_HW_DIR)/xilinx/xilinx_shell_v1_0_0/
 	make -C $(LIB_HW_DIR)/std/fallthrough_small_fifo_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/nf_endianess_manager_v1_0_0/
@@ -107,12 +107,13 @@ osnt:
 	make -C $(LIB_HW_DIR)/std/input_arbiter_v1_0_0/
 	make -C $(LIB_HW_DIR)/std/output_queues_v1_0_0/
 	make -C $(LIB_HW_DIR)/std/nic_output_port_lookup_v1_0_0/
-	make -C $(LIB_HW_DIR)/contrib/osnt_packet_cutter_v1_00/
-	make -C $(LIB_HW_DIR)/contrib/osnt_inter_packet_delay_v1_00/
+	make -C $(LIB_HW_DIR)/contrib/osnt_packet_cutter_v1_0_0/
+	make -C $(LIB_HW_DIR)/contrib/osnt_inter_packet_delay_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_extract_metadata_v1_0_0/
-	make -C $(LIB_HW_DIR)/contrib/osnt_bram_pcap_replay_uengine_v1_00/
+	make -C $(LIB_HW_DIR)/contrib/osnt_bram_pcap_replay_uengine_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_stamp_counter_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_mac_attachment_v1_0_0/
+	make -C $(LIB_HW_DIR)/contrib/osnt_rate_limiter_v1_0_0/
 	@echo "/////////////////////////////////////////";
 	@echo "//\tOSNT library cores created.";
 	@echo "/////////////////////////////////////////";
