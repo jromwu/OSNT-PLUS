@@ -36,6 +36,7 @@
  */
 
 `timescale 1ns/1ps
+`include "inter_packet_delay_cpu_regs_defines.v"
 
 module osnt_inter_packet_delay
 #(
@@ -127,72 +128,6 @@ localparam NUM_RO_REGS = 0;
   wire                                            use_reg_val[0:C_NUM_QUEUES-1];
   wire     [C_S_AXI_DATA_WIDTH-1:0]               delay_reg_val[0:C_NUM_QUEUES-1];
 
-
-  // -- AXILITE Registers
-  axi_lite_regs
-  #(
-    .C_S_AXI_DATA_WIDTH   (C_S_AXI_DATA_WIDTH),
-    .C_S_AXI_ADDR_WIDTH   (C_S_AXI_ADDR_WIDTH),
-    .C_USE_WSTRB          (C_USE_WSTRB),
-    .C_DPHASE_TIMEOUT     (C_DPHASE_TIMEOUT),
-    .C_BAR0_BASEADDR      (C_BASEADDR),
-    .C_BAR0_HIGHADDR      (C_HIGHADDR),
-    .C_S_AXI_ACLK_FREQ_HZ (C_S_AXI_ACLK_FREQ_HZ),
-    .NUM_RW_REGS          (NUM_RW_REGS),
-    .NUM_WO_REGS          (NUM_WO_REGS),
-    .NUM_RO_REGS          (NUM_RO_REGS)
-  )
-    axi_lite_regs_1bar_inst
-  (
-    .s_axi_aclk      (s_axi_aclk),
-    .s_axi_aresetn   (s_axi_aresetn),
-    .s_axi_awaddr    (s_axi_awaddr),
-    .s_axi_awvalid   (s_axi_awvalid),
-    .s_axi_wdata     (s_axi_wdata),
-    .s_axi_wstrb     (s_axi_wstrb),
-    .s_axi_wvalid    (s_axi_wvalid),
-    .s_axi_bready    (s_axi_bready),
-    .s_axi_araddr    (s_axi_araddr),
-    .s_axi_arvalid   (s_axi_arvalid),
-    .s_axi_rready    (s_axi_rready),
-    .s_axi_arready   (s_axi_arready),
-    .s_axi_rdata     (s_axi_rdata),
-    .s_axi_rresp     (s_axi_rresp),
-    .s_axi_rvalid    (s_axi_rvalid),
-    .s_axi_wready    (s_axi_wready),
-    .s_axi_bresp     (s_axi_bresp),
-    .s_axi_bvalid    (s_axi_bvalid),
-    .s_axi_awready   (s_axi_awready),
-
-    .rw_regs         (rw_regs),
-    .rw_defaults     ((SIM_ONLY==0) ? {NUM_RW_REGS*C_S_AXI_DATA_WIDTH{1'b0}} :
-                                         {
-                                             {32'd0},
-                                             {31'b0, 1'b0},
-                                             {31'b0, 1'b1},
-                                             {31'b0, 1'b0},
-
-                                             {32'd0},
-                                             {31'b0, 1'b0},
-                                             {31'b0, 1'b1},
-                                             {31'b0, 1'b0},
-
-                                             {32'd0},
-                                             {31'b0, 1'b0},
-                                             {31'b0, 1'b1},
-                                             {31'b0, 1'b0},
-
-                                             {32'd2000},
-                                             {31'b0, 1'b1},
-                                             {31'b0, 1'b1},
-                                             {31'b0, 1'b0}
-                                         }
-                                         ),
-    .wo_regs         (),
-    .wo_defaults     (0),
-    .ro_regs         ()
-  );
-
   // -- Register assignments
 
     generate 
@@ -283,6 +218,144 @@ localparam NUM_RO_REGS = 0;
         .delay_reg_val        ( delay_reg_val[1] )
       );
       end
-
     endgenerate
+
+   // -------------------- CPU Registers -----------------------------
+
+   wire [`REG_CTRL0_BITS] 		     ip2cpu_ctrl0;
+   wire [`REG_CTRL0_BITS] 		     cpu2ip_ctrl0;
+   wire [`REG_CTRL1_BITS] 		     ip2cpu_ctrl1;
+   wire [`REG_CTRL1_BITS] 		     cpu2ip_ctrl1;
+   wire [`REG_CTRL2_BITS] 		     ip2cpu_ctrl2;
+   wire [`REG_CTRL2_BITS] 		     cpu2ip_ctrl2;
+   wire [`REG_CTRL3_BITS] 		     ip2cpu_ctrl3;
+   wire [`REG_CTRL3_BITS] 		     cpu2ip_ctrl3;
+   wire [`REG_CTRL4_BITS] 		     ip2cpu_ctrl4;
+   wire [`REG_CTRL4_BITS] 		     cpu2ip_ctrl4;
+   wire [`REG_CTRL5_BITS] 		     ip2cpu_ctrl5;
+   wire [`REG_CTRL5_BITS] 		     cpu2ip_ctrl5;
+   wire [`REG_CTRL6_BITS] 		     ip2cpu_ctrl6;
+   wire [`REG_CTRL6_BITS] 		     cpu2ip_ctrl6;
+   wire [`REG_CTRL7_BITS] 		     ip2cpu_ctrl7;
+   wire [`REG_CTRL7_BITS] 		     cpu2ip_ctrl7;
+   wire [`REG_CTRL8_BITS] 		     ip2cpu_ctrl8;
+   wire [`REG_CTRL8_BITS] 		     cpu2ip_ctrl8;
+   wire [`REG_CTRL9_BITS] 		     ip2cpu_ctrl9;
+   wire [`REG_CTRL9_BITS] 		     cpu2ip_ctrl9;
+   wire [`REG_CTRL10_BITS] 		     ip2cpu_ctrl10;
+   wire [`REG_CTRL10_BITS] 		     cpu2ip_ctrl10;
+   wire [`REG_CTRL11_BITS] 		     ip2cpu_ctrl11;
+   wire [`REG_CTRL11_BITS] 		     cpu2ip_ctrl11;
+   wire [`REG_CTRL12_BITS] 		     ip2cpu_ctrl12;
+   wire [`REG_CTRL12_BITS] 		     cpu2ip_ctrl12;
+   wire [`REG_CTRL13_BITS] 		     ip2cpu_ctrl13;
+   wire [`REG_CTRL13_BITS] 		     cpu2ip_ctrl13;
+   wire [`REG_CTRL14_BITS] 		     ip2cpu_ctrl14;
+   wire [`REG_CTRL14_BITS] 		     cpu2ip_ctrl14;
+   wire [`REG_CTRL15_BITS] 		     ip2cpu_ctrl15;
+   wire [`REG_CTRL15_BITS] 		     cpu2ip_ctrl15;
+
+   assign ip2cpu_ctrl0 = cpu2ip_ctrl0;
+   assign ip2cpu_ctrl1 = cpu2ip_ctrl1;
+   assign ip2cpu_ctrl2 = cpu2ip_ctrl2;
+   assign ip2cpu_ctrl3 = cpu2ip_ctrl3;
+   assign ip2cpu_ctrl4 = cpu2ip_ctrl4;
+   assign ip2cpu_ctrl5 = cpu2ip_ctrl5;
+   assign ip2cpu_ctrl6 = cpu2ip_ctrl6;
+   assign ip2cpu_ctrl7 = cpu2ip_ctrl7;
+   assign ip2cpu_ctrl8 = cpu2ip_ctrl8;
+   assign ip2cpu_ctrl9 = cpu2ip_ctrl9;
+   assign ip2cpu_ctrl10 = cpu2ip_ctrl10;
+   assign ip2cpu_ctrl11 = cpu2ip_ctrl11;
+   assign ip2cpu_ctrl12 = cpu2ip_ctrl12;
+   assign ip2cpu_ctrl13 = cpu2ip_ctrl13;
+   assign ip2cpu_ctrl14 = cpu2ip_ctrl14;
+   assign ip2cpu_ctrl15 = cpu2ip_ctrl15;
+
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 1 - 1:C_S_AXI_DATA_WIDTH * 0] = cpu2ip_ctrl0;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 2 - 1:C_S_AXI_DATA_WIDTH * 1] = cpu2ip_ctrl1;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 3 - 1:C_S_AXI_DATA_WIDTH * 2] = cpu2ip_ctrl2;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 4 - 1:C_S_AXI_DATA_WIDTH * 3] = cpu2ip_ctrl3;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 5 - 1:C_S_AXI_DATA_WIDTH * 4] = cpu2ip_ctrl4;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 6 - 1:C_S_AXI_DATA_WIDTH * 5] = cpu2ip_ctrl5;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 7 - 1:C_S_AXI_DATA_WIDTH * 6] = cpu2ip_ctrl6;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 8 - 1:C_S_AXI_DATA_WIDTH * 7] = cpu2ip_ctrl7;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 9 - 1:C_S_AXI_DATA_WIDTH * 8] = cpu2ip_ctrl8;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 10 - 1:C_S_AXI_DATA_WIDTH * 9] = cpu2ip_ctrl9;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 11 - 1:C_S_AXI_DATA_WIDTH * 10] = cpu2ip_ctrl10;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 12 - 1:C_S_AXI_DATA_WIDTH * 11] = cpu2ip_ctrl11;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 13 - 1:C_S_AXI_DATA_WIDTH * 12] = cpu2ip_ctrl12;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 14 - 1:C_S_AXI_DATA_WIDTH * 13] = cpu2ip_ctrl13;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 15 - 1:C_S_AXI_DATA_WIDTH * 14] = cpu2ip_ctrl14;
+   assign rw_regs[C_S_AXI_DATA_WIDTH * 16 - 1:C_S_AXI_DATA_WIDTH * 15] = cpu2ip_ctrl15;
+
+   inter_packet_delay_cpu_regs #
+     (
+      .C_BASE_ADDRESS(C_BASEADDR),
+      .C_S_AXI_DATA_WIDTH(32),
+      .C_S_AXI_ADDR_WIDTH(32)
+      )
+   (
+    // General ports
+    .clk(s_axi_aclk),
+    .resetn(s_axi_aresetn),
+    // Global Registers
+    .cpu_resetn_soft(),
+    .resetn_soft(),
+    .resetn_sync(),
+
+    // Register ports
+    .ip2cpu_ctrl0_reg(ip2cpu_ctrl0),
+    .cpu2ip_ctrl0_reg(cpu2ip_ctrl0),
+    .ip2cpu_ctrl1_reg(ip2cpu_ctrl1),
+    .cpu2ip_ctrl1_reg(cpu2ip_ctrl1),
+    .ip2cpu_ctrl2_reg(ip2cpu_ctrl2),
+    .cpu2ip_ctrl2_reg(cpu2ip_ctrl2),
+    .ip2cpu_ctrl3_reg(ip2cpu_ctrl3),
+    .cpu2ip_ctrl3_reg(cpu2ip_ctrl3),
+    .ip2cpu_ctrl4_reg(ip2cpu_ctrl4),
+    .cpu2ip_ctrl4_reg(cpu2ip_ctrl4),
+    .ip2cpu_ctrl5_reg(ip2cpu_ctrl5),
+    .cpu2ip_ctrl5_reg(cpu2ip_ctrl5),
+    .ip2cpu_ctrl6_reg(ip2cpu_ctrl6),
+    .cpu2ip_ctrl6_reg(cpu2ip_ctrl6),
+    .ip2cpu_ctrl7_reg(ip2cpu_ctrl7),
+    .cpu2ip_ctrl7_reg(cpu2ip_ctrl7),
+    .cpu2ip_ctrl8_reg(cpu2ip_ctrl8),
+    .ip2cpu_ctrl9_reg(ip2cpu_ctrl9),
+    .cpu2ip_ctrl9_reg(cpu2ip_ctrl9),
+    .ip2cpu_ctrl10_reg(ip2cpu_ctrl10),
+    .cpu2ip_ctrl10_reg(cpu2ip_ctrl10),
+    .ip2cpu_ctrl11_reg(ip2cpu_ctrl11),
+    .cpu2ip_ctrl11_reg(cpu2ip_ctrl11),
+    .ip2cpu_ctrl12_reg(ip2cpu_ctrl12),
+    .cpu2ip_ctrl12_reg(cpu2ip_ctrl12),
+    .ip2cpu_ctrl13_reg(ip2cpu_ctrl13),
+    .cpu2ip_ctrl13_reg(cpu2ip_ctrl13),
+    .ip2cpu_ctrl14_reg(ip2cpu_ctrl14),
+    .cpu2ip_ctrl14_reg(cpu2ip_ctrl14),
+    .ip2cpu_ctrl15_reg(ip2cpu_ctrl15),
+    .cpu2ip_ctrl15_reg(cpu2ip_ctrl15),
+
+    // AXI Lite ports
+    .S_AXI_ACLK(s_axi_aclk),
+    .S_AXI_ARESETN(s_axi_aresetn),
+    .S_AXI_AWADDR(s_axi_awaddr),
+    .S_AXI_AWVALID(s_axi_awvalid),
+    .S_AXI_WDATA(s_axi_wdata),
+    .S_AXI_WSTRB(s_axi_wstrb),
+    .S_AXI_WVALID(s_axi_wvalid),
+    .S_AXI_BREADY(s_axi_bready),
+    .S_AXI_ARADDR(s_axi_araddr),
+    .S_AXI_ARVALID(s_axi_arvalid),
+    .S_AXI_RREADY(s_axi_rready),
+    .S_AXI_ARREADY(s_axi_arready),
+    .S_AXI_RDATA(s_axi_rdata),
+    .S_AXI_RRESP(s_axi_rresp),
+    .S_AXI_RVALID(s_axi_rvalid),
+    .S_AXI_WREADY(s_axi_wready),
+    .S_AXI_BRESP(s_axi_bresp),
+    .S_AXI_BVALID(s_axi_bvalid),
+    .S_AXI_AWREADY(s_axi_awready)
+    );
 endmodule

@@ -47,15 +47,11 @@ update_ip_catalog
 
 # IP build.
 read_verilog "./hdl/verilog/osnt_packet_cutter.v"
+read_verilog "./hdl/verilog/packet_cutter_cpu_regs_defines.v"
 read_verilog "./hdl/verilog/packet_cutter.v"
-
 
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
-
-read_verilog "../osnt_lib/hdl/axi_lite_regs.v"
-read_verilog "../osnt_lib/hdl/ipif_regs.v"
-read_verilog "../osnt_lib/hdl/sume_axi_ipif.v"
 
 update_compile_order -fileset sources_1
 

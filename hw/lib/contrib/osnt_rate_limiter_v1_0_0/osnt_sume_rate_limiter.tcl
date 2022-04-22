@@ -27,14 +27,14 @@
 
 
 # Set variables.
-set design              osnt_inter_packet_delay
-set top                 osnt_inter_packet_delay
-set ip_version          1.00
-set ip_version_display  v1_00
+set design              osnt_rate_limiter
+set top                 osnt_rate_limiter
+set ip_version          1.0
+set ip_version_display  v1_0
 set proj_dir            ./ip_proj
 
 # Call common setting for ips
-source ../osnt_lib/osnt_ip_set_common.tcl
+source ../lib/osnt_ip_set_common.tcl
 
 #####################################
 # Project Settings
@@ -46,9 +46,9 @@ set_property ip_repo_paths $::env(NFPLUS_FOLDER)/hw/lib/  [current_fileset]
 update_ip_catalog
 
 # IP build.
-read_verilog "./hdl/verilog/osnt_inter_packet_delay.v"
-read_verilog "./hdl/verilog/inter_packet_delay_cpu_regs.v"
-read_verilog "./hdl/verilog/inter_packet_delay.v"
+read_verilog "./hdl/verilog/osnt_sume_rate_limiter.v"
+read_verilog "./hdl/verilog/rate_limiter_simple.v"
+read_verilog "./hdl/verilog/rate_limiter_cpu_regs.v"
 
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
 read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
@@ -58,13 +58,19 @@ update_compile_order -fileset sources_1
 ipx::package_project
 
 # Call common properties of ips
-source ../osnt_lib/osnt_ip_property_common.tcl
+source ../lib/osnt_ip_property_common.tcl
 
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axi -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m0_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m1_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m2_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m3_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m4_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s0_axis -of_objects [ipx::current_core]]
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s1_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s2_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s3_axis -of_objects [ipx::current_core]]
+ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s4_axis -of_objects [ipx::current_core]]
 
 ipx::infer_user_parameters [ipx::current_core]
 ipx::check_integrity [ipx::current_core]

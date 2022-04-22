@@ -9,8 +9,7 @@
 //
 // @NETFPGA_LICENSE_HEADER_START@
 //
-// Licensed to NetFPGA Open Systems C.I.C. (NetFPGA) under one or more
-// contributor license agreements. See the NOTICE file distributed with this
+// Licensed to NetFPGA Open Systems C.I.C. (NetFPGA) under one or more // contributor license agreements. See the NOTICE file distributed with this
 // work for additional information regarding copyright ownership. NetFPGA
 // licenses this file to you under the NetFPGA Hardware-Software License,
 // Version 1.0 (the License); you may not use this file except in compliance
@@ -27,7 +26,7 @@
 
 
 `timescale 1ns/1ps
-
+`include "bram_pcap_replay_uengine_cpu_regs_defines.v"
 module osnt_bram_pcap_replay_uengine
 #(
   parameter C_S_AXI_DATA_WIDTH   = 32,
@@ -42,76 +41,76 @@ module osnt_bram_pcap_replay_uengine
   parameter C_M_AXIS_TUSER_WIDTH = 128,
   parameter C_S_AXIS_TUSER_WIDTH = 128,
   parameter SRC_PORT_POS         = 16,
-   parameter   QDR_ADDR_WIDTH       = 12,
-   parameter   REPLAY_COUNT_WIDTH   = 32,
-   parameter   NUM_QUEUES           = 2,
-   parameter   SIM_ONLY             = 0,
-   parameter   MEM_DEPTH            = 20 
+  parameter   QDR_ADDR_WIDTH       = 12,
+  parameter   REPLAY_COUNT_WIDTH   = 32,
+  parameter   NUM_QUEUES           = 2,
+  parameter   SIM_ONLY             = 0,
+  parameter   MEM_DEPTH            = 20 
 )
 (
-   // Slave AXI Ports
-   input                                           s_axi_aclk,
-   input                                           s_axi_aresetn,
-   input      [C_S_AXI_ADDR_WIDTH-1:0]             s_axi_awaddr,
-   input                                           s_axi_awvalid,
-   input      [C_S_AXI_DATA_WIDTH-1:0]             s_axi_wdata,
-   input      [C_S_AXI_DATA_WIDTH/8-1:0]           s_axi_wstrb,
-   input                                           s_axi_wvalid,
-   input                                           s_axi_bready,
-   input      [C_S_AXI_ADDR_WIDTH-1:0]             s_axi_araddr,
-   input                                           s_axi_arvalid,
-   input                                           s_axi_rready,
-   output                                          s_axi_arready,
-   output     [C_S_AXI_DATA_WIDTH-1:0]             s_axi_rdata,
-   output     [1:0]                                s_axi_rresp,
-   output                                          s_axi_rvalid,
-   output                                          s_axi_wready,
-   output     [1:0]                                s_axi_bresp,
-   output                                          s_axi_bvalid,
-   output                                          s_axi_awready,
+  // Slave AXI Ports
+  input                                           s_axi_aclk,
+  input                                           s_axi_aresetn,
+  input      [C_S_AXI_ADDR_WIDTH-1:0]             s_axi_awaddr,
+  input                                           s_axi_awvalid,
+  input      [C_S_AXI_DATA_WIDTH-1:0]             s_axi_wdata,
+  input      [C_S_AXI_DATA_WIDTH/8-1:0]           s_axi_wstrb,
+  input                                           s_axi_wvalid,
+  input                                           s_axi_bready,
+  input      [C_S_AXI_ADDR_WIDTH-1:0]             s_axi_araddr,
+  input                                           s_axi_arvalid,
+  input                                           s_axi_rready,
+  output                                          s_axi_arready,
+  output     [C_S_AXI_DATA_WIDTH-1:0]             s_axi_rdata,
+  output     [1:0]                                s_axi_rresp,
+  output                                          s_axi_rvalid,
+  output                                          s_axi_wready,
+  output     [1:0]                                s_axi_bresp,
+  output                                          s_axi_bvalid,
+  output                                          s_axi_awready,
 
-   // Master Stream Ports (interface to data path)
-   input                                                 axis_aclk,
-   input                                                 axis_aresetn,
+  // Master Stream Ports (interface to data path)
+  input                                                 axis_aclk,
+  input                                                 axis_aresetn,
 
-   output   reg   [C_M_AXIS_DATA_WIDTH-1:0]              m0_axis_tdata,
-   output   reg   [((C_M_AXIS_DATA_WIDTH/8))-1:0]        m0_axis_tkeep,
-   output   reg   [C_M_AXIS_TUSER_WIDTH-1:0]             m0_axis_tuser,
-   output   reg                                          m0_axis_tvalid,
-   input                                                 m0_axis_tready,
-   output   reg                                          m0_axis_tlast,
+  output   reg   [C_M_AXIS_DATA_WIDTH-1:0]              m0_axis_tdata,
+  output   reg   [((C_M_AXIS_DATA_WIDTH/8))-1:0]        m0_axis_tkeep,
+  output   reg   [C_M_AXIS_TUSER_WIDTH-1:0]             m0_axis_tuser,
+  output   reg                                          m0_axis_tvalid,
+  input                                                 m0_axis_tready,
+  output   reg                                          m0_axis_tlast,
 
-   output   reg   [C_M_AXIS_DATA_WIDTH-1:0]              m1_axis_tdata,
-   output   reg   [((C_M_AXIS_DATA_WIDTH/8))-1:0]        m1_axis_tkeep,
-   output   reg   [C_M_AXIS_TUSER_WIDTH-1:0]             m1_axis_tuser,
-   output   reg                                          m1_axis_tvalid,
-   input                                                 m1_axis_tready,
-   output   reg                                          m1_axis_tlast,
+  output   reg   [C_M_AXIS_DATA_WIDTH-1:0]              m1_axis_tdata,
+  output   reg   [((C_M_AXIS_DATA_WIDTH/8))-1:0]        m1_axis_tkeep,
+  output   reg   [C_M_AXIS_TUSER_WIDTH-1:0]             m1_axis_tuser,
+  output   reg                                          m1_axis_tvalid,
+  input                                                 m1_axis_tready,
+  output   reg                                          m1_axis_tlast,
 
-   // Slave Stream Ports (interface to RX queues)
-   input          [C_S_AXIS_DATA_WIDTH-1:0]              s_axis_tdata,
-   input          [((C_S_AXIS_DATA_WIDTH/8))-1:0]        s_axis_tkeep,
-   input          [C_S_AXIS_TUSER_WIDTH-1:0]             s_axis_tuser,
-   input                                                 s_axis_tvalid,
-   output                                                s_axis_tready,
-   input                                                 s_axis_tlast,
+  // Slave Stream Ports (interface to RX queues)
+  input          [C_S_AXIS_DATA_WIDTH-1:0]              s_axis_tdata,
+  input          [((C_S_AXIS_DATA_WIDTH/8))-1:0]        s_axis_tkeep,
+  input          [C_S_AXIS_TUSER_WIDTH-1:0]             s_axis_tuser,
+  input                                                 s_axis_tvalid,
+  output                                                s_axis_tready,
+  input                                                 s_axis_tlast,
 
-   output                                                clka0,
-   output         [MEM_DEPTH-1:0]                                 addra0,
-   output                                                ena0,
-   output                                                wea0,
-   output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta0,
-   input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina0,
-   
-   output                                                clka1,
-   output         [MEM_DEPTH-1:0]                                 addra1,
-   output                                                ena1,
-   output                                                wea1,
-   output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta1,
-   input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina1,
-   
-   output                                                replay_start_out,
-   input                                                 replay_start_in
+  output                                                clka0,
+  output         [MEM_DEPTH-1:0]                        addra0,
+  output                                                ena0,
+  output                                                wea0,
+  output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta0,
+  input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina0,
+
+  output                                                clka1,
+  output         [MEM_DEPTH-1:0]                        addra1,
+  output                                                ena1,
+  output                                                wea1,
+  output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta1,
+  input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina1,
+
+  output                                                replay_start_out,
+  input                                                 replay_start_in
 );
 
 integer j;
@@ -233,6 +232,59 @@ wire  [C_S_AXIS_TUSER_WIDTH-1:0]       pre_axis_tuser;
 wire                                   pre_axis_tvalid;
 wire                                   pre_axis_tready;
 wire                                   pre_axis_tlast;
+
+wire [`REG_CTRL0_BITS] 		   ip2cpu_ctrl0;
+wire [`REG_CTRL0_BITS] 		   cpu2ip_ctrl0;
+wire [`REG_CTRL1_BITS] 		   ip2cpu_ctrl1;
+wire [`REG_CTRL1_BITS] 		   cpu2ip_ctrl1;
+wire [`REG_CTRL2_BITS] 		   ip2cpu_ctrl2;
+wire [`REG_CTRL2_BITS] 		   cpu2ip_ctrl2;
+wire [`REG_CTRL3_BITS] 		   ip2cpu_ctrl3;
+wire [`REG_CTRL3_BITS] 		   cpu2ip_ctrl3;
+wire [`REG_CTRL4_BITS] 		   ip2cpu_ctrl4;
+wire [`REG_CTRL4_BITS] 		   cpu2ip_ctrl4;
+wire [`REG_CTRL5_BITS] 		   ip2cpu_ctrl5;
+wire [`REG_CTRL5_BITS] 		   cpu2ip_ctrl5;
+wire [`REG_CTRL6_BITS] 		   ip2cpu_ctrl6;
+wire [`REG_CTRL6_BITS] 		   cpu2ip_ctrl6;
+wire [`REG_CTRL7_BITS] 		   ip2cpu_ctrl7;
+wire [`REG_CTRL7_BITS] 		   cpu2ip_ctrl7;
+wire [`REG_CTRL8_BITS] 		   ip2cpu_ctrl8;
+wire [`REG_CTRL8_BITS] 		   cpu2ip_ctrl8;
+wire [`REG_CTRL9_BITS] 		   ip2cpu_ctrl9;
+wire [`REG_CTRL9_BITS] 		   cpu2ip_ctrl9;
+wire [`REG_CTRL10_BITS] 		   ip2cpu_ctrl10;
+wire [`REG_CTRL10_BITS] 		   cpu2ip_ctrl10;
+wire [`REG_CTRL11_BITS] 		   ip2cpu_ctrl11;
+wire [`REG_CTRL11_BITS] 		   cpu2ip_ctrl11;
+wire [`REG_CTRL12_BITS] 		   ip2cpu_ctrl12;
+wire [`REG_CTRL12_BITS] 		   cpu2ip_ctrl12;
+wire [`REG_CTRL13_BITS] 		   ip2cpu_ctrl13;
+wire [`REG_CTRL13_BITS] 		   cpu2ip_ctrl13;
+wire [`REG_CTRL14_BITS] 		   ip2cpu_ctrl14;
+wire [`REG_CTRL14_BITS] 		   cpu2ip_ctrl14;
+wire [`REG_CTRL15_BITS] 		   ip2cpu_ctrl15;
+wire [`REG_CTRL15_BITS] 		   cpu2ip_ctrl15;
+wire [`REG_CTRL16_BITS] 		   ip2cpu_ctrl16;
+wire [`REG_CTRL16_BITS] 		   cpu2ip_ctrl16;
+wire [`REG_CTRL17_BITS] 		   ip2cpu_ctrl17;
+wire [`REG_CTRL17_BITS] 		   cpu2ip_ctrl17;
+wire [`REG_CTRL18_BITS] 		   ip2cpu_ctrl18;
+wire [`REG_CTRL18_BITS] 		   cpu2ip_ctrl18;
+wire [`REG_CTRL19_BITS] 		   ip2cpu_ctrl19;
+wire [`REG_CTRL19_BITS] 		   cpu2ip_ctrl19;
+wire [`REG_CTRL20_BITS] 		   ip2cpu_ctrl20;
+wire [`REG_CTRL20_BITS] 		   cpu2ip_ctrl20;
+wire [`REG_CTRL21_BITS] 		   ip2cpu_ctrl21;
+wire [`REG_CTRL21_BITS] 		   cpu2ip_ctrl21;
+wire [`REG_CTRL22_BITS] 		   ip2cpu_ctrl22;
+wire [`REG_CTRL22_BITS] 		   cpu2ip_ctrl22;
+wire [`REG_CTRL23_BITS] 		   ip2cpu_ctrl23;
+wire [`REG_CTRL23_BITS] 		   cpu2ip_ctrl23;
+wire [`REG_CTRL24_BITS] 		   ip2cpu_ctrl24;
+wire [`REG_CTRL24_BITS] 		   cpu2ip_ctrl24;
+wire [`REG_CTRL25_BITS] 		   ip2cpu_ctrl25;
+wire [`REG_CTRL25_BITS] 		   cpu2ip_ctrl25;
 
 assign pre_axis_tready = 1;
 
@@ -812,70 +864,210 @@ pre_pcap_bram_store
    .s_axis_tlast           (  s_axis_tlast            )
 );
 
-// -- AXILITE Registers
-axi_lite_regs
-#(
-   .C_S_AXI_DATA_WIDTH        (  C_S_AXI_DATA_WIDTH      ),
-   .C_S_AXI_ADDR_WIDTH        (  C_S_AXI_ADDR_WIDTH      ),
-   .C_USE_WSTRB               (  C_USE_WSTRB             ),
-   .C_DPHASE_TIMEOUT          (  C_DPHASE_TIMEOUT        ),
-   .C_BAR0_BASEADDR           (  C_BASEADDR              ),
-   .C_BAR0_HIGHADDR           (  C_HIGHADDR              ),
-   .C_S_AXI_ACLK_FREQ_HZ      (  C_S_AXI_ACLK_FREQ_HZ    ),
-   .NUM_RW_REGS               (  NUM_RW_REGS             ),
-   .NUM_WO_REGS               (  NUM_WO_REGS             ),
-   .NUM_RO_REGS               (  NUM_RO_REGS             )
-)
-axi_lite_regs_1bar_inst
-(
-   .s_axi_aclk                (  s_axi_aclk              ),
-   .s_axi_aresetn             (  s_axi_aresetn           ),
-   .s_axi_awaddr              (  s_axi_awaddr            ),
-   .s_axi_awvalid             (  s_axi_awvalid           ),
-   .s_axi_wdata               (  s_axi_wdata             ),
-   .s_axi_wstrb               (  s_axi_wstrb             ),
-   .s_axi_wvalid              (  s_axi_wvalid            ),
-   .s_axi_bready              (  s_axi_bready            ),
-   .s_axi_araddr              (  s_axi_araddr            ),
-   .s_axi_arvalid             (  s_axi_arvalid           ),
-   .s_axi_rready              (  s_axi_rready            ),
-   .s_axi_arready             (  s_axi_arready           ),
-   .s_axi_rdata               (  s_axi_rdata             ),
-   .s_axi_rresp               (  s_axi_rresp             ),
-   .s_axi_rvalid              (  s_axi_rvalid            ),
-   .s_axi_wready              (  s_axi_wready            ),
-   .s_axi_bresp               (  s_axi_bresp             ),
-   .s_axi_bvalid              (  s_axi_bvalid            ),
-   .s_axi_awready             (  s_axi_awready           ),
-
-   .rw_regs                   (  rw_regs                 ),
-   .rw_defaults               (  {NUM_RW_REGS*C_S_AXI_DATA_WIDTH{1'b0}}), 
-   .wo_regs                   (),
-   .wo_defaults               (0),
-   .ro_regs                   () 
-);
-
+//// -- AXILITE Registers
+//axi_lite_regs
+//#(
+//   .C_S_AXI_DATA_WIDTH        (  C_S_AXI_DATA_WIDTH      ),
+//   .C_S_AXI_ADDR_WIDTH        (  C_S_AXI_ADDR_WIDTH      ),
+//   .C_USE_WSTRB               (  C_USE_WSTRB             ),
+//   .C_DPHASE_TIMEOUT          (  C_DPHASE_TIMEOUT        ),
+//   .C_BAR0_BASEADDR           (  C_BASEADDR              ),
+//   .C_BAR0_HIGHADDR           (  C_HIGHADDR              ),
+//   .C_S_AXI_ACLK_FREQ_HZ      (  C_S_AXI_ACLK_FREQ_HZ    ),
+//   .NUM_RW_REGS               (  NUM_RW_REGS             ),
+//   .NUM_WO_REGS               (  NUM_WO_REGS             ),
+//   .NUM_RO_REGS               (  NUM_RO_REGS             )
+//)
+//axi_lite_regs_1bar_inst
+//(
+//   .s_axi_aclk                (  s_axi_aclk              ),
+//   .s_axi_aresetn             (  s_axi_aresetn           ),
+//   .s_axi_awaddr              (  s_axi_awaddr            ),
+//   .s_axi_awvalid             (  s_axi_awvalid           ),
+//   .s_axi_wdata               (  s_axi_wdata             ),
+//   .s_axi_wstrb               (  s_axi_wstrb             ),
+//   .s_axi_wvalid              (  s_axi_wvalid            ),
+//   .s_axi_bready              (  s_axi_bready            ),
+//   .s_axi_araddr              (  s_axi_araddr            ),
+//   .s_axi_arvalid             (  s_axi_arvalid           ),
+//   .s_axi_rready              (  s_axi_rready            ),
+//   .s_axi_arready             (  s_axi_arready           ),
+//   .s_axi_rdata               (  s_axi_rdata             ),
+//   .s_axi_rresp               (  s_axi_rresp             ),
+//   .s_axi_rvalid              (  s_axi_rvalid            ),
+//   .s_axi_wready              (  s_axi_wready            ),
+//   .s_axi_bresp               (  s_axi_bresp             ),
+//   .s_axi_bvalid              (  s_axi_bvalid            ),
+//   .s_axi_awready             (  s_axi_awready           ),
+//
+//   .rw_regs                   (  rw_regs                 ),
+//   .rw_defaults               (  {NUM_RW_REGS*C_S_AXI_DATA_WIDTH{1'b0}}), 
+//   .wo_regs                   (),
+//   .wo_defaults               (0),
+//   .ro_regs                   () 
+//);
+//
 // -- Register assignments
 assign sw_rst           = rw_regs[(C_S_AXI_DATA_WIDTH*0)+1-1:(C_S_AXI_DATA_WIDTH*0)]; //0x0000
 
 assign q0_start_replay  = rw_regs[(C_S_AXI_DATA_WIDTH*1)+1-1:(C_S_AXI_DATA_WIDTH*1)]; //0x0004
-assign q1_start_replay  = rw_regs[(C_S_AXI_DATA_WIDTH*2)+1-1:(C_S_AXI_DATA_WIDTH*2)]; //0x0008
+assign q1_start_replay  = q0_start_replay;//rw_regs[(C_S_AXI_DATA_WIDTH*2)+1-1:(C_S_AXI_DATA_WIDTH*2)]; //0x0008
 
 assign q0_replay_count  = rw_regs[(C_S_AXI_DATA_WIDTH*5)+REPLAY_COUNT_WIDTH-1:(C_S_AXI_DATA_WIDTH*5)]; //0x0014
 assign q1_replay_count  = rw_regs[(C_S_AXI_DATA_WIDTH*6)+REPLAY_COUNT_WIDTH-1:(C_S_AXI_DATA_WIDTH*6)]; //0x0018
-
-assign q0_addr_low      = rw_regs[(C_S_AXI_DATA_WIDTH*9)+QDR_ADDR_WIDTH-1:(C_S_AXI_DATA_WIDTH*9)]; //0x0024 
-assign q0_addr_high     = rw_regs[(C_S_AXI_DATA_WIDTH*10)+QDR_ADDR_WIDTH-1:(C_S_AXI_DATA_WIDTH*10)]; //0x0028 
-assign q1_addr_low      = rw_regs[(C_S_AXI_DATA_WIDTH*11)+QDR_ADDR_WIDTH-1:(C_S_AXI_DATA_WIDTH*11)]; //0x002c 
-assign q1_addr_high     = rw_regs[(C_S_AXI_DATA_WIDTH*12)+QDR_ADDR_WIDTH-1:(C_S_AXI_DATA_WIDTH*12)]; //0x0030 
-
-assign q0_enable        = rw_regs[(C_S_AXI_DATA_WIDTH*17)+1-1:(C_S_AXI_DATA_WIDTH*17)]; //0x0044
-assign q1_enable        = rw_regs[(C_S_AXI_DATA_WIDTH*18)+1-1:(C_S_AXI_DATA_WIDTH*18)]; //0x0048
 
 assign q0_wr_done       = rw_regs[(C_S_AXI_DATA_WIDTH*21)+1-1:(C_S_AXI_DATA_WIDTH*21)]; //0x0054
 assign q1_wr_done       = rw_regs[(C_S_AXI_DATA_WIDTH*22)+1-1:(C_S_AXI_DATA_WIDTH*22)]; //0x0058
 
 // 0x0 : default, 0x1: path 0, 0x2: path 1, 0x4: path 2, 0x8: path 3.
 assign conf_path        = rw_regs[(C_S_AXI_DATA_WIDTH*25)+32-1:(C_S_AXI_DATA_WIDTH*25)]; //0x0064
+
+// ------------- CPU Register -----------
+
+assign ip2cpu_ctrl0 = cpu2ip_ctrl0;
+assign ip2cpu_ctrl1 = cpu2ip_ctrl1;
+assign ip2cpu_ctrl2 = cpu2ip_ctrl2;
+assign ip2cpu_ctrl3 = cpu2ip_ctrl3;
+assign ip2cpu_ctrl4 = cpu2ip_ctrl4;
+assign ip2cpu_ctrl5 = cpu2ip_ctrl5;
+assign ip2cpu_ctrl6 = cpu2ip_ctrl6;
+assign ip2cpu_ctrl7 = cpu2ip_ctrl7;
+assign ip2cpu_ctrl8 = cpu2ip_ctrl8;
+assign ip2cpu_ctrl9 = cpu2ip_ctrl9;
+assign ip2cpu_ctrl10 = cpu2ip_ctrl10;
+assign ip2cpu_ctrl11 = cpu2ip_ctrl11;
+assign ip2cpu_ctrl12 = cpu2ip_ctrl12;
+assign ip2cpu_ctrl13 = cpu2ip_ctrl13;
+assign ip2cpu_ctrl14 = cpu2ip_ctrl14;
+assign ip2cpu_ctrl15 = cpu2ip_ctrl15;
+assign ip2cpu_ctrl16 = cpu2ip_ctrl16;
+assign ip2cpu_ctrl17 = cpu2ip_ctrl17;
+assign ip2cpu_ctrl18 = cpu2ip_ctrl18;
+assign ip2cpu_ctrl19 = cpu2ip_ctrl19;
+assign ip2cpu_ctrl20 = cpu2ip_ctrl20;
+assign ip2cpu_ctrl21 = cpu2ip_ctrl21;
+assign ip2cpu_ctrl22 = cpu2ip_ctrl22;
+assign ip2cpu_ctrl23 = cpu2ip_ctrl23;
+assign ip2cpu_ctrl24 = cpu2ip_ctrl24;
+assign ip2cpu_ctrl25 = cpu2ip_ctrl25;
+
+assign rw_regs[C_S_AXI_DATA_WIDTH * 1 - 1:C_S_AXI_DATA_WIDTH * 0] = cpu2ip_ctrl0;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 2 - 1:C_S_AXI_DATA_WIDTH * 1] = cpu2ip_ctrl1;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 3 - 1:C_S_AXI_DATA_WIDTH * 2] = cpu2ip_ctrl2;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 4 - 1:C_S_AXI_DATA_WIDTH * 3] = cpu2ip_ctrl3;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 5 - 1:C_S_AXI_DATA_WIDTH * 4] = cpu2ip_ctrl4;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 6 - 1:C_S_AXI_DATA_WIDTH * 5] = cpu2ip_ctrl5;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 7 - 1:C_S_AXI_DATA_WIDTH * 6] = cpu2ip_ctrl6;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 8 - 1:C_S_AXI_DATA_WIDTH * 7] = cpu2ip_ctrl7;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 9 - 1:C_S_AXI_DATA_WIDTH * 8] = cpu2ip_ctrl8;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 10 - 1:C_S_AXI_DATA_WIDTH * 9] = cpu2ip_ctrl9;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 11 - 1:C_S_AXI_DATA_WIDTH * 10] = cpu2ip_ctrl10;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 12 - 1:C_S_AXI_DATA_WIDTH * 11] = cpu2ip_ctrl11;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 13 - 1:C_S_AXI_DATA_WIDTH * 12] = cpu2ip_ctrl12;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 14 - 1:C_S_AXI_DATA_WIDTH * 13] = cpu2ip_ctrl13;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 15 - 1:C_S_AXI_DATA_WIDTH * 14] = cpu2ip_ctrl14;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 16 - 1:C_S_AXI_DATA_WIDTH * 15] = cpu2ip_ctrl15;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 17 - 1:C_S_AXI_DATA_WIDTH * 16] = cpu2ip_ctrl16;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 18 - 1:C_S_AXI_DATA_WIDTH * 17] = cpu2ip_ctrl17;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 19 - 1:C_S_AXI_DATA_WIDTH * 18] = cpu2ip_ctrl18;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 20 - 1:C_S_AXI_DATA_WIDTH * 19] = cpu2ip_ctrl19;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 21 - 1:C_S_AXI_DATA_WIDTH * 20] = cpu2ip_ctrl20;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 22 - 1:C_S_AXI_DATA_WIDTH * 21] = cpu2ip_ctrl21;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 23 - 1:C_S_AXI_DATA_WIDTH * 22] = cpu2ip_ctrl22;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 24 - 1:C_S_AXI_DATA_WIDTH * 23] = cpu2ip_ctrl23;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 25 - 1:C_S_AXI_DATA_WIDTH * 24] = cpu2ip_ctrl24;
+assign rw_regs[C_S_AXI_DATA_WIDTH * 26 - 1:C_S_AXI_DATA_WIDTH * 25] = cpu2ip_ctrl25;
+
+bram_pcap_replay_uengine_cpu_regs
+#(
+    .C_BASE_ADDRESS(C_BASEADDR),
+    .C_S_AXI_DATA_WIDTH(32),
+    .C_S_AXI_ADDR_WIDTH(32)
+)
+bram_pcap_replay_uengine_cpu_regs
+(
+    // General ports
+    .clk(s_axi_aclk),
+    .resetn(axis_aresetn),//(s_axi_aresetn),
+    // Global Registersoutput reg [`REG_CTRL25_BITS]    
+    .cpu_resetn_soft(),
+    .resetn_soft(),
+    .resetn_sync(),
+
+    // Register ports
+    .ip2cpu_ctrl0_reg(ip2cpu_ctrl0),
+    .cpu2ip_ctrl0_reg(cpu2ip_ctrl0),
+    .ip2cpu_ctrl1_reg(ip2cpu_ctrl1),
+    .cpu2ip_ctrl1_reg(cpu2ip_ctrl1),
+    .ip2cpu_ctrl2_reg(ip2cpu_ctrl2),
+    .cpu2ip_ctrl2_reg(cpu2ip_ctrl2),
+    .ip2cpu_ctrl3_reg(ip2cpu_ctrl3),
+    .cpu2ip_ctrl3_reg(cpu2ip_ctrl3),
+    .ip2cpu_ctrl4_reg(ip2cpu_ctrl4),
+    .cpu2ip_ctrl4_reg(cpu2ip_ctrl4),
+    .ip2cpu_ctrl5_reg(ip2cpu_ctrl5),
+    .cpu2ip_ctrl5_reg(cpu2ip_ctrl5),
+    .ip2cpu_ctrl6_reg(ip2cpu_ctrl6),
+    .cpu2ip_ctrl6_reg(cpu2ip_ctrl6),
+    .ip2cpu_ctrl7_reg(ip2cpu_ctrl7),
+    .cpu2ip_ctrl7_reg(cpu2ip_ctrl7),
+    .ip2cpu_ctrl8_reg(ip2cpu_ctrl8),
+    .cpu2ip_ctrl8_reg(cpu2ip_ctrl8),
+    .ip2cpu_ctrl9_reg(ip2cpu_ctrl9),
+    .cpu2ip_ctrl9_reg(cpu2ip_ctrl9),
+    .ip2cpu_ctrl10_reg(ip2cpu_ctrl10),
+    .cpu2ip_ctrl10_reg(cpu2ip_ctrl10),
+    .ip2cpu_ctrl11_reg(ip2cpu_ctrl11),
+    .cpu2ip_ctrl11_reg(cpu2ip_ctrl11),
+    .ip2cpu_ctrl12_reg(ip2cpu_ctrl12),
+    .cpu2ip_ctrl12_reg(cpu2ip_ctrl12),
+    .ip2cpu_ctrl13_reg(ip2cpu_ctrl13),
+    .cpu2ip_ctrl13_reg(cpu2ip_ctrl13),
+    .ip2cpu_ctrl14_reg(ip2cpu_ctrl14),
+    .cpu2ip_ctrl14_reg(cpu2ip_ctrl14),
+    .ip2cpu_ctrl15_reg(ip2cpu_ctrl15),
+    .cpu2ip_ctrl15_reg(cpu2ip_ctrl15),
+    .ip2cpu_ctrl16_reg(ip2cpu_ctrl16),
+    .cpu2ip_ctrl16_reg(cpu2ip_ctrl16),
+    .ip2cpu_ctrl17_reg(ip2cpu_ctrl17),
+    .cpu2ip_ctrl17_reg(cpu2ip_ctrl17),
+    .ip2cpu_ctrl18_reg(ip2cpu_ctrl18),
+    .cpu2ip_ctrl18_reg(cpu2ip_ctrl18),
+    .ip2cpu_ctrl19_reg(ip2cpu_ctrl19),
+    .cpu2ip_ctrl19_reg(cpu2ip_ctrl19),
+    .ip2cpu_ctrl20_reg(ip2cpu_ctrl20),
+    .cpu2ip_ctrl20_reg(cpu2ip_ctrl20),
+    .ip2cpu_ctrl21_reg(ip2cpu_ctrl21),
+    .cpu2ip_ctrl21_reg(cpu2ip_ctrl21),
+    .ip2cpu_ctrl22_reg(ip2cpu_ctrl22),
+    .cpu2ip_ctrl22_reg(cpu2ip_ctrl22),
+    .ip2cpu_ctrl23_reg(ip2cpu_ctrl23),
+    .cpu2ip_ctrl23_reg(cpu2ip_ctrl23),
+    .ip2cpu_ctrl24_reg(ip2cpu_ctrl24),
+    .cpu2ip_ctrl24_reg(cpu2ip_ctrl24),
+    .ip2cpu_ctrl25_reg(ip2cpu_ctrl25),
+    .cpu2ip_ctrl25_reg(cpu2ip_ctrl25),
+    
+    // AXI Lite ports
+    .S_AXI_ACLK(s_axi_aclk),
+    .S_AXI_ARESETN(s_axi_aresetn),
+    .S_AXI_AWADDR(s_axi_awaddr),
+    .S_AXI_AWVALID(s_axi_awvalid),
+    .S_AXI_WDATA(s_axi_wdata),
+    .S_AXI_WSTRB(s_axi_wstrb),
+    .S_AXI_WVALID(s_axi_wvalid),
+    .S_AXI_BREADY(s_axi_bready),
+    .S_AXI_ARADDR(s_axi_araddr),
+    .S_AXI_ARVALID(s_axi_arvalid),
+    .S_AXI_RREADY(s_axi_rready),
+    .S_AXI_ARREADY(s_axi_arready),
+    .S_AXI_RDATA(s_axi_rdata),
+    .S_AXI_RRESP(s_axi_rresp),
+    .S_AXI_RVALID(s_axi_rvalid),
+    .S_AXI_WREADY(s_axi_wready),
+    .S_AXI_BRESP(s_axi_bresp),
+    .S_AXI_BVALID(s_axi_bvalid),
+    .S_AXI_AWREADY(s_axi_awready)
+);
 
 endmodule

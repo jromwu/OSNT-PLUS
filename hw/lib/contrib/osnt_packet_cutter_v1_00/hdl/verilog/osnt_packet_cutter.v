@@ -35,6 +35,8 @@
  *  Description:
  */
 
+`timescale 1ns/1ps
+`include "packet_cutter_cpu_regs_defines.v"
 
 module osnt_packet_cutter
 #(
@@ -121,109 +123,6 @@ module osnt_packet_cutter
   reg [C_S_AXI_ADDR_WIDTH-1:0]              s_axis_cnt;
   reg [C_S_AXI_ADDR_WIDTH-1:0]              m_axis_cnt;
 
-
-  sume_axi_ipif#
-  (
-    .C_S_AXI_DATA_WIDTH  ( C_S_AXI_DATA_WIDTH ),
-    .C_S_AXI_ADDR_WIDTH  ( C_S_AXI_ADDR_WIDTH ),
-    .C_BASEADDR          ( C_BASEADDR         ),
-    .C_HIGHADDR          ( C_HIGHADDR         )
-  ) sume_axi_ipif
-  (
-    .S_AXI_ACLK          ( S_AXI_ACLK     ),
-    .S_AXI_ARESETN       ( S_AXI_ARESETN  ),
-    .S_AXI_AWADDR        ( S_AXI_AWADDR   ),
-    .S_AXI_AWVALID       ( S_AXI_AWVALID  ),
-    .S_AXI_WDATA         ( S_AXI_WDATA    ),
-    .S_AXI_WSTRB         ( S_AXI_WSTRB    ),
-    .S_AXI_WVALID        ( S_AXI_WVALID   ),
-    .S_AXI_BREADY        ( S_AXI_BREADY   ),
-    .S_AXI_ARADDR        ( S_AXI_ARADDR   ),
-    .S_AXI_ARVALID       ( S_AXI_ARVALID  ),
-    .S_AXI_RREADY        ( S_AXI_RREADY   ),
-    .S_AXI_ARREADY       ( S_AXI_ARREADY  ),
-    .S_AXI_RDATA         ( S_AXI_RDATA    ),
-    .S_AXI_RRESP         ( S_AXI_RRESP    ),
-    .S_AXI_RVALID        ( S_AXI_RVALID   ),
-    .S_AXI_WREADY        ( S_AXI_WREADY   ),
-    .S_AXI_BRESP         ( S_AXI_BRESP    ),
-    .S_AXI_BVALID        ( S_AXI_BVALID   ),
-    .S_AXI_AWREADY       ( S_AXI_AWREADY  ),
-
-    // Controls to the IP/IPIF modules
-    .Bus2IP_Clk          ( Bus2IP_Clk     ),
-    .Bus2IP_Resetn       ( Bus2IP_Resetn  ),
-    .Bus2IP_Addr         ( Bus2IP_Addr    ),
-    .Bus2IP_RNW          ( Bus2IP_RNW     ),
-    .Bus2IP_BE           ( Bus2IP_BE      ),
-    .Bus2IP_CS           ( Bus2IP_CS      ),
-    .Bus2IP_Data         ( Bus2IP_Data    ),
-    .IP2Bus_Data         ( IP2Bus_Data    ),
-    .IP2Bus_WrAck        ( IP2Bus_WrAck   ),
-    .IP2Bus_RdAck        ( IP2Bus_RdAck   ),
-    .IP2Bus_Error        ( IP2Bus_Error   )
-  );
-
-  // -- IPIF REGS
-  ipif_regs #
-  (
-    .C_S_AXI_DATA_WIDTH ( C_S_AXI_DATA_WIDTH ),
-    .C_S_AXI_ADDR_WIDTH ( C_S_AXI_ADDR_WIDTH ),
-    .NUM_RW_REGS        ( NUM_RW_REGS        ),
-    .NUM_RO_REGS        ( NUM_RO_REGS        )
-  ) ipif_regs_inst
-  (
-    .Bus2IP_Clk         ( Bus2IP_Clk     ),
-    .Bus2IP_Resetn      ( Bus2IP_Resetn  ),
-    .Bus2IP_Addr        ( Bus2IP_Addr    ),
-    .Bus2IP_CS          ( Bus2IP_CS[0]   ),
-    .Bus2IP_RNW         ( Bus2IP_RNW     ),
-    .Bus2IP_Data        ( Bus2IP_Data    ),
-    .Bus2IP_BE          ( Bus2IP_BE      ),
-    .IP2Bus_Data        ( IP2Bus_Data    ),
-    .IP2Bus_RdAck       ( IP2Bus_RdAck   ),
-    .IP2Bus_WrAck       ( IP2Bus_WrAck   ),
-    .IP2Bus_Error       ( IP2Bus_Error   ),
-
-    .rw_regs            ( rw_regs        ),
-    .rw_defaults        ( rw_defaults    ),
-    .ro_regs            (  ro_regs       )
-  );
-
-  assign ro_regs = {s_axis_cnt, m_axis_cnt};
-
-  always @(posedge Bus2IP_Clk)
-     if (~Bus2IP_Resetn) begin
-        s_axis_cnt  <= 0;
-     end
-     else if (cut_en) begin
-        s_axis_cnt  <= 0;
-     end
-     else begin
-        s_axis_cnt  <= (S_AXIS_TVALID & S_AXIS_TREADY & S_AXIS_TLAST) ? s_axis_cnt + 1 : s_axis_cnt;
-     end
-
-  always @(posedge Bus2IP_Clk)
-     if (~Bus2IP_Resetn) begin
-        m_axis_cnt  <= 0;
-     end
-     else if (cut_en) begin
-        m_axis_cnt  <= 0;
-     end
-     else begin
-        m_axis_cnt  <= (M_AXIS_TVALID & M_AXIS_TREADY & M_AXIS_TLAST) ? m_axis_cnt + 1 : m_axis_cnt;
-     end
-
-  // -- Register assignments
-
-  assign rw_defaults = 0;
-  assign cut_en = rw_regs[C_S_AXI_DATA_WIDTH*0];
-  assign cut_words = rw_regs[31+C_S_AXI_DATA_WIDTH*1:C_S_AXI_DATA_WIDTH*1];
-  assign cut_offset = rw_regs[31+C_S_AXI_DATA_WIDTH*2:C_S_AXI_DATA_WIDTH*2];
-  assign cut_bytes = rw_regs[31+C_S_AXI_DATA_WIDTH*3:C_S_AXI_DATA_WIDTH*3];
-  assign hash_en = rw_regs[C_S_AXI_DATA_WIDTH*4:C_S_AXI_DATA_WIDTH*4];
-
-
   // -- Packet cutter
   packet_cutter #
   (
@@ -262,5 +161,120 @@ module osnt_packet_cutter
     .cut_bytes     (cut_bytes),
     .hash_en       (hash_en)
   );
+
+   wire [`REG_CTRL_REGS0_BITS] 		       ip2cpu_ctrl_regs0_wire;
+   wire [`REG_CTRL_REGS1_BITS] 		       ip2cpu_ctrl_regs1_wire;
+   wire [`REG_CTRL_REGS2_BITS] 		       ip2cpu_ctrl_regs2_wire;
+   wire [`REG_CTRL_REGS3_BITS] 		       ip2cpu_ctrl_regs3_wire;
+   wire [`REG_CTRL_REGS4_BITS] 		       ip2cpu_ctrl_regs4_wire;
+
+   wire [`REG_CTRL_REGS0_BITS] 		       cpu2ip_ctrl_regs0_wire;
+   wire [`REG_CTRL_REGS1_BITS] 		       cpu2ip_ctrl_regs1_wire;
+   wire [`REG_CTRL_REGS2_BITS] 		       cpu2ip_ctrl_regs2_wire;
+   wire [`REG_CTRL_REGS3_BITS] 		       cpu2ip_ctrl_regs3_wire;
+   wire [`REG_CTRL_REGS4_BITS] 		       ctrl_regs4_wire;
+
+   wire [`REG_CTRL_REGS3_BITS] 		       return_regs0_wire;
+   wire [`REG_CTRL_REGS4_BITS] 		       return_regs1_wire;
+
+   assign cpu2ip_ctrl_regs0_wire = ip2cpu_ctrl_regs0_wire;
+   assign cpu2ip_ctrl_regs1_wire = ip2cpu_ctrl_regs1_wire;
+   assign cpu2ip_ctrl_regs2_wire = ip2cpu_ctrl_regs2_wire;
+   assign cpu2ip_ctrl_regs3_wire = ip2cpu_ctrl_regs3_wire;
+   assign cpu2ip_ctrl_regs4_wire = ip2cpu_ctrl_regs4_wire;
+
+   always @(posedge S_AXI_ACLK)
+     if (S_AXI_ARESETN) begin
+       s_axis_cnt  <= 0;
+     end
+     else if (cut_en) begin
+       s_axis_cnt  <= 0;
+     end
+     else begin
+       s_axis_cnt  <= (S_AXIS_TVALID & S_AXIS_TREADY & S_AXIS_TLAST) ? s_axis_cnt + 1 : s_axis_cnt;
+     end
+
+   always @(posedge S_AXI_ACLK)
+     if (S_AXI_ARESETN) begin
+       m_axis_cnt  <= 0;
+     end
+     else if (cut_en) begin
+       m_axis_cnt  <= 0;
+     end
+     else begin
+       m_axis_cnt  <= (M_AXIS_TVALID & M_AXIS_TREADY & M_AXIS_TLAST) ? m_axis_cnt + 1 : m_axis_cnt;
+     end
+
+   // -- Register assignments
+
+   assign ro_regs = {s_axis_cnt, m_axis_cnt};
+
+   assign cut_en       = rw_regs[C_S_AXI_DATA_WIDTH*0];
+   assign cut_words    = rw_regs[31+C_S_AXI_DATA_WIDTH*1:C_S_AXI_DATA_WIDTH*1];
+   assign cut_offset   = rw_regs[31+C_S_AXI_DATA_WIDTH*2:C_S_AXI_DATA_WIDTH*2];
+   assign cut_bytes    = rw_regs[31+C_S_AXI_DATA_WIDTH*3:C_S_AXI_DATA_WIDTH*3];
+   assign hash_en      = rw_regs[C_S_AXI_DATA_WIDTH*4:C_S_AXI_DATA_WIDTH*4];
+
+   assign rw_regs[(C_S_AXI_DATA_WIDTH * 1)-1 : C_S_AXI_DATA_WIDTH * 0] = cpu2ip_ctrl_regs0_wire;
+   assign rw_regs[(C_S_AXI_DATA_WIDTH * 2)-1 : C_S_AXI_DATA_WIDTH * 1] = cpu2ip_ctrl_regs1_wire;
+   assign rw_regs[(C_S_AXI_DATA_WIDTH * 3)-1 : C_S_AXI_DATA_WIDTH * 2] = cpu2ip_ctrl_regs2_wire;
+   assign rw_regs[(C_S_AXI_DATA_WIDTH * 4)-1 : C_S_AXI_DATA_WIDTH * 3] = cpu2ip_ctrl_regs3_wire;
+   assign rw_regs[(C_S_AXI_DATA_WIDTH * 5)-1 : C_S_AXI_DATA_WIDTH * 4] = cpu2ip_ctrl_regs4_wire;
+
+   assign return_regs0_wire = ro_regs[(C_S_AXI_DATA_WIDTH * 1) - 1 : C_S_AXI_DATA_WIDTH * 0];
+   assign return_regs1_wire = ro_regs[(C_S_AXI_DATA_WIDTH * 2) - 1 : C_S_AXI_DATA_WIDTH * 1]; 
+
+   packet_cutter_cpu_regs#
+     (
+      .C_BASE_ADDRESS(C_BASEADDR),
+      .C_S_AXI_DATA_WIDTH(C_S_AXI_DATA_WIDTH),
+      .C_S_AXI_ADDR_WIDTH(C_S_AXI_ADDR_WIDTH)
+      )
+   (
+    // General ports
+    .clk                    (S_AXI_ACLK),
+    .resetn                 (S_AXI_ARESETN),
+    // Global Registers
+    .cpu_resetn_soft        (),
+    .resetn_soft            (),
+    .resetn_sync            (),
+
+    // Register ports
+    .ip2cpu_ctrl_regs0_reg  (ip2cpu_ctrl_regs0_wire),
+    .cpu2ip_ctrl_regs0_reg  (cpu2ip_ctrl_regs0_wire),
+    .ip2cpu_ctrl_regs1_reg  (ip2cpu_ctrl_regs1_wire),
+    .cpu2ip_ctrl_regs1_reg  (cpu2ip_ctrl_regs1_wire),
+    .ip2cpu_ctrl_regs2_reg  (ip2cpu_ctrl_regs2_wire),
+    .cpu2ip_ctrl_regs2_reg  (cpu2ip_ctrl_regs2_wire),
+    .ip2cpu_ctrl_regs3_reg  (ip2cpu_ctrl_regs3_wire),
+    .cpu2ip_ctrl_regs3_reg  (cpu2ip_ctrl_regs3_wire),
+    .ip2cpu_ctrl_regs4_reg  (ip2cpu_ctrl_regs4_wire),
+    .cpu2ip_ctrl_regs4_reg  (cpu2ip_ctrl_regs4_wire),
+    .return_regs0_reg       (return_regs0_wire),
+    .return_regs1_reg       (return_regs1_wire),
+
+    // AXI Lite ports
+    .S_AXI_ACLK             ( S_AXI_ACLK     ),
+    .S_AXI_ARESETN          ( S_AXI_ARESETN  ),
+    .S_AXI_AWADDR           ( S_AXI_AWADDR   ),
+    .S_AXI_AWVALID          ( S_AXI_AWVALID  ),
+    .S_AXI_WDATA            ( S_AXI_WDATA    ),
+    .S_AXI_WSTRB            ( S_AXI_WSTRB    ),
+    .S_AXI_WVALID           ( S_AXI_WVALID   ),
+    .S_AXI_BREADY           ( S_AXI_BREADY   ),
+    .S_AXI_ARADDR           ( S_AXI_ARADDR   ),
+    .S_AXI_ARVALID          ( S_AXI_ARVALID  ),
+    .S_AXI_RREADY           ( S_AXI_RREADY   ),
+    .S_AXI_ARREADY          ( S_AXI_ARREADY  ),
+    .S_AXI_RDATA            ( S_AXI_RDATA    ),
+    .S_AXI_RRESP            ( S_AXI_RRESP    ),
+    .S_AXI_RVALID           ( S_AXI_RVALID   ),
+    .S_AXI_WREADY           ( S_AXI_WREADY   ),
+    .S_AXI_BRESP            ( S_AXI_BRESP    ),
+    .S_AXI_BVALID           ( S_AXI_BVALID   ),
+    .S_AXI_AWREADY          ( S_AXI_AWREADY  )
+
+    );
+
 
 endmodule
