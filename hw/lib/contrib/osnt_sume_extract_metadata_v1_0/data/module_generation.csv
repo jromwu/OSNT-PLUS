@@ -1,0 +1,6 @@
+Block,,Address,Description,Type,Bits,Endian Type,Access Mode,Valid for sub-modules,Default,"Constraints, Remarks"
+,,,,,,,,,,
+EXTRACT_METADATA,ctrl0,0,,Reg,31:0,Little,RWA,,32'h0,
+,sw_rst,,,Field,0,,,,1’h0,
+EXTRACT_METADATA,ctrl1,4,,Reg,31:0,Little,RWA,,32'h0,
+,em_enable,,,Field,0,,,,1’h0,

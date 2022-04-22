@@ -1,0 +1,11 @@
+Block,,Address,Description,Type,Bits,Endian Type,Access Mode,Valid for sub-modules,Default,"Constraints, Remarks"
+,,,,,,,,,,
+PACKET_CUTTER,ctrl_regs0,0,,Reg,31:0,Little,RWA,,32'h0,
+,cut_en,,,Field,0,,RWA,,1’h0,
+PACKET_CUTTER,ctrl_regs1,4,cut_words,Reg,31:0,Little,RWA,,32'h0,
+PACKET_CUTTER,ctrl_regs2,8,cut_offset,Reg,31:0,Little,RWA,,32'h0,
+PACKET_CUTTER,ctrl_regs3,C,cut_bytes,Reg,31:0,Little,RWA,,32'h0,
+PACKET_CUTTER,ctrl_regs4,10,,Reg,31:0,Little,RWA,,32'h0,
+,hash_en,,,Field,0,,RWA,,1’h0,
+PACKET_CUTTER,return_regs0,18,,Reg,31:0,Little,RO,,32'h0,
+PACKET_CUTTER,return_regs1,1C,,Reg,31:0,Little,RO,,32'h0,
