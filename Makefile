@@ -62,7 +62,7 @@ RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(eval $(RUN_ARGS):;@:)
 
 
-all:	clean cores hwtestlib
+all:	clean cores osnt-cores hwtestlib
 
 clean: libclean toolsclean projectsclean swclean
 	@rm -rfv *.*~
@@ -98,15 +98,6 @@ cores:
 	@echo "/////////////////////////////////////////";
 
 osnt-cores:
-	make -C $(LIB_HW_DIR)/xilinx/xilinx_shell_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/fallthrough_small_fifo_v1_0_0/
-	make -C $(LIB_HW_DIR)/contrib/nf_endianess_manager_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/axis_fifo_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/nf_axis_converter_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/nf_mac_attachment_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/input_arbiter_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/output_queues_v1_0_0/
-	make -C $(LIB_HW_DIR)/std/nic_output_port_lookup_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_packet_cutter_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_inter_packet_delay_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_extract_metadata_v1_0_0/
