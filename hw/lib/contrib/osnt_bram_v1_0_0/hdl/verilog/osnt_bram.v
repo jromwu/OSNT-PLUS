@@ -31,7 +31,7 @@
 module osnt_bram 
 #(
 	parameter	ADDR_WIDTH		= 20,
-	parameter	DATA_WIDTH		= 1282 //TDATA=1024 + TUSER=128 + TKEEP=128 + TVALID=1 + TLAST=1 
+	parameter	DATA_WIDTH		= 770 //TDATA=512 + TUSER=128 + TKEEP=128 + TVALID=1 + TLAST=1 
 )
 (
    input    [ADDR_WIDTH-1:0]     bram_addr_a,
