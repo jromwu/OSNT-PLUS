@@ -70,22 +70,6 @@ module inter_packet_delay_cpu_regs #
     output reg [`REG_CTRL6_BITS]       cpu2ip_ctrl6_reg,
     input [`REG_CTRL7_BITS] 	       ip2cpu_ctrl7_reg,
     output reg [`REG_CTRL7_BITS]       cpu2ip_ctrl7_reg,
-    input [`REG_CTRL8_BITS] 	       ip2cpu_ctrl8_reg,
-    output reg [`REG_CTRL8_BITS]       cpu2ip_ctrl8_reg,
-    input [`REG_CTRL9_BITS] 	       ip2cpu_ctrl9_reg,
-    output reg [`REG_CTRL9_BITS]       cpu2ip_ctrl9_reg,
-    input [`REG_CTRL10_BITS] 	       ip2cpu_ctrl10_reg,
-    output reg [`REG_CTRL10_BITS]      cpu2ip_ctrl10_reg,
-    input [`REG_CTRL11_BITS] 	       ip2cpu_ctrl11_reg,
-    output reg [`REG_CTRL11_BITS]      cpu2ip_ctrl11_reg,
-    input [`REG_CTRL12_BITS] 	       ip2cpu_ctrl12_reg,
-    output reg [`REG_CTRL12_BITS]      cpu2ip_ctrl12_reg,
-    input [`REG_CTRL13_BITS] 	       ip2cpu_ctrl13_reg,
-    output reg [`REG_CTRL13_BITS]      cpu2ip_ctrl13_reg,
-    input [`REG_CTRL14_BITS] 	       ip2cpu_ctrl14_reg,
-    output reg [`REG_CTRL14_BITS]      cpu2ip_ctrl14_reg,
-    input [`REG_CTRL15_BITS] 	       ip2cpu_ctrl15_reg,
-    output reg [`REG_CTRL15_BITS]      cpu2ip_ctrl15_reg,
 
     // AXI Lite ports
     input 			       S_AXI_ACLK,
@@ -327,15 +311,7 @@ module inter_packet_delay_cpu_regs #
          cpu2ip_ctrl5_reg <= #1 `REG_CTRL5_DEFAULT;
          cpu2ip_ctrl6_reg <= #1 `REG_CTRL6_DEFAULT;
          cpu2ip_ctrl7_reg <= #1 `REG_CTRL7_DEFAULT;
-         cpu2ip_ctrl8_reg <= #1 `REG_CTRL8_DEFAULT;
-         cpu2ip_ctrl9_reg <= #1 `REG_CTRL9_DEFAULT;
-         cpu2ip_ctrl10_reg <= #1 `REG_CTRL10_DEFAULT;
-         cpu2ip_ctrl11_reg <= #1 `REG_CTRL11_DEFAULT;
-         cpu2ip_ctrl12_reg <= #1 `REG_CTRL12_DEFAULT;
-         cpu2ip_ctrl13_reg <= #1 `REG_CTRL13_DEFAULT;
-         cpu2ip_ctrl14_reg <= #1 `REG_CTRL14_DEFAULT;
-         cpu2ip_ctrl15_reg <= #1 `REG_CTRL15_DEFAULT;
-      end
+     end
       else begin
          if (reg_wren) //write event
            case (axi_awaddr)
@@ -395,63 +371,7 @@ module inter_packet_delay_cpu_regs #
                      cpu2ip_ctrl7_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
                   end
              end
-             //Ctrl8 Register
-             `REG_CTRL8_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL8_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl8_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl9 Register
-             `REG_CTRL9_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL9_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl9_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl10 Register
-             `REG_CTRL10_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL10_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl10_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl11 Register
-             `REG_CTRL11_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL11_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl11_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl12 Register
-             `REG_CTRL12_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL12_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl12_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl13 Register
-             `REG_CTRL13_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL13_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl13_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl14 Register
-             `REG_CTRL14_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL14_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl14_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl15 Register
-             `REG_CTRL15_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL15_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl15_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             32'h40: tester <= S_AXI_WDATA;
+            32'h40: tester <= S_AXI_WDATA;
              default: begin
              end
 
@@ -509,40 +429,7 @@ module inter_packet_delay_cpu_regs #
           `REG_CTRL7_ADDR : begin
              reg_data_out [`REG_CTRL7_BITS] =  ip2cpu_ctrl7_reg;
           end
-          //Ctrl8 Register
-          `REG_CTRL8_ADDR : begin
-             reg_data_out [`REG_CTRL8_BITS] =  ip2cpu_ctrl8_reg;
-          end
-          //Ctrl9 Register
-          `REG_CTRL9_ADDR : begin
-             reg_data_out [`REG_CTRL9_BITS] =  ip2cpu_ctrl9_reg;
-          end
-          //Ctrl10 Register
-          `REG_CTRL10_ADDR : begin
-             reg_data_out [`REG_CTRL10_BITS] =  ip2cpu_ctrl10_reg;
-          end
-          //Ctrl11 Register
-          `REG_CTRL11_ADDR : begin
-             reg_data_out [`REG_CTRL11_BITS] =  ip2cpu_ctrl11_reg;
-          end
-          //Ctrl12 Register
-          `REG_CTRL12_ADDR : begin
-             reg_data_out [`REG_CTRL12_BITS] =  ip2cpu_ctrl12_reg;
-          end
-          //Ctrl13 Register
-          `REG_CTRL13_ADDR : begin
-             reg_data_out [`REG_CTRL13_BITS] =  ip2cpu_ctrl13_reg;
-          end
-          //Ctrl14 Register
-          `REG_CTRL14_ADDR : begin
-             reg_data_out [`REG_CTRL14_BITS] =  ip2cpu_ctrl14_reg;
-          end
-          //Ctrl15 Register
-          `REG_CTRL15_ADDR : begin
-             reg_data_out [`REG_CTRL15_BITS] =  ip2cpu_ctrl15_reg;
-          end
-          32'h40: reg_data_out = tester;
-          //Default return value
+         //Default return value
           default: begin
              reg_data_out [31:0] =  32'hDEADBEEF;
           end

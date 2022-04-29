@@ -2,6 +2,7 @@
 // Copyright (C) 2010, 2011 The Board of Trustees of The Leland Stanford
 // Junior University
 // Copyright (c) 2016 University of Cambridge
+// Copyright (c) 2022 Gianni Antichi
 // All rights reserved.
 //
 // This software was developed by University of Cambridge Computer Laboratory
@@ -114,14 +115,24 @@ module osnt_inter_packet_delay
 
   // -- Internal Parameters
   localparam NUM_RW_REGS = 4*C_NUM_QUEUES;
-localparam NUM_WO_REGS = 0;
-localparam NUM_RO_REGS = 0;
+  localparam NUM_WO_REGS = 0;
+  localparam NUM_RO_REGS = 0;
 
   // -- Signals
 
   genvar                                          i;
 
   wire     [NUM_RW_REGS*C_S_AXI_DATA_WIDTH-1:0]   rw_regs;
+
+//REG0 software reset q0	(0x0000)
+//REG1 enable ipd q0		(0x0004)
+//REG2 use delay from pkt q0	(0x0008)
+//REG3 user-specified delay q0	(0x000c)
+//REG4 software reset q1	(0x0010)
+//REG5 enable ipd q1		(0x0014)
+//REG6 use delay from pkt q1	(0x0018)
+//REG7 user-specified delay q1	(0x001c)
+
 
   wire                                            sw_rst[0:C_NUM_QUEUES-1];
   wire                                            ipd_en[0:C_NUM_QUEUES-1];
@@ -238,22 +249,6 @@ localparam NUM_RO_REGS = 0;
    wire [`REG_CTRL6_BITS] 		     cpu2ip_ctrl6;
    wire [`REG_CTRL7_BITS] 		     ip2cpu_ctrl7;
    wire [`REG_CTRL7_BITS] 		     cpu2ip_ctrl7;
-   wire [`REG_CTRL8_BITS] 		     ip2cpu_ctrl8;
-   wire [`REG_CTRL8_BITS] 		     cpu2ip_ctrl8;
-   wire [`REG_CTRL9_BITS] 		     ip2cpu_ctrl9;
-   wire [`REG_CTRL9_BITS] 		     cpu2ip_ctrl9;
-   wire [`REG_CTRL10_BITS] 		     ip2cpu_ctrl10;
-   wire [`REG_CTRL10_BITS] 		     cpu2ip_ctrl10;
-   wire [`REG_CTRL11_BITS] 		     ip2cpu_ctrl11;
-   wire [`REG_CTRL11_BITS] 		     cpu2ip_ctrl11;
-   wire [`REG_CTRL12_BITS] 		     ip2cpu_ctrl12;
-   wire [`REG_CTRL12_BITS] 		     cpu2ip_ctrl12;
-   wire [`REG_CTRL13_BITS] 		     ip2cpu_ctrl13;
-   wire [`REG_CTRL13_BITS] 		     cpu2ip_ctrl13;
-   wire [`REG_CTRL14_BITS] 		     ip2cpu_ctrl14;
-   wire [`REG_CTRL14_BITS] 		     cpu2ip_ctrl14;
-   wire [`REG_CTRL15_BITS] 		     ip2cpu_ctrl15;
-   wire [`REG_CTRL15_BITS] 		     cpu2ip_ctrl15;
 
    assign ip2cpu_ctrl0 = cpu2ip_ctrl0;
    assign ip2cpu_ctrl1 = cpu2ip_ctrl1;
@@ -263,14 +258,6 @@ localparam NUM_RO_REGS = 0;
    assign ip2cpu_ctrl5 = cpu2ip_ctrl5;
    assign ip2cpu_ctrl6 = cpu2ip_ctrl6;
    assign ip2cpu_ctrl7 = cpu2ip_ctrl7;
-   assign ip2cpu_ctrl8 = cpu2ip_ctrl8;
-   assign ip2cpu_ctrl9 = cpu2ip_ctrl9;
-   assign ip2cpu_ctrl10 = cpu2ip_ctrl10;
-   assign ip2cpu_ctrl11 = cpu2ip_ctrl11;
-   assign ip2cpu_ctrl12 = cpu2ip_ctrl12;
-   assign ip2cpu_ctrl13 = cpu2ip_ctrl13;
-   assign ip2cpu_ctrl14 = cpu2ip_ctrl14;
-   assign ip2cpu_ctrl15 = cpu2ip_ctrl15;
 
    assign rw_regs[C_S_AXI_DATA_WIDTH * 1 - 1:C_S_AXI_DATA_WIDTH * 0] = cpu2ip_ctrl0;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 2 - 1:C_S_AXI_DATA_WIDTH * 1] = cpu2ip_ctrl1;
@@ -280,14 +267,6 @@ localparam NUM_RO_REGS = 0;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 6 - 1:C_S_AXI_DATA_WIDTH * 5] = cpu2ip_ctrl5;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 7 - 1:C_S_AXI_DATA_WIDTH * 6] = cpu2ip_ctrl6;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 8 - 1:C_S_AXI_DATA_WIDTH * 7] = cpu2ip_ctrl7;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 9 - 1:C_S_AXI_DATA_WIDTH * 8] = cpu2ip_ctrl8;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 10 - 1:C_S_AXI_DATA_WIDTH * 9] = cpu2ip_ctrl9;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 11 - 1:C_S_AXI_DATA_WIDTH * 10] = cpu2ip_ctrl10;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 12 - 1:C_S_AXI_DATA_WIDTH * 11] = cpu2ip_ctrl11;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 13 - 1:C_S_AXI_DATA_WIDTH * 12] = cpu2ip_ctrl12;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 14 - 1:C_S_AXI_DATA_WIDTH * 13] = cpu2ip_ctrl13;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 15 - 1:C_S_AXI_DATA_WIDTH * 14] = cpu2ip_ctrl14;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 16 - 1:C_S_AXI_DATA_WIDTH * 15] = cpu2ip_ctrl15;
 
    inter_packet_delay_cpu_regs #
      (
@@ -321,21 +300,6 @@ localparam NUM_RO_REGS = 0;
     .cpu2ip_ctrl6_reg(cpu2ip_ctrl6),
     .ip2cpu_ctrl7_reg(ip2cpu_ctrl7),
     .cpu2ip_ctrl7_reg(cpu2ip_ctrl7),
-    .cpu2ip_ctrl8_reg(cpu2ip_ctrl8),
-    .ip2cpu_ctrl9_reg(ip2cpu_ctrl9),
-    .cpu2ip_ctrl9_reg(cpu2ip_ctrl9),
-    .ip2cpu_ctrl10_reg(ip2cpu_ctrl10),
-    .cpu2ip_ctrl10_reg(cpu2ip_ctrl10),
-    .ip2cpu_ctrl11_reg(ip2cpu_ctrl11),
-    .cpu2ip_ctrl11_reg(cpu2ip_ctrl11),
-    .ip2cpu_ctrl12_reg(ip2cpu_ctrl12),
-    .cpu2ip_ctrl12_reg(cpu2ip_ctrl12),
-    .ip2cpu_ctrl13_reg(ip2cpu_ctrl13),
-    .cpu2ip_ctrl13_reg(cpu2ip_ctrl13),
-    .ip2cpu_ctrl14_reg(ip2cpu_ctrl14),
-    .cpu2ip_ctrl14_reg(cpu2ip_ctrl14),
-    .ip2cpu_ctrl15_reg(ip2cpu_ctrl15),
-    .cpu2ip_ctrl15_reg(cpu2ip_ctrl15),
 
     // AXI Lite ports
     .S_AXI_ACLK(s_axi_aclk),
