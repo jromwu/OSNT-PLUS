@@ -82,30 +82,6 @@ module bram_pcap_replay_uengine_cpu_regs #
     output reg [`REG_CTRL12_BITS]      cpu2ip_ctrl12_reg,
     input [`REG_CTRL13_BITS] 	       ip2cpu_ctrl13_reg,
     output reg [`REG_CTRL13_BITS]      cpu2ip_ctrl13_reg,
-    input [`REG_CTRL14_BITS] 	       ip2cpu_ctrl14_reg,
-    output reg [`REG_CTRL14_BITS]      cpu2ip_ctrl14_reg,
-    input [`REG_CTRL15_BITS] 	       ip2cpu_ctrl15_reg,
-    output reg [`REG_CTRL15_BITS]      cpu2ip_ctrl15_reg,
-    input [`REG_CTRL16_BITS] 	       ip2cpu_ctrl16_reg,
-    output reg [`REG_CTRL16_BITS]      cpu2ip_ctrl16_reg,
-    input [`REG_CTRL17_BITS] 	       ip2cpu_ctrl17_reg,
-    output reg [`REG_CTRL17_BITS]      cpu2ip_ctrl17_reg,
-    input [`REG_CTRL18_BITS] 	       ip2cpu_ctrl18_reg,
-    output reg [`REG_CTRL18_BITS]      cpu2ip_ctrl18_reg,
-    input [`REG_CTRL19_BITS] 	       ip2cpu_ctrl19_reg,
-    output reg [`REG_CTRL19_BITS]      cpu2ip_ctrl19_reg,
-    input [`REG_CTRL20_BITS] 	       ip2cpu_ctrl20_reg,
-    output reg [`REG_CTRL20_BITS]      cpu2ip_ctrl20_reg,
-    input [`REG_CTRL21_BITS] 	       ip2cpu_ctrl21_reg,
-    output reg [`REG_CTRL21_BITS]      cpu2ip_ctrl21_reg,
-    input [`REG_CTRL22_BITS] 	       ip2cpu_ctrl22_reg,
-    output reg [`REG_CTRL22_BITS]      cpu2ip_ctrl22_reg,
-    input [`REG_CTRL23_BITS] 	       ip2cpu_ctrl23_reg,
-    output reg [`REG_CTRL23_BITS]      cpu2ip_ctrl23_reg,
-    input [`REG_CTRL24_BITS] 	       ip2cpu_ctrl24_reg,
-    output reg [`REG_CTRL24_BITS]      cpu2ip_ctrl24_reg,
-    input [`REG_CTRL25_BITS] 	       ip2cpu_ctrl25_reg,
-    output reg [`REG_CTRL25_BITS]      cpu2ip_ctrl25_reg,
 
     // AXI Lite ports
     input 			       S_AXI_ACLK,
@@ -353,19 +329,7 @@ module bram_pcap_replay_uengine_cpu_regs #
          cpu2ip_ctrl11_reg <= #1 `REG_CTRL11_DEFAULT;
          cpu2ip_ctrl12_reg <= #1 `REG_CTRL12_DEFAULT;
          cpu2ip_ctrl13_reg <= #1 `REG_CTRL13_DEFAULT;
-         cpu2ip_ctrl14_reg <= #1 `REG_CTRL14_DEFAULT;
-         cpu2ip_ctrl15_reg <= #1 `REG_CTRL15_DEFAULT;
-         cpu2ip_ctrl16_reg <= #1 `REG_CTRL16_DEFAULT;
-         cpu2ip_ctrl17_reg <= #1 `REG_CTRL17_DEFAULT;
-         cpu2ip_ctrl18_reg <= #1 `REG_CTRL18_DEFAULT;
-         cpu2ip_ctrl19_reg <= #1 `REG_CTRL19_DEFAULT;
-         cpu2ip_ctrl20_reg <= #1 `REG_CTRL20_DEFAULT;
-         cpu2ip_ctrl21_reg <= #1 `REG_CTRL21_DEFAULT;
-         cpu2ip_ctrl22_reg <= #1 `REG_CTRL22_DEFAULT;
-         cpu2ip_ctrl23_reg <= #1 `REG_CTRL23_DEFAULT;
-         cpu2ip_ctrl24_reg <= #1 `REG_CTRL24_DEFAULT;
-         cpu2ip_ctrl25_reg <= #1 `REG_CTRL25_DEFAULT;
-      end
+     end
       else begin
          if (reg_wren) //write event
            case (axi_awaddr)
@@ -467,91 +431,7 @@ module bram_pcap_replay_uengine_cpu_regs #
                      cpu2ip_ctrl13_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
                   end
              end
-             //Ctrl14 Register
-             `REG_CTRL14_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL14_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl14_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl15 Register
-             `REG_CTRL15_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL15_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl15_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl16 Register
-             `REG_CTRL16_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL16_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl16_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl17 Register
-             `REG_CTRL17_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL17_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl17_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl18 Register
-             `REG_CTRL18_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL18_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl18_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl19 Register
-             `REG_CTRL19_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL19_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl19_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl20 Register
-             `REG_CTRL20_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL20_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl20_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl21 Register
-             `REG_CTRL21_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL21_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl21_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl22 Register
-             `REG_CTRL22_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL22_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl22_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl23 Register
-             `REG_CTRL23_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL23_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl23_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl24 Register
-             `REG_CTRL24_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL24_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl24_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             //Ctrl25 Register
-             `REG_CTRL25_ADDR : begin
-                for ( byte_index = 0; byte_index <= (`REG_CTRL25_WIDTH/8-1); byte_index = byte_index +1)
-                  if (S_AXI_WSTRB[byte_index] == 1) begin
-                     cpu2ip_ctrl25_reg[byte_index*8 +: 8] <=  S_AXI_WDATA[byte_index*8 +: 8]; //dynamic register;
-                  end
-             end
-             32'h68: tester <= S_AXI_WDATA;
+            32'h68: tester <= S_AXI_WDATA;
              default: begin
              end
 
@@ -633,55 +513,7 @@ module bram_pcap_replay_uengine_cpu_regs #
           `REG_CTRL13_ADDR : begin
              reg_data_out [`REG_CTRL13_BITS] =  ip2cpu_ctrl13_reg;
           end
-          //Ctrl14 Register
-          `REG_CTRL14_ADDR : begin
-             reg_data_out [`REG_CTRL14_BITS] =  ip2cpu_ctrl14_reg;
-          end
-          //Ctrl15 Register
-          `REG_CTRL15_ADDR : begin
-             reg_data_out [`REG_CTRL15_BITS] =  ip2cpu_ctrl15_reg;
-          end
-          //Ctrl16 Register
-          `REG_CTRL16_ADDR : begin
-             reg_data_out [`REG_CTRL16_BITS] =  ip2cpu_ctrl16_reg;
-          end
-          //Ctrl17 Register
-          `REG_CTRL17_ADDR : begin
-             reg_data_out [`REG_CTRL17_BITS] =  ip2cpu_ctrl17_reg;
-          end
-          //Ctrl18 Register
-          `REG_CTRL18_ADDR : begin
-             reg_data_out [`REG_CTRL18_BITS] =  ip2cpu_ctrl18_reg;
-          end
-          //Ctrl19 Register
-          `REG_CTRL19_ADDR : begin
-             reg_data_out [`REG_CTRL19_BITS] =  ip2cpu_ctrl19_reg;
-          end
-          //Ctrl20 Register
-          `REG_CTRL20_ADDR : begin
-             reg_data_out [`REG_CTRL20_BITS] =  ip2cpu_ctrl20_reg;
-          end
-          //Ctrl21 Register
-          `REG_CTRL21_ADDR : begin
-             reg_data_out [`REG_CTRL21_BITS] =  ip2cpu_ctrl21_reg;
-          end
-          //Ctrl22 Register
-          `REG_CTRL22_ADDR : begin
-             reg_data_out [`REG_CTRL22_BITS] =  ip2cpu_ctrl22_reg;
-          end
-          //Ctrl23 Register
-          `REG_CTRL23_ADDR : begin
-             reg_data_out [`REG_CTRL23_BITS] =  ip2cpu_ctrl23_reg;
-          end
-          //Ctrl24 Register
-          `REG_CTRL24_ADDR : begin
-             reg_data_out [`REG_CTRL24_BITS] =  ip2cpu_ctrl24_reg;
-          end
-          //Ctrl25 Register
-          `REG_CTRL25_ADDR : begin
-             reg_data_out [`REG_CTRL25_BITS] =  ip2cpu_ctrl25_reg;
-          end
-          32'h68: reg_data_out = tester;
+         32'h68: reg_data_out = tester;
           //Default return value
           default: begin
              reg_data_out [31:0] =  32'hDEAD7777;//32'hDEADBEEF;
