@@ -154,7 +154,7 @@ localparam  MAX_PKT_SIZE      = 2000; // In bytes
 localparam  IN_FIFO_DEPTH_BIT = log2(MAX_PKT_SIZE/(C_M_AXIS_DATA_WIDTH / 8));
 
 // -- Internal Parameters
-localparam NUM_RW_REGS = 26;
+localparam NUM_RW_REGS = 14;
 localparam NUM_WO_REGS = 0;
 localparam NUM_RO_REGS = 0;
 
