@@ -34,27 +34,28 @@
 
 
 set DEF_LIST {
-	{INPUT_ARBITER 0 1 input_arbiter_v1_0_0/data/input_arbiter_regs_defines.txt} \
-	{OUTPUT_QUEUES 0 1 output_queues_v1_0_0/data/output_queues_regs_defines.txt} \
-	{OUTPUT_PORT_LOOKUP 0 1 nic_output_port_lookup_v1_0_0/data/output_port_lookup_regs_defines.txt} \
-	{PKT_CUTTER 0 1 osnt_packet_cutter_v1_0_0/data/osnt_packet_cutter_regs_defines.txt} \
+	{INPUT_ARBITER 0 1 std/input_arbiter_v1_0_0/data/input_arbiter_regs_defines.txt} \
+	{OUTPUT_QUEUES 0 1 std/output_queues_v1_0_0/data/output_queues_regs_defines.txt} \
+	{OUTPUT_PORT_LOOKUP 0 1 std/nic_output_port_lookup_v1_0_0/data/output_port_lookup_regs_defines.txt} \
+	{PKT_CUTTER 0 1 contrib/osnt_packet_cutter_v1_0_0/data/packet_cutter_regs_defines.txt} \
 }
 
+set pwd_dir [pwd]
 foreach file_name $DEF_LIST {
 	set file_path [lindex $file_name 3]
 	set dir_path [file dirname $file_path]
+	puts $file_path
+	puts $::env(NFPLUS_FOLDER)/hw/lib/$dir_path
+	if {[file exists $::env(NFPLUS_FOLDER)/hw/lib/$dir_path]} {
 
-	if {[file exists $::env(NF_DESIGN_DIR)/hw/lib/std/$dir_path]} {
-		if {![file exists $::env(NF_DESIGN_DIR)/hw/lib/std/$file_path] && [file exists $::env(NF_DESIGN_DIR)/hw/lib/std/$dir_path/module_generation.csv]} {
-			exec cd $::env(NF_DESIGN_DIR)/hw/lib/std/$dir_path ; python3 $::env(NF_DESIGN_DIR)/tools/infrastructure/csv_gen.py 
-			exec cd $::env(NF_DESIGN_DIR)/hw/lib/std/$dir_path ; python3 regs_gen.py
-		}
-		continue
-	}
-	if {[file exists $::env(NF_DESIGN_DIR)/hw/lib/contrib/$dir_path]} {
-		if {![file exists $::env(NF_DESIGN_DIR)/hw/lib/contrib/$file_path] && [file exists $::env(NF_DESIGN_DIR)/hw/lib/contrib/$dir_path/module_generation.csv]} {
-			exec cd $::env(NF_DESIGN_DIR)/hw/lib/contrib/$dir_path ; python3 $::env(NF_DESIGN_DIR)/tools/infrastructure/csv_gen.py 
-			exec cd $::env(NF_DESIGN_DIR)/hw/lib/contrib/$dir_path ; python3 regs_gen.py
+		puts "aaa"
+		if {![file exists $::env(NFPLUS_FOLDER)/hw/lib/$file_path] && [file exists $::env(NFPLUS_FOLDER)/hw/lib/$dir_path/module_generation.csv]} {
+			puts "hello"
+			cd $::env(NFPLUS_FOLDER)/hw/lib/$dir_path
+			exec cp $::env(NFPLUS_FOLDER)/tools/infrastructure/regs_template.txt .
+			exec python3 $::env(NFPLUS_FOLDER)/tools/infrastructure/csv_gen.py 
+			exec python3 regs_gen.py
+			cd $pwd_dir
 		}
 		continue
 	}
@@ -150,7 +151,7 @@ puts $h_file ""
 
 #Second, read the registers information from the library defines file
 if $has_registers {
-	set lib_path "$public_repo_dir/std/$lib_name"
+	set lib_path "$public_repo_dir/$lib_name"
 	set regs_h_define_file $lib_path
 	set regs_h_define_file_read [open $regs_h_define_file r]
 	set regs_h_define_file_data [read $regs_h_define_file_read]
@@ -180,4 +181,3 @@ write_header  $target_file
 foreach lib_item $DEF_LIST { 
      write_core  $target_file [lindex $lib_item 0] [lindex $lib_item 1] [lindex $lib_item 2] [lindex $lib_item 3] 
 }
-
