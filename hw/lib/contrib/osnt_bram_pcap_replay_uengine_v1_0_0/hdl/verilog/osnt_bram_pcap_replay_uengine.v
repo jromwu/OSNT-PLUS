@@ -1,6 +1,7 @@
 //
 // Copyright (c) 2016-2017 University of Cambridge
 // Copyright (c) 2016-2017 Jong Hun Han
+// Copyright (c) 2022 Gianni Antichi
 // All rights reserved.
 //
 // This software was developed by University of Cambridge Computer Laboratory
