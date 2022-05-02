@@ -336,6 +336,20 @@ set_property generate_synth_checkpoint false [get_files clk_wiz_1.xci]
 reset_target all [get_ips clk_wiz_1]
 generate_target all [get_ips clk_wiz_1]
 
+create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -module_name axi_bram_ctrl_0
+set_property -dict {
+	CONFIG.PROTOCOL {AXI4LITE}
+	CONFIG.SUPPORTS_NARROW_BURST {0}
+	CONFIG.ECC_TYPE {0}
+	CONFIG.MEM_DEPTH {16384}
+	CONFIG.READ_LATENCY {1}
+	CONFIG.SINGLE_PORT_BRAM {1}
+	CONFIG.RD_CMD_OPTIMIZATION {1}
+} [get_ips axi_bram_ctrl_0]
+set_property generate_synth_checkpoint false [get_files  axi_bram_ctrl_0.xci]
+reset_target all [get_ips axi_bram_ctrl_0]
+generate_target all [get_ips axi_bram_ctrl_0]
+
 read_verilog     "./hdl/nf_datapath.v"
 read_verilog -sv "./hdl/top_wrapper.sv"
 read_verilog -sv "./hdl/osnt_attachment.sv"

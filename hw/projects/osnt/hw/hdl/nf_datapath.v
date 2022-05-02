@@ -328,5 +328,37 @@ module nf_datapath #(
       .S_AXI_ACLK (axi_aclk), 
       .S_AXI_ARESETN(axi_resetn)
     ); 
-    
+
+
+    axi_bram_ctrl_0 u_axi_bram_ctrl (
+      .s_axi_aclk    (axi_aclk),
+      .s_axi_aresetn (axi_resetn),
+      .s_axi_awaddr  (S0_AXI_AWADDR, ),
+      .s_axi_awprot  (),
+      .s_axi_awvalid (S0_AXI_AWVALID,),
+      .s_axi_awready (S0_AXI_AWREADY),
+      .s_axi_wdata   (S0_AXI_WDATA,  ),
+      .s_axi_wstrb   (S0_AXI_WSTRB,  ),
+      .s_axi_wvalid  (S0_AXI_WVALID, ),
+      .s_axi_wready  (S0_AXI_WREADY, ),
+      .s_axi_bresp   (S0_AXI_BRESP,  ),
+      .s_axi_bvalid  (S0_AXI_BVALID, ),
+      .s_axi_bready  (S0_AXI_BREADY, ),
+      .s_axi_araddr  (S0_AXI_ARADDR, ),
+      .s_axi_arprot  (),
+      .s_axi_arvalid (S0_AXI_ARVALID,),
+      .s_axi_arready (S0_AXI_ARREADY,),
+      .s_axi_rdata   (S0_AXI_RDATA,  ),
+      .s_axi_rresp   (S0_AXI_RRESP,  ),
+      .s_axi_rvalid  (S0_AXI_RVALID, ),
+      .s_axi_rready  (S0_AXI_RREADY, ),
+      .bram_rst_a    (),
+      .bram_clk_a    (),
+      .bram_en_a     (),
+      .bram_we_a     (),
+      .bram_addr_a   (),
+      .bram_wrdata_a (),
+      .bram_rddata_a ()
+    );
+
 endmodule
