@@ -48,9 +48,7 @@ foreach file_name $DEF_LIST {
 	puts $::env(NFPLUS_FOLDER)/hw/lib/$dir_path
 	if {[file exists $::env(NFPLUS_FOLDER)/hw/lib/$dir_path]} {
 
-		puts "aaa"
 		if {![file exists $::env(NFPLUS_FOLDER)/hw/lib/$file_path] && [file exists $::env(NFPLUS_FOLDER)/hw/lib/$dir_path/module_generation.csv]} {
-			puts "hello"
 			cd $::env(NFPLUS_FOLDER)/hw/lib/$dir_path
 			exec cp $::env(NFPLUS_FOLDER)/tools/infrastructure/regs_template.txt .
 			exec python3 $::env(NFPLUS_FOLDER)/tools/infrastructure/csv_gen.py 
