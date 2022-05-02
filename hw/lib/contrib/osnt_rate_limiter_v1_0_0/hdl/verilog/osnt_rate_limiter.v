@@ -2,6 +2,7 @@
 // Copyright (C) 2010, 2011 The Board of Trustees of The Leland Stanford
 // Junior University
 // Copyright (c) 2016 University of Cambridge
+// Copyright (c) 2022 Gianni Antichi 
 // All rights reserved.
 //
 // This software was developed by University of Cambridge Computer Laboratory
@@ -95,13 +96,6 @@ module osnt_rate_limiter
     input                                  m1_axis_tready,
     output                                 m1_axis_tlast,
 
-    output [C_M_AXIS_DATA_WIDTH-1:0]       m2_axis_tdata,
-    output [((C_M_AXIS_DATA_WIDTH/8))-1:0] m2_axis_tkeep,
-    output [C_M_AXIS_TUSER_WIDTH-1:0]      m2_axis_tuser,
-    output                                 m2_axis_tvalid,
-    input                                  m2_axis_tready,
-    output                                 m2_axis_tlast,
-
     // Slave Stream Ports (interface to RX queues)
     input [C_S_AXIS_DATA_WIDTH-1:0]        s0_axis_tdata,
     input [((C_S_AXIS_DATA_WIDTH/8))-1:0]  s0_axis_tkeep,
@@ -117,13 +111,7 @@ module osnt_rate_limiter
     output                                 s1_axis_tready,
     input                                  s1_axis_tlast,
 
-    input [C_S_AXIS_DATA_WIDTH-1:0]        s2_axis_tdata,
-    input [((C_S_AXIS_DATA_WIDTH/8))-1:0]  s2_axis_tkeep,
-    input [C_S_AXIS_TUSER_WIDTH-1:0]       s2_axis_tuser,
-    input                                  s2_axis_tvalid,
-    output                                 s2_axis_tready,
-    input                                  s2_axis_tlast
-    );
+   );
 
    // -- Internal Parameters
    localparam NUM_RW_REGS = 3*C_NUM_QUEUES;
@@ -134,6 +122,14 @@ module osnt_rate_limiter
    genvar                                    i;
 
    wire [NUM_RW_REGS*C_S_AXI_DATA_WIDTH-1:0] rw_regs;
+
+//REG0 software reset q0	(0x0000)
+//REG1 enable rl q0		(0x0004)
+//REG2 rl in bits q0		(0x0008)
+//REG3 software reset q1	(0x000c)
+//REG4 enable rl q1		(0x0010)
+//REG5 rl in bits q1		(0x0014)
+
 
    wire                                      sw_rst[0:C_NUM_QUEUES-1];
    wire                                      rate_lim_en[0:C_NUM_QUEUES-1];
@@ -151,19 +147,6 @@ module osnt_rate_limiter
    wire [`REG_CTRL4_BITS]                    cpu2ip_ctrl4;
    wire [`REG_CTRL5_BITS]                    ip2cpu_ctrl5;
    wire [`REG_CTRL5_BITS]                    cpu2ip_ctrl5;
-   wire [`REG_CTRL6_BITS]                    ip2cpu_ctrl6;
-   wire [`REG_CTRL6_BITS]                    cpu2ip_ctrl6;
-   wire [`REG_CTRL7_BITS]                    ip2cpu_ctrl7;
-   wire [`REG_CTRL7_BITS]                    cpu2ip_ctrl7;
-   wire [`REG_CTRL8_BITS]                    ip2cpu_ctrl8;
-   wire [`REG_CTRL8_BITS]                    cpu2ip_ctrl8;
-   wire [`REG_CTRL9_BITS]                    ip2cpu_ctrl9;
-   wire [`REG_CTRL9_BITS]                    cpu2ip_ctrl9;
-   wire [`REG_CTRL10_BITS]                   ip2cpu_ctrl10;
-   wire [`REG_CTRL10_BITS]                   cpu2ip_ctrl10;
-   wire [`REG_CTRL11_BITS]                   ip2cpu_ctrl11;
-   wire [`REG_CTRL11_BITS]                   cpu2ip_ctrl11;
-
 
    // -- Register assignments
 
@@ -252,43 +235,7 @@ module osnt_rate_limiter
         );
       end
 
-      if (C_NUM_QUEUES > 2) begin : _rlim_2
-     rate_limiter #
-       (
-        .C_M_AXIS_DATA_WIDTH  ( C_M_AXIS_DATA_WIDTH ),
-        .C_S_AXIS_DATA_WIDTH  ( C_S_AXIS_DATA_WIDTH ),
-        .C_M_AXIS_TUSER_WIDTH ( C_M_AXIS_TUSER_WIDTH ),
-        .C_S_AXIS_TUSER_WIDTH ( C_S_AXIS_TUSER_WIDTH ),
-        .C_S_AXI_DATA_WIDTH   ( C_S_AXI_DATA_WIDTH )
-        )
-     _inst
-       (
-        // Global Ports
-        .axi_aclk             ( axis_aclk ),
-        .axi_aresetn          ( axis_aresetn ),
-
-        // Master Stream Ports (interface to data path)
-        .m_axis_tdata         ( m2_axis_tdata ),
-        .m_axis_tstrb         ( m2_axis_tkeep ),
-        .m_axis_tuser         ( m2_axis_tuser ),
-        .m_axis_tvalid        ( m2_axis_tvalid ),
-        .m_axis_tready        ( m2_axis_tready ),
-        .m_axis_tlast         ( m2_axis_tlast ),
-
-        // Slave Stream Ports (interface to RX queues)
-        .s_axis_tdata         ( s2_axis_tdata ),
-        .s_axis_tstrb         ( s2_axis_tkeep ),
-        .s_axis_tuser         ( s2_axis_tuser ),
-        .s_axis_tvalid        ( s2_axis_tvalid ),
-        .s_axis_tready        ( s2_axis_tready ),
-        .s_axis_tlast         ( s2_axis_tlast ),
-
-        .sw_rst               ( sw_rst[2] ),
-        .rate_lim_en          ( rate_lim_en[2] ),
-        .rate_in_bits         ( rate_in_bits[2] )
-        );
-      end
-   endgenerate
+  endgenerate
 
    assign ip2cpu_ctrl0 = cpu2ip_ctrl0;
    assign ip2cpu_ctrl1 = cpu2ip_ctrl1;
@@ -296,12 +243,6 @@ module osnt_rate_limiter
    assign ip2cpu_ctrl3 = cpu2ip_ctrl3;
    assign ip2cpu_ctrl4 = cpu2ip_ctrl4;
    assign ip2cpu_ctrl5 = cpu2ip_ctrl5;
-   assign ip2cpu_ctrl6 = cpu2ip_ctrl6;
-   assign ip2cpu_ctrl7 = cpu2ip_ctrl7;
-   assign ip2cpu_ctrl8 = cpu2ip_ctrl8;
-   assign ip2cpu_ctrl9 = cpu2ip_ctrl9;
-   assign ip2cpu_ctrl10 = cpu2ip_ctrl10;
-   assign ip2cpu_ctrl11 = cpu2ip_ctrl11;
 
    assign rw_regs[C_S_AXI_DATA_WIDTH * 1 - 1:C_S_AXI_DATA_WIDTH * 0] = cpu2ip_ctrl0;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 2 - 1:C_S_AXI_DATA_WIDTH * 1] = cpu2ip_ctrl1;
@@ -309,12 +250,6 @@ module osnt_rate_limiter
    assign rw_regs[C_S_AXI_DATA_WIDTH * 4 - 1:C_S_AXI_DATA_WIDTH * 3] = cpu2ip_ctrl3;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 5 - 1:C_S_AXI_DATA_WIDTH * 4] = cpu2ip_ctrl4;
    assign rw_regs[C_S_AXI_DATA_WIDTH * 6 - 1:C_S_AXI_DATA_WIDTH * 5] = cpu2ip_ctrl5;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 7 - 1:C_S_AXI_DATA_WIDTH * 6] = cpu2ip_ctrl6;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 8 - 1:C_S_AXI_DATA_WIDTH * 7] = cpu2ip_ctrl7;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 9 - 1:C_S_AXI_DATA_WIDTH * 8] = cpu2ip_ctrl8;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 10 - 1:C_S_AXI_DATA_WIDTH * 9] = cpu2ip_ctrl9;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 11 - 1:C_S_AXI_DATA_WIDTH * 10] = cpu2ip_ctrl10;
-   assign rw_regs[C_S_AXI_DATA_WIDTH * 12 - 1:C_S_AXI_DATA_WIDTH * 11] = cpu2ip_ctrl11;    
 
    rate_limiter_cpu_regs #
      (
@@ -344,18 +279,6 @@ module osnt_rate_limiter
     .cpu2ip_ctrl4_reg(cpu2ip_ctrl4),
     .ip2cpu_ctrl5_reg(ip2cpu_ctrl5),
     .cpu2ip_ctrl5_reg(cpu2ip_ctrl5),
-    .ip2cpu_ctrl6_reg(ip2cpu_ctrl6),
-    .cpu2ip_ctrl6_reg(cpu2ip_ctrl6),
-    .ip2cpu_ctrl7_reg(ip2cpu_ctrl7),
-    .cpu2ip_ctrl7_reg(cpu2ip_ctrl7),
-    .ip2cpu_ctrl8_reg(ip2cpu_ctrl8),
-    .cpu2ip_ctrl8_reg(cpu2ip_ctrl8),
-    .ip2cpu_ctrl9_reg(ip2cpu_ctrl9),
-    .cpu2ip_ctrl9_reg(cpu2ip_ctrl9),
-    .ip2cpu_ctrl10_reg(ip2cpu_ctrl10),
-    .cpu2ip_ctrl10_reg(cpu2ip_ctrl10),
-    .ip2cpu_ctrl11_reg(ip2cpu_ctrl11),
-    .cpu2ip_ctrl11_reg(cpu2ip_ctrl11),
 
     // AXI Lite ports
     .S_AXI_ACLK(s_axi_aclk),

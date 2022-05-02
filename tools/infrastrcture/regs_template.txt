@@ -1378,14 +1378,14 @@ def write_h(hFile,regsDict,memsDict):
    #Registers offset definitions\n\n');
    
    for entry in regsDict:
-      hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_OFFSET 0x'+entry['addr'][4:]+'\n');
-      hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
-      hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_WIDTH '+entry['width']+'\n');
+      hFile.write('#define NFPLUS_'+block_name+'_'+entry['name'].upper()+'_0_OFFSET 0x'+entry['addr'][4:]+'\n');
+      hFile.write('#define NFPLUS_'+block_name+'_'+entry['name'].upper()+'_0_DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
+      hFile.write('#define NFPLUS_'+block_name+'_'+entry['name'].upper()+'_0_WIDTH '+entry['width']+'\n');
 
    for entry in memsDict:
-     hFile.write('#define SUME_'+block_name+'_MEM_'+entry['name'].upper()+'_0_WIDTH '+entry['width']+'\n');
-     hFile.write('#define SUME_'+block_name+'_MEM_'+entry['name'].upper()+'_0_DEPTH '+str(2**(int(entry['addr_bits'].split(':')[0])+1))+'\n');
-     hFile.write('#define SUME_'+block_name+'_MEM_'+entry['name'].upper()+'_0_ADDRESS 0x'+entry['address'].split("'h")[-1]+'\n');
+     hFile.write('#define NFPLUS_'+block_name+'_MEM_'+entry['name'].upper()+'_0_WIDTH '+entry['width']+'\n');
+     hFile.write('#define NFPLUS_'+block_name+'_MEM_'+entry['name'].upper()+'_0_DEPTH '+str(2**(int(entry['addr_bits'].split(':')[0])+1))+'\n');
+     hFile.write('#define NFPLUS_'+block_name+'_MEM_'+entry['name'].upper()+'_0_ADDRESS 0x'+entry['address'].split("'h")[-1]+'\n');
 
 #end of write_h
 
@@ -1413,14 +1413,14 @@ def write_tcl(tclFile,regsDict,memsDict):
 
 def write_tb(tbFile,regsDict,memsDict):
    for entry in regsDict:
-      tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' OFFSET 0x'+entry['addr'][4:]+'\n');
-      tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
-      tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' WIDTH '+entry['width']+'\n');
+      tbFile.write('#define NFPLUS '+block_name+' '+entry['name'].upper()+' OFFSET 0x'+entry['addr'][4:]+'\n');
+      tbFile.write('#define NFPLUS '+block_name+' '+entry['name'].upper()+' DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
+      tbFile.write('#define NFPLUS '+block_name+' '+entry['name'].upper()+' WIDTH '+entry['width']+'\n');
 
    for entry in memsDict:
-      tbFile.write('#define  SUME '+block_name+' MEM_'+entry['name'].upper()+' WIDTH '+entry['width']+'\n');
-      tbFile.write('#define  SUME '+block_name+' MEM_'+entry['name'].upper()+' DEPTH '+str(2**(int(entry['addr_bits'].split(':')[0])+1))+'\n');
-      tbFile.write('#define  SUME '+block_name+' MEM_'+entry['name'].upper()+' ADDRESS 0x'+entry['address'].split("'h")[-1]+'\n');
+      tbFile.write('#define  NFPLUS '+block_name+' MEM_'+entry['name'].upper()+' WIDTH '+entry['width']+'\n');
+      tbFile.write('#define  NFPLUS '+block_name+' MEM_'+entry['name'].upper()+' DEPTH '+str(2**(int(entry['addr_bits'].split(':')[0])+1))+'\n');
+      tbFile.write('#define  NFPLUS '+block_name+' MEM_'+entry['name'].upper()+' ADDRESS 0x'+entry['address'].split("'h")[-1]+'\n');
 #end of write_tb
 
 ##################################################################

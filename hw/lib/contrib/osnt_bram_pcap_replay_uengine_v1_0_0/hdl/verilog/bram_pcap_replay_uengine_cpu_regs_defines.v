@@ -39,131 +39,71 @@
 
 
 `define  REG_CTRL0_BITS				31:0
-`define  REG_CTRL0_WIDTH				32
-`define  REG_CTRL0_DEFAULT				32'h0
+`define  REG_CTRL0_WIDTH			32
+`define  REG_CTRL0_DEFAULT			32'h0
 `define  REG_CTRL0_ADDR				32'h0
 
 `define  REG_CTRL1_BITS				31:0
-`define  REG_CTRL1_WIDTH				32
-`define  REG_CTRL1_DEFAULT				32'h0
+`define  REG_CTRL1_WIDTH			32
+`define  REG_CTRL1_DEFAULT			32'h0
 `define  REG_CTRL1_ADDR				32'h4
 
 `define  REG_CTRL2_BITS				31:0
-`define  REG_CTRL2_WIDTH				32
-`define  REG_CTRL2_DEFAULT				32'h0
+`define  REG_CTRL2_WIDTH			32
+`define  REG_CTRL2_DEFAULT			32'h0
 `define  REG_CTRL2_ADDR				32'h8
 
 `define  REG_CTRL3_BITS				31:0
-`define  REG_CTRL3_WIDTH				32
-`define  REG_CTRL3_DEFAULT				32'h0
+`define  REG_CTRL3_WIDTH			32
+`define  REG_CTRL3_DEFAULT			32'h0
 `define  REG_CTRL3_ADDR				32'hC
 
 `define  REG_CTRL4_BITS				31:0
-`define  REG_CTRL4_WIDTH				32
-`define  REG_CTRL4_DEFAULT				32'h0
+`define  REG_CTRL4_WIDTH			32
+`define  REG_CTRL4_DEFAULT			32'h0
 `define  REG_CTRL4_ADDR				32'h10
 
 `define  REG_CTRL5_BITS				31:0
-`define  REG_CTRL5_WIDTH				32
-`define  REG_CTRL5_DEFAULT				32'h0
+`define  REG_CTRL5_WIDTH			32
+`define  REG_CTRL5_DEFAULT			32'h0
 `define  REG_CTRL5_ADDR				32'h14
 
 `define  REG_CTRL6_BITS				31:0
-`define  REG_CTRL6_WIDTH				32
-`define  REG_CTRL6_DEFAULT				32'h0
+`define  REG_CTRL6_WIDTH			32
+`define  REG_CTRL6_DEFAULT			32'h0
 `define  REG_CTRL6_ADDR				32'h18
 
 `define  REG_CTRL7_BITS				31:0
-`define  REG_CTRL7_WIDTH				32
-`define  REG_CTRL7_DEFAULT				32'h0
+`define  REG_CTRL7_WIDTH			32
+`define  REG_CTRL7_DEFAULT			32'h0
 `define  REG_CTRL7_ADDR				32'h1C
 
 `define  REG_CTRL8_BITS				31:0
-`define  REG_CTRL8_WIDTH				32
-`define  REG_CTRL8_DEFAULT				32'h0
+`define  REG_CTRL8_WIDTH			32
+`define  REG_CTRL8_DEFAULT			32'h0
 `define  REG_CTRL8_ADDR				32'h20
 
 `define  REG_CTRL9_BITS				31:0
-`define  REG_CTRL9_WIDTH				32
-`define  REG_CTRL9_DEFAULT				32'h0
+`define  REG_CTRL9_WIDTH			32
+`define  REG_CTRL9_DEFAULT			32'h0
 `define  REG_CTRL9_ADDR				32'h24
 
-`define  REG_CTRL10_BITS				31:0
-`define  REG_CTRL10_WIDTH				32
-`define  REG_CTRL10_DEFAULT				32'h0
-`define  REG_CTRL10_ADDR				32'h28
+`define  REG_CTRL10_BITS			31:0
+`define  REG_CTRL10_WIDTH			32
+`define  REG_CTRL10_DEFAULT			32'h0
+`define  REG_CTRL10_ADDR			32'h28
 
-`define  REG_CTRL11_BITS				31:0
-`define  REG_CTRL11_WIDTH				32
-`define  REG_CTRL11_DEFAULT				32'h0
-`define  REG_CTRL11_ADDR				32'h2C
+`define  REG_CTRL11_BITS			31:0
+`define  REG_CTRL11_WIDTH			32
+`define  REG_CTRL11_DEFAULT			32'h0
+`define  REG_CTRL11_ADDR			32'h2C
 
-`define  REG_CTRL12_BITS				31:0
-`define  REG_CTRL12_WIDTH				32
-`define  REG_CTRL12_DEFAULT				32'h0
-`define  REG_CTRL12_ADDR				32'h30
+`define  REG_CTRL12_BITS			31:0
+`define  REG_CTRL12_WIDTH			32
+`define  REG_CTRL12_DEFAULT			32'h0
+`define  REG_CTRL12_ADDR			32'h30
 
-`define  REG_CTRL13_BITS				31:0
-`define  REG_CTRL13_WIDTH				32
-`define  REG_CTRL13_DEFAULT				32'h0
-`define  REG_CTRL13_ADDR				32'h34
-
-`define  REG_CTRL14_BITS				31:0
-`define  REG_CTRL14_WIDTH				32
-`define  REG_CTRL14_DEFAULT				32'h0
-`define  REG_CTRL14_ADDR				32'h38
-
-`define  REG_CTRL15_BITS				31:0
-`define  REG_CTRL15_WIDTH				32
-`define  REG_CTRL15_DEFAULT				32'h0
-`define  REG_CTRL15_ADDR				32'h3C
-
-`define  REG_CTRL16_BITS				31:0
-`define  REG_CTRL16_WIDTH				32
-`define  REG_CTRL16_DEFAULT				32'h0
-`define  REG_CTRL16_ADDR				32'h40
-
-`define  REG_CTRL17_BITS				31:0
-`define  REG_CTRL17_WIDTH				32
-`define  REG_CTRL17_DEFAULT				32'h0
-`define  REG_CTRL17_ADDR				32'h44
-
-`define  REG_CTRL18_BITS				31:0
-`define  REG_CTRL18_WIDTH				32
-`define  REG_CTRL18_DEFAULT				32'h0
-`define  REG_CTRL18_ADDR				32'h48
-
-`define  REG_CTRL19_BITS				31:0
-`define  REG_CTRL19_WIDTH				32
-`define  REG_CTRL19_DEFAULT				32'h0
-`define  REG_CTRL19_ADDR				32'h4C
-
-`define  REG_CTRL20_BITS				31:0
-`define  REG_CTRL20_WIDTH				32
-`define  REG_CTRL20_DEFAULT				32'h0
-`define  REG_CTRL20_ADDR				32'h50
-
-`define  REG_CTRL21_BITS				31:0
-`define  REG_CTRL21_WIDTH				32
-`define  REG_CTRL21_DEFAULT				32'h0
-`define  REG_CTRL21_ADDR				32'h54
-
-`define  REG_CTRL22_BITS				31:0
-`define  REG_CTRL22_WIDTH				32
-`define  REG_CTRL22_DEFAULT				32'h0
-`define  REG_CTRL22_ADDR				32'h58
-
-`define  REG_CTRL23_BITS				31:0
-`define  REG_CTRL23_WIDTH				32
-`define  REG_CTRL23_DEFAULT				32'h0
-`define  REG_CTRL23_ADDR				32'h5C
-
-`define  REG_CTRL24_BITS				31:0
-`define  REG_CTRL24_WIDTH				32
-`define  REG_CTRL24_DEFAULT				32'h0
-`define  REG_CTRL24_ADDR				32'h60
-
-`define  REG_CTRL25_BITS				31:0
-`define  REG_CTRL25_WIDTH				32
-`define  REG_CTRL25_DEFAULT				32'h0
-`define  REG_CTRL25_ADDR				32'h64
+`define  REG_CTRL13_BITS			31:0
+`define  REG_CTRL13_WIDTH			32
+`define  REG_CTRL13_DEFAULT			32'h0
+`define  REG_CTRL13_ADDR			32'h34
