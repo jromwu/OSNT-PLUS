@@ -97,7 +97,7 @@ set_property constrset constraints [get_runs impl_1]
 #####################################
 update_ip_catalog
 # Extract Metadata
-create_ip -name osnt_extract_metadata -module_name osnt_extract_metadata_ip
+create_ip -name osnt_extract_metadata -vendor NetFPGA -library NetFPGA -module_name osnt_extract_metadata_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
 set_property generate_synth_checkpoint false [get_files osnt_extract_metadata_ip.xci]
