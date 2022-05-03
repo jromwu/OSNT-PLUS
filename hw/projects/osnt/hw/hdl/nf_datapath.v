@@ -630,7 +630,7 @@ module nf_datapath #(
       .S_AXI_ARESETN(axi_resetn)
     );
   //Rate Limiter
-  osnt_rate_limiter_ip  u_osnt_rate_limiter_1  (
+  osnt_rate_limiter_ip  u_osnt_rate_limiter_0  (
       .axis_aclk(axis_aclk),
       .axis_resetn(axis_resetn),
       .m0_axis_tdata (m_axis_0_tdata),
