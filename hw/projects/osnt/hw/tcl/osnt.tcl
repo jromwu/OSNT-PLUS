@@ -133,7 +133,7 @@ set_property generate_synth_checkpoint false [get_files osnt_inter_packet_delay_
 reset_target all [get_ips osnt_inter_packet_delay_ip]
 generate_target all [get_ips osnt_inter_packet_delay_ip]
 # Rate Limiter
-create_ip -name osnt_rate_limiter -vendor NetFPGA -library NetFPGA -module_name osnt_rate_limiter
+create_ip -name osnt_rate_limiter -vendor NetFPGA -library NetFPGA -module_name osnt_rate_limiter_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_rate_limiter_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_rate_limiter_ip]
 set_property generate_synth_checkpoint false [get_files osnt_rate_limiter_ip.xci]
