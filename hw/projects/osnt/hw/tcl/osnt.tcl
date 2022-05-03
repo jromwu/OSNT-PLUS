@@ -157,7 +157,7 @@ generate_target all [get_ips nf_mac_attachment_dma_ip]
 
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -module_name axi_crossbar_0
 set_property -dict [list \
-CONFIG.NUM_MI {3}                            \
+CONFIG.NUM_MI {6}                            \
 CONFIG.PROTOCOL {AXI4LITE}                   \
 CONFIG.CONNECTIVITY_MODE {SASD}              \
 CONFIG.R_REGISTER {1}                        \
@@ -229,9 +229,15 @@ CONFIG.S00_SINGLE_THREAD {1}                 \
 CONFIG.M00_A00_ADDR_WIDTH {16}               \
 CONFIG.M01_A00_ADDR_WIDTH {16}               \
 CONFIG.M02_A00_ADDR_WIDTH {16}               \
+CONFIG.M03_A00_ADDR_WIDTH {16}               \
+CONFIG.M04_A00_ADDR_WIDTH {16}               \
+CONFIG.M05_A00_ADDR_WIDTH {16}               \
 CONFIG.M00_A00_BASE_ADDR {0x0000000000000000}\
 CONFIG.M01_A00_BASE_ADDR {0x0000000000010000}\
-CONFIG.M02_A00_BASE_ADDR {0x0000000000020000}] [get_ips axi_crossbar_0]
+CONFIG.M02_A00_BASE_ADDR {0x0000000000020000}\
+CONFIG.M03_A00_BASE_ADDR {0x0000000000030000}\
+CONFIG.M04_A00_BASE_ADDR {0x0000000000040000}\
+CONFIG.M05_A00_BASE_ADDR {0x0000000000050000}] [get_ips axi_crossbar_0]
 set_property generate_synth_checkpoint false [get_files axi_crossbar_0.xci]
 reset_target all [get_ips axi_crossbar_0]
 generate_target all [get_ips axi_crossbar_0]
@@ -343,10 +349,24 @@ set_property generate_synth_checkpoint false [get_files clk_wiz_1.xci]
 reset_target all [get_ips clk_wiz_1]
 generate_target all [get_ips clk_wiz_1]
 
+create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -module_name axi_bram_ctrl_0
+set_property -dict {
+	CONFIG.PROTOCOL {AXI4LITE}
+	CONFIG.SUPPORTS_NARROW_BURST {0}
+	CONFIG.ECC_TYPE {0}
+	CONFIG.MEM_DEPTH {524288}
+	CONFIG.READ_LATENCY {1}
+	CONFIG.SINGLE_PORT_BRAM {1}
+	CONFIG.RD_CMD_OPTIMIZATION {1}
+} [get_ips axi_bram_ctrl_0]
+set_property generate_synth_checkpoint false [get_files  axi_bram_ctrl_0.xci]
+reset_target all [get_ips axi_bram_ctrl_0]
+generate_target all [get_ips axi_bram_ctrl_0]
+
 read_verilog     "./hdl/nf_datapath.v"
 read_verilog -sv "./hdl/top_wrapper.sv"
 read_verilog -sv "./hdl/osnt_attachment.sv"
-read_verilog     "${public_repo_dir}/common/hdl/top.v"
+read_verilog     "./hdl/top.v"
 
 #Setting Synthesis options
 create_run -flow {Vivado Synthesis 2020} synth
