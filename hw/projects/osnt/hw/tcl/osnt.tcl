@@ -96,6 +96,13 @@ set_property constrset constraints [get_runs impl_1]
 # Project 
 #####################################
 update_ip_catalog
+# Extract Metadata
+create_ip -name osnt_extract_metadata -module_name osnt_extract_metadata_ip
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
+set_property generate_synth_checkpoint false [get_files osnt_extract_metadata_ip.xci]
+reset_target all [get_ips osnt_extract_metadata_ip]
+generate_target all [get_ips osnt_extract_metadata_ip]
 # OPL
 create_ip -name nic_output_port_lookup -vendor NetFPGA -library NetFPGA -module_name nic_output_port_lookup_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nic_output_port_lookup_ip]
