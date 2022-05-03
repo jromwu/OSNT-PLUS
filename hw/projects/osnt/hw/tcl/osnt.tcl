@@ -120,6 +120,11 @@ set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_bram
 set_property generate_synth_checkpoint false [get_files osnt_bram_pcap_replay_uengine_ip.xci]
 reset_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
 generate_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
+# BRAM memory
+create_ip -name osnt_bram -vendor NetFPGA -library NetFPGA -module_name osnt_bram_ip
+set_property generate_synth_checkpoint false [get_files osnt_bram_ip.xci]
+reset_target all [get_ips osnt_bram_ip]
+generate_target all [get_ips osnt_bram_ip]
 # Inter Packet Delay
 create_ip -name osnt_inter_packet_delay -vendor NetFPGA -library NetFPGA -module_name osnt_inter_packet_delay_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
