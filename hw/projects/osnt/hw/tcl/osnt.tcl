@@ -150,7 +150,7 @@ generate_target all [get_ips nf_mac_attachment_dma_ip]
 
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -module_name axi_crossbar_0
 set_property -dict [list \
-CONFIG.NUM_MI {6}                            \
+CONFIG.NUM_MI {12}                           \
 CONFIG.PROTOCOL {AXI4LITE}                   \
 CONFIG.CONNECTIVITY_MODE {SASD}              \
 CONFIG.R_REGISTER {1}                        \
@@ -225,12 +225,24 @@ CONFIG.M02_A00_ADDR_WIDTH {16}               \
 CONFIG.M03_A00_ADDR_WIDTH {16}               \
 CONFIG.M04_A00_ADDR_WIDTH {16}               \
 CONFIG.M05_A00_ADDR_WIDTH {16}               \
+CONFIG.M06_A00_ADDR_WIDTH {16}               \
+CONFIG.M07_A00_ADDR_WIDTH {16}               \
+CONFIG.M08_A00_ADDR_WIDTH {16}               \
+CONFIG.M09_A00_ADDR_WIDTH {16}               \
+CONFIG.M10_A00_ADDR_WIDTH {16}               \
+CONFIG.M11_A00_ADDR_WIDTH {16}               \
 CONFIG.M00_A00_BASE_ADDR {0x0000000000000000}\
 CONFIG.M01_A00_BASE_ADDR {0x0000000000010000}\
 CONFIG.M02_A00_BASE_ADDR {0x0000000000020000}\
 CONFIG.M03_A00_BASE_ADDR {0x0000000000030000}\
 CONFIG.M04_A00_BASE_ADDR {0x0000000000040000}\
-CONFIG.M05_A00_BASE_ADDR {0x0000000000050000}] [get_ips axi_crossbar_0]
+CONFIG.M05_A00_BASE_ADDR {0x0000000000050000}\
+CONFIG.M06_A00_BASE_ADDR {0x0000000000060000}\
+CONFIG.M07_A00_BASE_ADDR {0x0000000000070000}\
+CONFIG.M08_A00_BASE_ADDR {0x0000000000080000}\
+CONFIG.M09_A00_BASE_ADDR {0x0000000000090000}\
+CONFIG.M10_A00_BASE_ADDR {0x00000000000a0000}\
+CONFIG.M11_A00_BASE_ADDR {0x00000000000b0000}] [get_ips axi_crossbar_0]
 set_property generate_synth_checkpoint false [get_files axi_crossbar_0.xci]
 reset_target all [get_ips axi_crossbar_0]
 generate_target all [get_ips axi_crossbar_0]
