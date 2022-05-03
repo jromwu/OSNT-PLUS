@@ -38,6 +38,12 @@ set DEF_LIST {
 	{OUTPUT_QUEUES 0 1 std/output_queues_v1_0_0/data/output_queues_regs_defines.txt} \
 	{OUTPUT_PORT_LOOKUP 0 1 std/nic_output_port_lookup_v1_0_0/data/output_port_lookup_regs_defines.txt} \
 	{PKT_CUTTER 0 1 contrib/osnt_packet_cutter_v1_0_0/data/packet_cutter_regs_defines.txt} \
+	{EXTRACT_METADATA 0 1 contrib/osnt_extract_metadata_v1_0_0/data/extract_metadata_regs_defines.txt} \
+	{PCAP_REPLAY 0 1 contrib/osnt_bram_pcap_replay_uengine_v1_0_0/data/bram_pcap_replay_uengine_regs_defines.txt} \
+	{INTER_PACKET_DELAY 0 1 contrib/osnt_packet_cutter_v1_0_0/data/packet_cutter_regs_defines.txt} \
+	{INTER_PACKET_DELAY 1 1 contrib/osnt_packet_cutter_v1_0_0/data/packet_cutter_regs_defines.txt} \
+	{RATE_LIMITER 0 1 contrib/osnt_rate_limiter_v1_0_0/data/rate_limiter_regs_defines.txt} \
+	{RATE_LIMITER 1 1 contrib/osnt_rate_limiter_v1_0_0/data/rate_limiter_regs_defines.txt} \
 }
 
 set pwd_dir [pwd]
@@ -47,7 +53,6 @@ foreach file_name $DEF_LIST {
 	puts $file_path
 	puts $::env(NFPLUS_FOLDER)/hw/lib/$dir_path
 	if {[file exists $::env(NFPLUS_FOLDER)/hw/lib/$dir_path]} {
-
 		if {![file exists $::env(NFPLUS_FOLDER)/hw/lib/$file_path] && [file exists $::env(NFPLUS_FOLDER)/hw/lib/$dir_path/module_generation.csv]} {
 			cd $::env(NFPLUS_FOLDER)/hw/lib/$dir_path
 			exec cp $::env(NFPLUS_FOLDER)/tools/infrastructure/regs_template.txt .
