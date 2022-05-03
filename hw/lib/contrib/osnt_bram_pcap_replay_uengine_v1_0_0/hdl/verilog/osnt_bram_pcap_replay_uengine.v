@@ -96,14 +96,14 @@ module osnt_bram_pcap_replay_uengine
   output                                                s_axis_tready,
   input                                                 s_axis_tlast,
 
-  output                                                clka0,
+//  output                                                clka0,
   output         [MEM_DEPTH-1:0]                        addra0,
   output                                                ena0,
   output                                                wea0,
   output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta0,
   input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina0,
 
-  output                                                clka1,
+//  output                                                clka1,
   output         [MEM_DEPTH-1:0]                        addra1,
   output                                                ena1,
   output                                                wea1,
@@ -431,8 +431,8 @@ always @(posedge axis_aclk)
       r_mem_wr_data[1]  <= tmp1_data;
    end
 
-assign clka0 = axis_aclk;
-assign clka1 = axis_aclk;
+//assign clka0 = axis_aclk;
+//assign clka1 = axis_aclk;
 
 assign addra0 = (r_mem_wren[0]) ? {r_mem_wr_addr[0], 6'b0} : {r_mem_rd_addr[0], 6'b0};
 assign addra1 = (r_mem_wren[1]) ? {r_mem_wr_addr[1], 6'b0} : {r_mem_rd_addr[1], 6'b0};
