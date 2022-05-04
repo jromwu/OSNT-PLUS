@@ -185,7 +185,7 @@ generate_target all [get_ips osnt_mac_attachment_ip]
 # MAC (DMA)
 create_ip -name nf_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_dma_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH 512 [get_ips nf_mac_attachment_dma_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_dma_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips nf_mac_attachment_dma_ip]
 set_property CONFIG.C_DEFAULT_VALUE_ENABLE 0 [get_ips nf_mac_attachment_dma_ip]
 set_property generate_synth_checkpoint false [get_files nf_mac_attachment_dma_ip.xci]
 reset_target all [get_ips nf_mac_attachment_dma_ip]
