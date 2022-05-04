@@ -100,15 +100,15 @@ module osnt_bram_pcap_replay_uengine
   output         [MEM_DEPTH-1:0]                        addra0,
   output                                                ena0,
   output                                                wea0,
-  output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta0,
-  input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina0,
+  output         [(C_S_AXI_DATA_WIDTH*25)-1:0]          douta0,
+  input          [(C_S_AXI_DATA_WIDTH*25)-1:0]          dina0,
 
 //  output                                                clka1,
   output         [MEM_DEPTH-1:0]                        addra1,
   output                                                ena1,
   output                                                wea1,
-  output         [(C_S_AXI_DATA_WIDTH*16)-1:0]          douta1,
-  input          [(C_S_AXI_DATA_WIDTH*16)-1:0]          dina1,
+  output         [(C_S_AXI_DATA_WIDTH*25)-1:0]          douta1,
+  input          [(C_S_AXI_DATA_WIDTH*25)-1:0]          dina1,
 
   output                                                replay_start_out,
   input                                                 replay_start_in
@@ -127,7 +127,7 @@ function integer log2;
 endfunction//log2
 
 // tvalid, tlast, tuser, tkeep, tdata
-localparam MEM_NILL_BIT_NO = (C_S_AXI_DATA_WIDTH*16) - (1 + 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH);
+localparam MEM_NILL_BIT_NO = (C_S_AXI_DATA_WIDTH*25) - (1 + 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH);
 localparam MEM_TLAST_POS = C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH;
 localparam MEM_TVALID_POS = 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH;
 
@@ -205,25 +205,25 @@ wire  [C_S_AXI_DATA_WIDTH-1:0]                     conf_path;
 
 localparam  PCAP_DATA_WIDTH = 1 + C_M_AXIS_TUSER_WIDTH + (C_M_AXIS_DATA_WIDTH/8) + C_M_AXIS_DATA_WIDTH;
 
-reg   r_wr_clear;
-reg   [MEM_DEPTH-6-1:0]   r_mem_wr_addr[0:NUM_QUEUES-1];
-reg   [(C_S_AXI_DATA_WIDTH*16)-1:0]    r_mem_wr_data[0:NUM_QUEUES-1];
-reg   [NUM_QUEUES-1:0]        r_mem_wren;
-reg   [3:0]    r_mem_wr_sel;
+reg                                 r_wr_clear;
+reg   [MEM_DEPTH-6-1:0]             r_mem_wr_addr[0:NUM_QUEUES-1];
+reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] r_mem_wr_data[0:NUM_QUEUES-1];
+reg   [NUM_QUEUES-1:0]              r_mem_wren;
+reg   [3:0]                         r_mem_wr_sel;
 
-reg   [MEM_DEPTH-6-1:0]   tmp0_addr, tmp0_addr_next;
-reg   [(C_S_AXI_DATA_WIDTH*16)-1:0]    tmp0_data;
-reg   [NUM_QUEUES-1:0]        tmp0_we;
+reg   [MEM_DEPTH-6-1:0]             tmp0_addr, tmp0_addr_next;
+reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] tmp0_data;
+reg   [NUM_QUEUES-1:0]              tmp0_we;
 
-reg   [MEM_DEPTH-6-1:0]   tmp1_addr, tmp1_addr_next;
-reg   [(C_S_AXI_DATA_WIDTH*16)-1:0]    tmp1_data;
-reg   [NUM_QUEUES-1:0]        tmp1_we;
+reg   [MEM_DEPTH-6-1:0]             tmp1_addr, tmp1_addr_next;
+reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] tmp1_data;
+reg   [NUM_QUEUES-1:0]              tmp1_we;
 
-reg   r_rd_clear;
-reg   [MEM_DEPTH-6-1:0]   r_mem_rd_addr[0:NUM_QUEUES-1], r_mem_rd_addr_next[0:NUM_QUEUES-1];
-reg   [(C_S_AXI_DATA_WIDTH*16)-1:0]    r_mem_rd_data[0:NUM_QUEUES-1];
-reg   [NUM_QUEUES-1:0]        r_mem_rden;
-reg   [3:0]    r_mem_rd_sel;
+reg                                 r_rd_clear;
+reg   [MEM_DEPTH-6-1:0]             r_mem_rd_addr[0:NUM_QUEUES-1], r_mem_rd_addr_next[0:NUM_QUEUES-1];
+reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] r_mem_rd_data[0:NUM_QUEUES-1];
+reg   [NUM_QUEUES-1:0]              r_mem_rden;
+reg   [3:0]                         r_mem_rd_sel;
 
 reg   [NUM_QUEUES-1:0]  fifo_rden;
 wire  [NUM_QUEUES-1:0]  fifo_empty;
