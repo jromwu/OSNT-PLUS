@@ -42,6 +42,7 @@ set_param synth.elaboration.rodinMoreOptions "rt::set_parameter max_loop_limit 2
 # Design Parameters on NF_DATAPATH
 #####################################
 set datapath_width_bit    1024
+set tx_datapath_width_bit 512
 set timestamp_width_bit   64
 set datapath_freq_mhz     250
 #####################################
@@ -101,22 +102,22 @@ update_ip_catalog
 #--------------------------
 # Extract Metadata
 create_ip -name osnt_extract_metadata -vendor NetFPGA -library NetFPGA -module_name osnt_extract_metadata_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_extract_metadata_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_extract_metadata_ip]
 set_property generate_synth_checkpoint false [get_files osnt_extract_metadata_ip.xci]
 reset_target all [get_ips osnt_extract_metadata_ip]
 generate_target all [get_ips osnt_extract_metadata_ip]
 # NIC OPL
 create_ip -name nic_output_port_lookup -vendor NetFPGA -library NetFPGA -module_name nic_output_port_lookup_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nic_output_port_lookup_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nic_output_port_lookup_ip]
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips nic_output_port_lookup_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips nic_output_port_lookup_ip]
 set_property generate_synth_checkpoint false [get_files nic_output_port_lookup_ip.xci]
 reset_target all [get_ips nic_output_port_lookup_ip]
 generate_target all [get_ips nic_output_port_lookup_ip]
 # PCAP REPLY
 create_ip -name osnt_bram_pcap_replay_uengine -vendor NetFPGA -library NetFPGA -module_name osnt_bram_pcap_replay_uengine_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_bram_pcap_replay_uengine_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_bram_pcap_replay_uengine_ip]
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_bram_pcap_replay_uengine_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_bram_pcap_replay_uengine_ip]
 set_property generate_synth_checkpoint false [get_files osnt_bram_pcap_replay_uengine_ip.xci]
 reset_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
 generate_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
@@ -127,15 +128,15 @@ reset_target all [get_ips osnt_bram_ip]
 generate_target all [get_ips osnt_bram_ip]
 # Inter Packet Delay
 create_ip -name osnt_inter_packet_delay -vendor NetFPGA -library NetFPGA -module_name osnt_inter_packet_delay_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
 set_property generate_synth_checkpoint false [get_files osnt_inter_packet_delay_ip.xci]
 reset_target all [get_ips osnt_inter_packet_delay_ip]
 generate_target all [get_ips osnt_inter_packet_delay_ip]
 # Rate Limiter
 create_ip -name osnt_rate_limiter -vendor NetFPGA -library NetFPGA -module_name osnt_rate_limiter_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_rate_limiter_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_rate_limiter_ip]
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_rate_limiter_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_rate_limiter_ip]
 set_property generate_synth_checkpoint false [get_files osnt_rate_limiter_ip.xci]
 reset_target all [get_ips osnt_rate_limiter_ip]
 generate_target all [get_ips osnt_rate_limiter_ip]
