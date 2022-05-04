@@ -177,29 +177,29 @@ wire  [NUM_RW_REGS*C_S_AXI_DATA_WIDTH:0]           rw_regs;
 //REG12 wr_done q1	(0x0030)
 //REG13 conf_path	(0x0034)
 
-wire                                               sw_rst;
+wire                            sw_rst;
 
-wire  [QDR_ADDR_WIDTH-1:0]                         q0_addr_low;
-wire  [QDR_ADDR_WIDTH-1:0]                         q0_addr_high;
-wire  [QDR_ADDR_WIDTH-1:0]                         q1_addr_low;
-wire  [QDR_ADDR_WIDTH-1:0]                         q1_addr_high;
+wire  [QDR_ADDR_WIDTH-1:0]      q0_addr_low;  // not used
+wire  [QDR_ADDR_WIDTH-1:0]      q0_addr_high; // not used
+wire  [QDR_ADDR_WIDTH-1:0]      q1_addr_low;  // not used
+wire  [QDR_ADDR_WIDTH-1:0]      q1_addr_high; // not used
 
-wire                                               q0_enable;
-wire                                               q1_enable;
+wire                            q0_enable;
+wire                            q1_enable;
 
-wire                                               q0_wr_done;
-wire                                               q1_wr_done;
+wire                            q0_wr_done;
+wire                            q1_wr_done;
                                                   
-wire  [REPLAY_COUNT_WIDTH-1:0]                     q0_replay_count;
-wire  [REPLAY_COUNT_WIDTH-1:0]                     q1_replay_count;
+wire  [REPLAY_COUNT_WIDTH-1:0]  q0_replay_count;
+wire  [REPLAY_COUNT_WIDTH-1:0]  q1_replay_count;
 
-reg   [REPLAY_COUNT_WIDTH-1:0]                     q0_count, q0_count_next;
-reg   [REPLAY_COUNT_WIDTH-1:0]                     q1_count, q1_count_next;
+reg   [REPLAY_COUNT_WIDTH-1:0]  q0_count, q0_count_next;
+reg   [REPLAY_COUNT_WIDTH-1:0]  q1_count, q1_count_next;
                                                  
-wire                                               q0_start_replay;
-wire                                               q1_start_replay;
+wire                            q0_start_replay;
+wire                            q1_start_replay;
 
-wire  [C_S_AXI_DATA_WIDTH-1:0]                     conf_path;
+wire  [C_S_AXI_DATA_WIDTH-1:0]  conf_path;
 
 // ------------- Regs/ wires -----------
 
@@ -209,7 +209,7 @@ reg                                 r_wr_clear;
 reg   [MEM_DEPTH-6-1:0]             r_mem_wr_addr[0:NUM_QUEUES-1];
 reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] r_mem_wr_data[0:NUM_QUEUES-1];
 reg   [NUM_QUEUES-1:0]              r_mem_wren;
-reg   [3:0]                         r_mem_wr_sel;
+reg   [3:0]                         r_mem_wr_sel; //not used
 
 reg   [MEM_DEPTH-6-1:0]             tmp0_addr, tmp0_addr_next;
 reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] tmp0_data;
@@ -223,7 +223,7 @@ reg                                 r_rd_clear;
 reg   [MEM_DEPTH-6-1:0]             r_mem_rd_addr[0:NUM_QUEUES-1], r_mem_rd_addr_next[0:NUM_QUEUES-1];
 reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] r_mem_rd_data[0:NUM_QUEUES-1];
 reg   [NUM_QUEUES-1:0]              r_mem_rden;
-reg   [3:0]                         r_mem_rd_sel;
+reg   [3:0]                         r_mem_rd_sel; //not used
 
 reg   [NUM_QUEUES-1:0]  fifo_rden;
 wire  [NUM_QUEUES-1:0]  fifo_empty;
