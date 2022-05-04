@@ -96,6 +96,9 @@ set_property constrset constraints [get_runs impl_1]
 # Project 
 #####################################
 update_ip_catalog
+#--------------------------
+# OSNT TX pipeline
+#--------------------------
 # Extract Metadata
 create_ip -name osnt_extract_metadata -vendor NetFPGA -library NetFPGA -module_name osnt_extract_metadata_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extract_metadata_ip]
@@ -103,28 +106,60 @@ set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_extr
 set_property generate_synth_checkpoint false [get_files osnt_extract_metadata_ip.xci]
 reset_target all [get_ips osnt_extract_metadata_ip]
 generate_target all [get_ips osnt_extract_metadata_ip]
-# OPL
+# NIC OPL
 create_ip -name nic_output_port_lookup -vendor NetFPGA -library NetFPGA -module_name nic_output_port_lookup_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nic_output_port_lookup_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nic_output_port_lookup_ip]
 set_property generate_synth_checkpoint false [get_files nic_output_port_lookup_ip.xci]
 reset_target all [get_ips nic_output_port_lookup_ip]
 generate_target all [get_ips nic_output_port_lookup_ip]
-# input_arbiter
+# PCAP REPLY
+create_ip -name osnt_bram_pcap_replay_uengine -vendor NetFPGA -library NetFPGA -module_name osnt_bram_pcap_replay_uengine_ip
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_bram_pcap_replay_uengine_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_bram_pcap_replay_uengine_ip]
+set_property generate_synth_checkpoint false [get_files osnt_bram_pcap_replay_uengine_ip.xci]
+reset_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
+generate_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
+# BRAM memory
+create_ip -name osnt_bram -vendor NetFPGA -library NetFPGA -module_name osnt_bram_ip
+set_property generate_synth_checkpoint false [get_files osnt_bram_ip.xci]
+reset_target all [get_ips osnt_bram_ip]
+generate_target all [get_ips osnt_bram_ip]
+# Inter Packet Delay
+create_ip -name osnt_inter_packet_delay -vendor NetFPGA -library NetFPGA -module_name osnt_inter_packet_delay_ip
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_inter_packet_delay_ip]
+set_property generate_synth_checkpoint false [get_files osnt_inter_packet_delay_ip.xci]
+reset_target all [get_ips osnt_inter_packet_delay_ip]
+generate_target all [get_ips osnt_inter_packet_delay_ip]
+# Rate Limiter
+create_ip -name osnt_rate_limiter -vendor NetFPGA -library NetFPGA -module_name osnt_rate_limiter_ip
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_rate_limiter_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_rate_limiter_ip]
+set_property generate_synth_checkpoint false [get_files osnt_rate_limiter_ip.xci]
+reset_target all [get_ips osnt_rate_limiter_ip]
+generate_target all [get_ips osnt_rate_limiter_ip]
+#--------------------------
+# OSNT RX pipeline
+#--------------------------
+# Input Arbiter
 create_ip -name input_arbiter -vendor NetFPGA -library NetFPGA -module_name input_arbiter_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips input_arbiter_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips input_arbiter_ip]
 set_property generate_synth_checkpoint false [get_files input_arbiter_ip.xci]
 reset_target all [get_ips input_arbiter_ip]
 generate_target all [get_ips input_arbiter_ip]
-# output_queues
+# Output Queues
 create_ip -name output_queues -vendor NetFPGA -library NetFPGA -module_name output_queues_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips output_queues_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips output_queues_ip]
 set_property generate_synth_checkpoint false [get_files output_queues_ip.xci]
 reset_target all [get_ips output_queues_ip]
 generate_target all [get_ips output_queues_ip]
-
+#--------------------------
+# OSNT shared modules
+#--------------------------
+# DMA/PCIe endpoint
 create_ip -name xilinx_shell -vendor xilinx -library xilinx -module_name xilinx_shell_ip
 set_property CONFIG.MAX_PKT_LEN 1518 [get_ips xilinx_shell_ip]
 set_property CONFIG.NUM_QUEUE 2048 [get_ips xilinx_shell_ip]
@@ -133,20 +168,20 @@ set_property CONFIG.NUM_CMAC_PORT 2 [get_ips xilinx_shell_ip]
 set_property generate_synth_checkpoint false [get_files xilinx_shell_ip.xci]
 reset_target all [get_ips xilinx_shell_ip]
 generate_target all [get_ips xilinx_shell_ip]
-
+# Stamp Counter
 create_ip -name osnt_stamp_counter -vendor NetFPGA -library NetFPGA -module_name osnt_stamp_counter_ip
 set_property CONFIG.TIMESTAMP_WIDTH ${timestamp_width_bit} [get_ips osnt_stamp_counter_ip]
 set_property generate_synth_checkpoint false [get_files osnt_stamp_counter_ip.xci]
 reset_target all [get_ips osnt_stamp_counter_ip]
 generate_target all [get_ips osnt_stamp_counter_ip]
-
+# MAC (physical ports) with RX timestamp
 create_ip -name osnt_mac_attachment -vendor NetFPGA -library NetFPGA -module_name osnt_mac_attachment_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_mac_attachment_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_mac_attachment_ip]
 set_property generate_synth_checkpoint false [get_files osnt_mac_attachment_ip.xci]
 reset_target all [get_ips osnt_mac_attachment_ip]
 generate_target all [get_ips osnt_mac_attachment_ip]
-
+# MAC (DMA)
 create_ip -name nf_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_dma_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH 512 [get_ips nf_mac_attachment_dma_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_dma_ip]
@@ -154,7 +189,7 @@ set_property CONFIG.C_DEFAULT_VALUE_ENABLE 0 [get_ips nf_mac_attachment_dma_ip]
 set_property generate_synth_checkpoint false [get_files nf_mac_attachment_dma_ip.xci]
 reset_target all [get_ips nf_mac_attachment_dma_ip]
 generate_target all [get_ips nf_mac_attachment_dma_ip]
-
+# AXI for memory map
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -module_name axi_crossbar_0
 set_property -dict [list \
 CONFIG.NUM_MI {10}                           \

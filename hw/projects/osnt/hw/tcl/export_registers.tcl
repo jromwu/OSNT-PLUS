@@ -35,7 +35,6 @@
 
 set DEF_LIST {
 	{INPUT_ARBITER 0 1 std/input_arbiter_v1_0_0/data/input_arbiter_regs_defines.txt} \
-	{OUTPUT_QUEUES 0 1 std/output_queues_v1_0_0/data/output_queues_regs_defines.txt} \
 	{OUTPUT_PORT_LOOKUP 0 1 std/nic_output_port_lookup_v1_0_0/data/output_port_lookup_regs_defines.txt} \
 	{PKT_CUTTER 0 1 contrib/osnt_packet_cutter_v1_0_0/data/packet_cutter_regs_defines.txt} \
 	{EXTRACT_METADATA 0 1 contrib/osnt_extract_metadata_v1_0_0/data/extract_metadata_regs_defines.txt} \
