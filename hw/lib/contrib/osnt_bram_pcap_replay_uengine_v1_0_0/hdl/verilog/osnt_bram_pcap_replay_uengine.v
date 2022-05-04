@@ -162,20 +162,20 @@ localparam NUM_RO_REGS = 0;
 // -- Signals
 wire  [NUM_RW_REGS*C_S_AXI_DATA_WIDTH:0]           rw_regs;
 
-//REG0 software reset	(0x0000)
+//REG0 software reset	  (0x0000)
 //REG1 start replay q0	(0x0004)
 //REG2 start replay q1  (0x0008)
 //REG3 replay count q0	(0x000c)
 //REG4 replay count q1	(0x0010)
-//REG5 addr_low q0	(0x0014) note: not used at the moment
-//REG6 addr_high q0	(0x0018) note: not used at the moment
-//REG7 addr_low q1	(0x001c) note: not used at the moment
-//REG8 addr_high q1	(0x0020) note: not used at the moment
-//REG9 enable q0	(0x0024)
-//REG10 enable q1	(0x0028)
-//REG11 wr_done q0	(0x002c)
-//REG12 wr_done q1	(0x0030)
-//REG13 conf_path	(0x0034)
+//REG5 addr_low q0	    (0x0014) note: not used at the moment
+//REG6 addr_high q0	    (0x0018) note: not used at the moment
+//REG7 addr_low q1	    (0x001c) note: not used at the moment
+//REG8 addr_high q1	    (0x0020) note: not used at the moment
+//REG9 enable q0	      (0x0024) note: not used at the moment
+//REG10 enable q1	      (0x0028) note: not used at the moment
+//REG11 wr_done q0	    (0x002c)
+//REG12 wr_done q1	    (0x0030)
+//REG13 conf_path	      (0x0034)
 
 wire                            sw_rst;
 
@@ -184,8 +184,8 @@ wire  [QDR_ADDR_WIDTH-1:0]      q0_addr_high; // not used
 wire  [QDR_ADDR_WIDTH-1:0]      q1_addr_low;  // not used
 wire  [QDR_ADDR_WIDTH-1:0]      q1_addr_high; // not used
 
-wire                            q0_enable;
-wire                            q1_enable;
+wire                            q0_enable; // not used
+wire                            q1_enable; // not used
 
 wire                            q0_wr_done;
 wire                            q1_wr_done;
