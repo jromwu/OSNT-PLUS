@@ -122,7 +122,7 @@ set_property generate_synth_checkpoint false [get_files osnt_bram_pcap_replay_ue
 reset_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
 generate_target all [get_ips osnt_bram_pcap_replay_uengine_ip]
 # BRAM memory
-create_ip -name osnt_bram -vendor NetFPGA -library NetFPGA -module_name osnt_bram_ip
+create_ip -name osnt_bram -version 1.10 -vendor NetFPGA -library NetFPGA -module_name osnt_bram_ip
 set_property generate_synth_checkpoint false [get_files osnt_bram_ip.xci]
 reset_target all [get_ips osnt_bram_ip]
 generate_target all [get_ips osnt_bram_ip]
@@ -393,19 +393,19 @@ set_property generate_synth_checkpoint false [get_files clk_wiz_1.xci]
 reset_target all [get_ips clk_wiz_1]
 generate_target all [get_ips clk_wiz_1]
 
-create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -module_name axi_bram_ctrl_0
-set_property -dict {
-	CONFIG.PROTOCOL {AXI4}
-	CONFIG.DATA_WIDTH {512}
-	CONFIG.ECC_TYPE {0}
-	CONFIG.MEM_DEPTH {16384}
-	CONFIG.READ_LATENCY {1}
-	CONFIG.SINGLE_PORT_BRAM {1}
-	CONFIG.RD_CMD_OPTIMIZATION {1}
-} [get_ips axi_bram_ctrl_0]
-set_property generate_synth_checkpoint false [get_files  axi_bram_ctrl_0.xci]
-reset_target all [get_ips axi_bram_ctrl_0]
-generate_target all [get_ips axi_bram_ctrl_0]
+#create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -module_name axi_bram_ctrl_0
+#set_property -dict {
+#	CONFIG.PROTOCOL {AXI4}
+#	CONFIG.DATA_WIDTH {512}
+#	CONFIG.ECC_TYPE {0}
+#	CONFIG.MEM_DEPTH {16384}
+#	CONFIG.READ_LATENCY {1}
+#	CONFIG.SINGLE_PORT_BRAM {1}
+#	CONFIG.RD_CMD_OPTIMIZATION {1}
+#} [get_ips axi_bram_ctrl_0]
+#set_property generate_synth_checkpoint false [get_files  axi_bram_ctrl_0.xci]
+#reset_target all [get_ips axi_bram_ctrl_0]
+#generate_target all [get_ips axi_bram_ctrl_0]
 
 read_verilog     "./hdl/nf_datapath.v"
 read_verilog -sv "./hdl/top_wrapper.sv"
