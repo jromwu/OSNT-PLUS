@@ -96,19 +96,19 @@ module osnt_bram_pcap_replay_uengine
   output                                                s_axis_tready,
   input                                                 s_axis_tlast,
 
-//  output                                                clka0,
+//  output                                              clka0,
   output         [MEM_DEPTH-1:0]                        addra0,
   output                                                ena0,
   output                                                wea0,
-  output         [(C_S_AXI_DATA_WIDTH*25)-1:0]          douta0,
-  input          [(C_S_AXI_DATA_WIDTH*25)-1:0]          dina0,
+  output         [(C_S_AXI_DATA_WIDTH*23)-1:0]          douta0, // this width has to be consistent with osnt_bram module
+  input          [(C_S_AXI_DATA_WIDTH*23)-1:0]          dina0, // this width has to be consistent with osnt_bram module
 
-//  output                                                clka1,
+//  output                                              clka1,
   output         [MEM_DEPTH-1:0]                        addra1,
   output                                                ena1,
   output                                                wea1,
-  output         [(C_S_AXI_DATA_WIDTH*25)-1:0]          douta1,
-  input          [(C_S_AXI_DATA_WIDTH*25)-1:0]          dina1,
+  output         [(C_S_AXI_DATA_WIDTH*23)-1:0]          douta1, // this width has to be consistent with osnt_bram module
+  input          [(C_S_AXI_DATA_WIDTH*23)-1:0]          dina1, // this width has to be consistent with osnt_bram module
 
   output                                                replay_start_out,
   input                                                 replay_start_in
@@ -127,7 +127,7 @@ function integer log2;
 endfunction//log2
 
 // tvalid, tlast, tuser, tkeep, tdata
-localparam MEM_NILL_BIT_NO = (C_S_AXI_DATA_WIDTH*25) - (1 + 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH);
+localparam MEM_NILL_BIT_NO = (C_S_AXI_DATA_WIDTH*23) - (1 + 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH);
 localparam MEM_TLAST_POS = C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH;
 localparam MEM_TVALID_POS = 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH;
 
@@ -162,20 +162,20 @@ localparam NUM_RO_REGS = 0;
 // -- Signals
 wire  [NUM_RW_REGS*C_S_AXI_DATA_WIDTH:0]           rw_regs;
 
-//REG0 software reset	  (0x0000)
+//REG0 software reset	(0x0000)
 //REG1 start replay q0	(0x0004)
 //REG2 start replay q1  (0x0008)
 //REG3 replay count q0	(0x000c)
 //REG4 replay count q1	(0x0010)
-//REG5 addr_low q0	    (0x0014) note: not used at the moment
-//REG6 addr_high q0	    (0x0018) note: not used at the moment
-//REG7 addr_low q1	    (0x001c) note: not used at the moment
-//REG8 addr_high q1	    (0x0020) note: not used at the moment
-//REG9 enable q0	      (0x0024) note: not used at the moment
-//REG10 enable q1	      (0x0028) note: not used at the moment
-//REG11 wr_done q0	    (0x002c)
-//REG12 wr_done q1	    (0x0030)
-//REG13 conf_path	      (0x0034)
+//REG5 addr_low q0	(0x0014) note: not used at the moment
+//REG6 addr_high q0	(0x0018) note: not used at the moment
+//REG7 addr_low q1	(0x001c) note: not used at the moment
+//REG8 addr_high q1	(0x0020) note: not used at the moment
+//REG9 enable q0	(0x0024) note: not used at the moment
+//REG10 enable q1	(0x0028) note: not used at the moment
+//REG11 wr_done q0	(0x002c)
+//REG12 wr_done q1	(0x0030)
+//REG13 conf_path	(0x0034)
 
 wire                            sw_rst;
 
@@ -205,49 +205,49 @@ wire  [C_S_AXI_DATA_WIDTH-1:0]  conf_path;
 
 localparam  PCAP_DATA_WIDTH = 1 + C_M_AXIS_TUSER_WIDTH + (C_M_AXIS_DATA_WIDTH/8) + C_M_AXIS_DATA_WIDTH;
 
-reg                                 r_wr_clear;
-reg   [MEM_DEPTH-6-1:0]             r_mem_wr_addr[0:NUM_QUEUES-1];
-reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] r_mem_wr_data[0:NUM_QUEUES-1];
-reg   [NUM_QUEUES-1:0]              r_mem_wren;
-reg   [3:0]                         r_mem_wr_sel; //not used
+reg                                	r_wr_clear;
+reg   [MEM_DEPTH-1:0]             	r_mem_wr_addr[0:NUM_QUEUES-1];
+reg   [(C_S_AXI_DATA_WIDTH*23)-1:0] 	r_mem_wr_data[0:NUM_QUEUES-1];
+reg   [NUM_QUEUES-1:0]              	r_mem_wren;
+reg   [3:0]                         	r_mem_wr_sel; //not used
 
-reg   [MEM_DEPTH-6-1:0]             tmp0_addr, tmp0_addr_next;
-reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] tmp0_data;
-reg   [NUM_QUEUES-1:0]              tmp0_we;
+reg   [MEM_DEPTH-1:0]             	tmp0_addr, tmp0_addr_next;
+reg   [(C_S_AXI_DATA_WIDTH*23)-1:0] 	tmp0_data;
+reg   [NUM_QUEUES-1:0]              	tmp0_we;
 
-reg   [MEM_DEPTH-6-1:0]             tmp1_addr, tmp1_addr_next;
-reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] tmp1_data;
-reg   [NUM_QUEUES-1:0]              tmp1_we;
+reg   [MEM_DEPTH-1:0]             	tmp1_addr, tmp1_addr_next;
+reg   [(C_S_AXI_DATA_WIDTH*23)-1:0] 	tmp1_data;
+reg   [NUM_QUEUES-1:0]              	tmp1_we;
 
-reg                                 r_rd_clear;
-reg   [MEM_DEPTH-6-1:0]             r_mem_rd_addr[0:NUM_QUEUES-1], r_mem_rd_addr_next[0:NUM_QUEUES-1];
-reg   [(C_S_AXI_DATA_WIDTH*25)-1:0] r_mem_rd_data[0:NUM_QUEUES-1];
-reg   [NUM_QUEUES-1:0]              r_mem_rden;
-reg   [3:0]                         r_mem_rd_sel; //not used
+reg                                 	r_rd_clear;
+reg   [MEM_DEPTH-1:0]             	r_mem_rd_addr[0:NUM_QUEUES-1], r_mem_rd_addr_next[0:NUM_QUEUES-1];
+reg   [(C_S_AXI_DATA_WIDTH*23)-1:0] 	r_mem_rd_data[0:NUM_QUEUES-1];
+reg   [NUM_QUEUES-1:0]              	r_mem_rden;
+reg   [3:0]                         	r_mem_rd_sel; //not used
 
-reg   [NUM_QUEUES-1:0]  fifo_rden;
-wire  [NUM_QUEUES-1:0]  fifo_empty;
-wire  [NUM_QUEUES-1:0]  fifo_nearly_full;
-reg   [NUM_QUEUES-1:0]  r_fifo_nearly_full;
-wire  [C_M_AXIS_DATA_WIDTH-1:0]        fifo_in_tdata[0:NUM_QUEUES-1];
-wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]    fifo_in_tkeep[0:NUM_QUEUES-1];
-wire  [C_M_AXIS_TUSER_WIDTH-1:0]       fifo_in_tuser[0:NUM_QUEUES-1];
-wire  [NUM_QUEUES-1:0]                 fifo_in_tlast;
-wire  [NUM_QUEUES-1:0]                 fifo_in_tvalid;
+reg   [NUM_QUEUES-1:0]  		fifo_rden;
+wire  [NUM_QUEUES-1:0]  		fifo_empty;
+wire  [NUM_QUEUES-1:0]  		fifo_nearly_full;
+reg   [NUM_QUEUES-1:0]  		r_fifo_nearly_full;
+wire  [C_M_AXIS_DATA_WIDTH-1:0]        	fifo_in_tdata[0:NUM_QUEUES-1];
+wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]    	fifo_in_tkeep[0:NUM_QUEUES-1];
+wire  [C_M_AXIS_TUSER_WIDTH-1:0]       	fifo_in_tuser[0:NUM_QUEUES-1];
+wire  [NUM_QUEUES-1:0]                 	fifo_in_tlast;
+wire  [NUM_QUEUES-1:0]                 	fifo_in_tvalid;
 
-wire  [C_M_AXIS_DATA_WIDTH-1:0]        fifo_out_tdata[0:NUM_QUEUES-1];
-wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]    fifo_out_tkeep[0:NUM_QUEUES-1];
-wire  [C_M_AXIS_TUSER_WIDTH-1:0]       fifo_out_tuser[0:NUM_QUEUES-1];
-wire  [NUM_QUEUES-1:0]                 fifo_out_tlast;
+wire  [C_M_AXIS_DATA_WIDTH-1:0]        	fifo_out_tdata[0:NUM_QUEUES-1];
+wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]    	fifo_out_tkeep[0:NUM_QUEUES-1];
+wire  [C_M_AXIS_TUSER_WIDTH-1:0]       	fifo_out_tuser[0:NUM_QUEUES-1];
+wire  [NUM_QUEUES-1:0]                 	fifo_out_tlast;
 
 wire  [7:0] tuser_src_port = s_axis_tuser[16+:8];
 
-wire  [C_S_AXIS_DATA_WIDTH-1:0]        pre_axis_tdata;
-wire  [((C_S_AXIS_DATA_WIDTH/8))-1:0]  pre_axis_tkeep;
-wire  [C_S_AXIS_TUSER_WIDTH-1:0]       pre_axis_tuser;
-wire                                   pre_axis_tvalid;
-wire                                   pre_axis_tready;
-wire                                   pre_axis_tlast;
+wire  [C_S_AXIS_DATA_WIDTH-1:0]        	pre_axis_tdata;
+wire  [((C_S_AXIS_DATA_WIDTH/8))-1:0]  	pre_axis_tkeep;
+wire  [C_S_AXIS_TUSER_WIDTH-1:0]       	pre_axis_tuser;
+wire                                   	pre_axis_tvalid;
+wire                                   	pre_axis_tready;
+wire                                   	pre_axis_tlast;
 
 wire [`REG_CTRL0_BITS]	ip2cpu_ctrl0;
 wire [`REG_CTRL0_BITS]	cpu2ip_ctrl0;
@@ -434,8 +434,8 @@ always @(posedge axis_aclk)
 //assign clka0 = axis_aclk;
 //assign clka1 = axis_aclk;
 
-assign addra0 = (r_mem_wren[0]) ? {r_mem_wr_addr[0], 6'b0} : {r_mem_rd_addr[0], 6'b0};
-assign addra1 = (r_mem_wren[1]) ? {r_mem_wr_addr[1], 6'b0} : {r_mem_rd_addr[1], 6'b0};
+assign addra0 = (r_mem_wren[0]) ? {r_mem_wr_addr[0]} : {r_mem_rd_addr[0]};
+assign addra1 = (r_mem_wren[1]) ? {r_mem_wr_addr[1]} : {r_mem_rd_addr[1]};
 
 assign ena0 = r_mem_wren[0] | r_mem_rden[0];
 assign ena1 = r_mem_wren[1] | r_mem_rden[1];
