@@ -178,7 +178,7 @@ generate_target all [get_ips osnt_stamp_counter_ip]
 # MAC (physical ports) with RX timestamp
 create_ip -name osnt_mac_attachment -vendor NetFPGA -library NetFPGA -module_name osnt_mac_attachment_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_mac_attachment_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips osnt_mac_attachment_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips osnt_mac_attachment_ip]
 set_property generate_synth_checkpoint false [get_files osnt_mac_attachment_ip.xci]
 reset_target all [get_ips osnt_mac_attachment_ip]
 generate_target all [get_ips osnt_mac_attachment_ip]
