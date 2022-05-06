@@ -30,4 +30,4 @@ all: clean
 	vivado -mode tcl -source osnt_bram_pcap_replay_uengine.tcl 
 
 clean:
-	rm -rf vivado*.* *.xml xgui/ .Xil* pro* xsim* web* xvlog* *blk*
+	rm -rf vivado*.* *.xml xgui/ .Xil* pro* xsim* web* xvlog* *blk* ip_proj/ ip_user_files/
