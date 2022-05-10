@@ -150,13 +150,6 @@ set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips input_arb
 set_property generate_synth_checkpoint false [get_files input_arbiter_ip.xci]
 reset_target all [get_ips input_arbiter_ip]
 generate_target all [get_ips input_arbiter_ip]
-# Output Queues
-create_ip -name output_queues -vendor NetFPGA -library NetFPGA -module_name output_queues_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips output_queues_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips output_queues_ip]
-set_property generate_synth_checkpoint false [get_files output_queues_ip.xci]
-reset_target all [get_ips output_queues_ip]
-generate_target all [get_ips output_queues_ip]
 #--------------------------
 # OSNT shared modules
 #--------------------------
