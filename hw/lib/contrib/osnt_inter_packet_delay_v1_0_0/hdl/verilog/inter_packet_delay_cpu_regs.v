@@ -36,6 +36,7 @@
 //
 // @NETFPGA_LICENSE_HEADER_END@
 //
+`timescale 1ns/1ps
 
 `include "inter_packet_delay_cpu_regs_defines.v"
 module inter_packet_delay_cpu_regs #

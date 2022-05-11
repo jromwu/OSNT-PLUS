@@ -36,6 +36,7 @@
 //
 // @NETFPGA_LICENSE_HEADER_END@
 //
+`timescale 1ns/1ps
 
 `include "bram_pcap_replay_uengine_cpu_regs_defines.v"
 module bram_pcap_replay_uengine_cpu_regs #

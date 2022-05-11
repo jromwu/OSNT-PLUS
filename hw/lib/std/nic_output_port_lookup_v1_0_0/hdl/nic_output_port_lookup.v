@@ -48,7 +48,7 @@
  *        Output port lookup for the reference NIC project
  *
  */
-
+`timescale 1ns/1ps
 
 `include "output_port_lookup_cpu_regs_defines.v"
 

@@ -35,6 +35,7 @@
 //
 // @NETFPGA_LICENSE_HEADER_END@
 //
+`timescale 1ns/1ps
 
 `include "output_port_lookup_cpu_regs_defines.v"
 module output_port_lookup_cpu_regs #
