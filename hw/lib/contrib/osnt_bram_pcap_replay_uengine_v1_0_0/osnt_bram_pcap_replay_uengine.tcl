@@ -31,7 +31,7 @@ set design              osnt_bram_pcap_replay_uengine
 set top                 osnt_bram_pcap_replay_uengine
 set ip_version          1.00
 set ip_version_display  v1_00
-set proj_dir            ./ip_proj
+set proj_dir            ip_proj
 
 # Call common setting for ips
 source ../osnt_lib/osnt_ip_set_common.tcl
@@ -53,8 +53,8 @@ set_property -dict {
    CONFIG.HAS_TLAST {1}
    CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
 set_property CONFIG.S_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
-generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
-generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target {instantiation_template} [get_files ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target all [get_files  ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
 set sub_ip_name  "bram_fifo_conv_128to512_0"
 create_ip -name axis_dwidth_converter -vendor xilinx.com -library ip -module_name ${sub_ip_name} -dir ./${proj_dir}
@@ -64,14 +64,12 @@ set_property -dict {
    CONFIG.HAS_TLAST {1}
    CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
 set_property CONFIG.M_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
-generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
-generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target {instantiation_template} [get_files ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target all [get_files  ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
 read_verilog "./hdl/verilog/bram_pcap_replay_uengine_cpu_regs.v"
 read_verilog "./hdl/verilog/osnt_bram_pcap_replay_uengine.v"
 read_verilog "./hdl/verilog/pre_pcap_bram_store.v"
-read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
-read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
@@ -80,6 +78,10 @@ ipx::package_project
 
 # Call common properties of ips
 source ../osnt_lib/osnt_ip_property_common.tcl
+
+ipx::add_subcore NetFPGA:NetFPGA:fallthrough_small_fifo:1.0 [ipx::get_file_groups xilinx_anylanguagesynthesis -of_objects [ipx::current_core]]
+ipx::add_subcore NetFPGA:NetFPGA:fallthrough_small_fifo:1.0 [ipx::get_file_groups xilinx_anylanguagebehavioralsimulation -of_objects [ipx::current_core]]
+ipx::infer_user_parameters [ipx::current_core]
 
 ipx::add_user_parameter {C_M_AXIS_DATA_WIDTH} [ipx::current_core]
 set_property value_resolve_type {user} [ipx::get_user_parameters C_M_AXIS_DATA_WIDTH]
