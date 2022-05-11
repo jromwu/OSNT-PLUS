@@ -70,8 +70,6 @@ generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.x
 read_verilog "./hdl/verilog/bram_pcap_replay_uengine_cpu_regs.v"
 read_verilog "./hdl/verilog/osnt_bram_pcap_replay_uengine.v"
 read_verilog "./hdl/verilog/pre_pcap_bram_store.v"
-read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/fallthrough_small_fifo.v"
-read_verilog "../../std/fallthrough_small_fifo_v1_0_0/hdl/small_fifo.v"
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
@@ -80,6 +78,10 @@ ipx::package_project
 
 # Call common properties of ips
 source ../osnt_lib/osnt_ip_property_common.tcl
+
+ipx::add_subcore NetFPGA:NetFPGA:fallthrough_small_fifo:1.0 [ipx::get_file_groups xilinx_anylanguagesynthesis -of_objects [ipx::current_core]]
+ipx::add_subcore NetFPGA:NetFPGA:fallthrough_small_fifo:1.0 [ipx::get_file_groups xilinx_anylanguagebehavioralsimulation -of_objects [ipx::current_core]]
+ipx::infer_user_parameters [ipx::current_core]
 
 ipx::add_user_parameter {C_M_AXIS_DATA_WIDTH} [ipx::current_core]
 set_property value_resolve_type {user} [ipx::get_user_parameters C_M_AXIS_DATA_WIDTH]
