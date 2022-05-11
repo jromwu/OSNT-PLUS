@@ -109,7 +109,7 @@ module osnt_rate_limiter
     input [C_S_AXIS_TUSER_WIDTH-1:0]       s1_axis_tuser,
     input                                  s1_axis_tvalid,
     output                                 s1_axis_tready,
-    input                                  s1_axis_tlast,
+    input                                  s1_axis_tlast
 
    );
 
