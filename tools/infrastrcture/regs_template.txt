@@ -1429,6 +1429,7 @@ def write_tb(tbFile,regsDict,memsDict):
 def write_module_template(moduleFile,regsDict,memsDict):
 
 #first write static inclusions....
+`timescale 1ns/1ps
   moduleFile.write('`include "'+module_name+'_cpu_regs_defines.v"\n\
 \n\
 //parameters to be added to the top module parameters\n\
