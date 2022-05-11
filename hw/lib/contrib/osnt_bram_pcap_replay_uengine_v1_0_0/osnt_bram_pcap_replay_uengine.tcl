@@ -53,8 +53,8 @@ set_property -dict {
    CONFIG.HAS_TLAST {1}
    CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
 set_property CONFIG.S_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
-generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
-generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target {instantiation_template} [get_files ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target all [get_files  ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
 set sub_ip_name  "bram_fifo_conv_128to256_0"
 create_ip -name axis_dwidth_converter -vendor xilinx.com -library ip -module_name ${sub_ip_name} -dir ./${proj_dir}
@@ -64,8 +64,8 @@ set_property -dict {
    CONFIG.HAS_TLAST {1}
    CONFIG.HAS_TKEEP {1}} [get_ips ${sub_ip_name}]
 set_property CONFIG.M_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
-generate_target {instantiation_template} [get_files ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
-generate_target all [get_files  ./${project_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target {instantiation_template} [get_files ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
+generate_target all [get_files  ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
 read_verilog "./hdl/verilog/bram_pcap_replay_uengine_cpu_regs.v"
 read_verilog "./hdl/verilog/osnt_bram_pcap_replay_uengine.v"
