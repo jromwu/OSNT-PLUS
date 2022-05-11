@@ -45,7 +45,7 @@ set_property top ${top} [current_fileset]
 set_property ip_repo_paths $::env(NFPLUS_FOLDER)/hw/lib/  [current_fileset]
 update_ip_catalog
 
-set sub_ip_name  "bram_fifo_conv_256to128_0"
+set sub_ip_name  "bram_fifo_conv_512to128_0"
 create_ip -name axis_dwidth_converter -vendor xilinx.com -library ip -module_name $sub_ip_name -dir ./${proj_dir}
 set_property -dict {
    CONFIG.M_TDATA_NUM_BYTES {16}
@@ -56,7 +56,7 @@ set_property CONFIG.S_TDATA_NUM_BYTES 64 [get_ips ${sub_ip_name}]
 generate_target {instantiation_template} [get_files ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 generate_target all [get_files  ./${proj_dir}/${sub_ip_name}/${sub_ip_name}.xci]
 
-set sub_ip_name  "bram_fifo_conv_128to256_0"
+set sub_ip_name  "bram_fifo_conv_128to512_0"
 create_ip -name axis_dwidth_converter -vendor xilinx.com -library ip -module_name ${sub_ip_name} -dir ./${proj_dir}
 set_property -dict {
    CONFIG.S_TDATA_NUM_BYTES {16}

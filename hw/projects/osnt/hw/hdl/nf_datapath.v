@@ -291,7 +291,7 @@ module nf_datapath #(
 
 
     localparam ADDR_WIDTH = 20; //hardcoded. Need to be consistent with osnt_bram module
-    localparam DATA_WIDTH = 800;//hardcoded. Need to be consistent with osnt_bram module
+    localparam DATA_WIDTH = 736;//hardcoded. Need to be consistent with osnt_bram module
     //internal connectivity
   
     // from Extract Metadata to NIC output port lookup
@@ -320,18 +320,18 @@ module nf_datapath #(
     wire [DATA_WIDTH-1:0]                    ip2bram_din1;
     wire                                     ip2bram_en1;
     wire                                     ip2bram_we1;
-   // Memory mapping for BRAM mem port 0
-    wire [ADDR_WIDTH-1:0]                    h2ip_addr0;
-    wire [DATA_WIDTH-1:0]                    h2ip_wrdata0;
-    wire [DATA_WIDTH-1:0]                    h2ip_rddata0;
-    wire                                     h2ip_en0;
-    wire                                     h2ip_we0;    
-   // Memory mapping for BRAM mem port 1
-    wire [ADDR_WIDTH-1:0]                    h2ip_addr1;
-    wire [DATA_WIDTH-1:0]                    h2ip_wrdata1;
-    wire [DATA_WIDTH-1:0]                    h2ip_rddata1;
-    wire                                     h2ip_en1;
-    wire                                     h2ip_we1;  
+//   // Memory mapping for BRAM mem port 0
+//    wire [ADDR_WIDTH-1:0]                    h2ip_addr0;
+//    wire [DATA_WIDTH-1:0]                    h2ip_wrdata0;
+//    wire [DATA_WIDTH-1:0]                    h2ip_rddata0;
+//    wire                                     h2ip_en0;
+//    wire                                     h2ip_we0;    
+//   // Memory mapping for BRAM mem port 1
+//    wire [ADDR_WIDTH-1:0]                    h2ip_addr1;
+//    wire [DATA_WIDTH-1:0]                    h2ip_wrdata1;
+//    wire [DATA_WIDTH-1:0]                    h2ip_rddata1;
+//    wire                                     h2ip_en1;
+//    wire                                     h2ip_we1;  
    // PCAP Reply to Inter Packet Delay
     wire [C_M_AXIS_DATA_WIDTH - 1:0]         m0_axis_pcap_tdata;
     wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m0_axis_pcap_tkeep;
@@ -488,100 +488,100 @@ module nf_datapath #(
     );
   //BRAM memory port 0  
   osnt_bram_ip  u_osnt_bram_0  (
-      .bram_clk_a(axi_aclk),
-      .bram_rst_a(axi_resetn),
-      .bram_addr_a(h2ip_addr0),
-      .bram_en_a(h2ip_en0),
-      .bram_we_a(h2ip_we0),      
-      .bram_wrdata_a(h2ip_wrdata0),
-      .bram_rddata_a(h2ip_rddata0),
-      .bram_clk_b(axi_aclk),
-      .bram_rst_b(axi_resetn), 
-      .bram_addr_b(ip2bram_addr0),
-      .bram_en_b(ip2bram_en0),
-      .bram_we_b(ip2bram_we0),            
-      .bram_wrdata_b(ip2bram_dout0),
-      .bram_rddata_b(ip2bram_din0)
+//      .bram_clk_a(axi_aclk),
+//      .bram_rst_a(axi_resetn),
+//      .bram_addr_a(h2ip_addr0),
+//      .bram_en_a(h2ip_en0),
+//      .bram_we_a(h2ip_we0),      
+//      .bram_wrdata_a(h2ip_wrdata0),
+//      .bram_rddata_a(h2ip_rddata0),
+      .bram_clk(axi_aclk),
+      .bram_rst(axi_resetn), 
+      .bram_addr(ip2bram_addr0),
+      .bram_en(ip2bram_en0),
+      .bram_we(ip2bram_we0),            
+      .bram_wrdata(ip2bram_dout0),
+      .bram_rddata(ip2bram_din0)
     );
-   //BRAM memory port 0 (memory mapping) 
-   axi_bram_ctrl_0 u_axi_bram_ctrl_0 (
-      .s_axi_aclk    (axi_aclk),
-      .s_axi_aresetn (axi_resetn),
-      .s_axi_awaddr  (S8_AXI_AWADDR),
-      .s_axi_awprot  (),
-      .s_axi_awvalid (S8_AXI_AWVALID),
-      .s_axi_awready (S8_AXI_AWREADY),
-      .s_axi_wdata   (S8_AXI_WDATA),
-      .s_axi_wstrb   (S8_AXI_WSTRB),
-      .s_axi_wvalid  (S8_AXI_WVALID),
-      .s_axi_wready  (S8_AXI_WREADY),
-      .s_axi_bresp   (S8_AXI_BRESP),
-      .s_axi_bvalid  (S8_AXI_BVALID),
-      .s_axi_bready  (S8_AXI_BREADY),
-      .s_axi_araddr  (S8_AXI_ARADDR),
-      .s_axi_arprot  (),
-      .s_axi_arvalid (S8_AXI_ARVALID),
-      .s_axi_arready (S8_AXI_ARREADY),
-      .s_axi_rdata   (S8_AXI_RDATA),
-      .s_axi_rresp   (S8_AXI_RRESP),
-      .s_axi_rvalid  (S8_AXI_RVALID),
-      .s_axi_rready  (S8_AXI_RREADY),
-      .bram_rst_a    (axi_resetn),
-      .bram_clk_a    (axi_aclk),
-      .bram_en_a     (h2ip_en0),
-      .bram_we_a     (h2ip_we0),
-      .bram_addr_a   (h2ip_addr0),
-      .bram_wrdata_a (h2ip_wrdata0),
-      .bram_rddata_a (h2ip_rddata0)
-    );
+//   //BRAM memory port 0 (memory mapping) 
+//   axi_bram_ctrl_0 u_axi_bram_ctrl_0 (
+//      .s_axi_aclk    (axi_aclk),
+//      .s_axi_aresetn (axi_resetn),
+//      .s_axi_awaddr  (S8_AXI_AWADDR),
+//      .s_axi_awprot  (),
+//      .s_axi_awvalid (S8_AXI_AWVALID),
+//      .s_axi_awready (S8_AXI_AWREADY),
+//      .s_axi_wdata   (S8_AXI_WDATA),
+//      .s_axi_wstrb   (S8_AXI_WSTRB),
+//      .s_axi_wvalid  (S8_AXI_WVALID),
+//      .s_axi_wready  (S8_AXI_WREADY),
+//      .s_axi_bresp   (S8_AXI_BRESP),
+//      .s_axi_bvalid  (S8_AXI_BVALID),
+//      .s_axi_bready  (S8_AXI_BREADY),
+//      .s_axi_araddr  (S8_AXI_ARADDR),
+//      .s_axi_arprot  (),
+//      .s_axi_arvalid (S8_AXI_ARVALID),
+//      .s_axi_arready (S8_AXI_ARREADY),
+//      .s_axi_rdata   (S8_AXI_RDATA),
+//      .s_axi_rresp   (S8_AXI_RRESP),
+//      .s_axi_rvalid  (S8_AXI_RVALID),
+//      .s_axi_rready  (S8_AXI_RREADY),
+//      .bram_rst_a    (axi_resetn),
+//      .bram_clk_a    (axi_aclk),
+//      .bram_en_a     (h2ip_en0),
+//      .bram_we_a     (h2ip_we0),
+//      .bram_addr_a   (h2ip_addr0),
+//      .bram_wrdata_a (h2ip_wrdata0),
+//      .bram_rddata_a (h2ip_rddata0)
+//    );
   //BRAM memory port 1  
   osnt_bram_ip  u_osnt_bram_1  (
-      .bram_clk_a(axi_aclk),
-      .bram_rst_a(axi_resetn),
-      .bram_addr_a(h2ip_addr1),
-      .bram_en_a(h2ip_en1),
-      .bram_we_a(h2ip_we1),
-      .bram_wrdata_a(h2ip_wrdata1),
-      .bram_rddata_a(h2ip_rddata1),
-      .bram_clk_b(axi_aclk),
-      .bram_rst_b(axi_resetn),
-      .bram_addr_b(ip2bram_addr1),
-      .bram_en_b(ip2bram_en1),
-      .bram_we_b(ip2bram_we1),
-      .bram_wrdata_b(ip2bram_dout1),
-      .bram_rddata_b(ip2bram_din1)
+//      .bram_clk_a(axi_aclk),
+//      .bram_rst_a(axi_resetn),
+//      .bram_addr_a(h2ip_addr1),
+//      .bram_en_a(h2ip_en1),
+//      .bram_we_a(h2ip_we1),
+//      .bram_wrdata_a(h2ip_wrdata1),
+//      .bram_rddata_a(h2ip_rddata1),
+      .bram_clk(axi_aclk),
+      .bram_rst(axi_resetn),
+      .bram_addr(ip2bram_addr1),
+      .bram_en(ip2bram_en1),
+      .bram_we(ip2bram_we1),
+      .bram_wrdata(ip2bram_dout1),
+      .bram_rddata(ip2bram_din1)
     );
-   //BRAM memory port 1 (memory mapping) 
-   axi_bram_ctrl_0 u_axi_bram_ctrl_1 (
-      .s_axi_aclk    (axi_aclk),
-      .s_axi_aresetn (axi_resetn),
-      .s_axi_awaddr  (S9_AXI_AWADDR),
-      .s_axi_awprot  (),
-      .s_axi_awvalid (S9_AXI_AWVALID),
-      .s_axi_awready (S9_AXI_AWREADY),
-      .s_axi_wdata   (S9_AXI_WDATA),
-      .s_axi_wstrb   (S9_AXI_WSTRB),
-      .s_axi_wvalid  (S9_AXI_WVALID),
-      .s_axi_wready  (S9_AXI_WREADY),
-      .s_axi_bresp   (S9_AXI_BRESP),
-      .s_axi_bvalid  (S9_AXI_BVALID),
-      .s_axi_bready  (S9_AXI_BREADY),
-      .s_axi_araddr  (S9_AXI_ARADDR),
-      .s_axi_arprot  (),
-      .s_axi_arvalid (S9_AXI_ARVALID),
-      .s_axi_arready (S9_AXI_ARREADY),
-      .s_axi_rdata   (S9_AXI_RDATA),
-      .s_axi_rresp   (S9_AXI_RRESP),
-      .s_axi_rvalid  (S9_AXI_RVALID),
-      .s_axi_rready  (S9_AXI_RREADY),
-      .bram_rst_a    (axi_resetn),
-      .bram_clk_a    (axi_aclk),
-      .bram_en_a     (h2ip_en1),
-      .bram_we_a     (h2ip_we1),
-      .bram_addr_a   (h2ip_addr1),
-      .bram_wrdata_a (h2ip_wrdata1),
-      .bram_rddata_a (h2ip_rddata1)
-    );
+//   //BRAM memory port 1 (memory mapping) 
+//   axi_bram_ctrl_0 u_axi_bram_ctrl_1 (
+//      .s_axi_aclk    (axi_aclk),
+//      .s_axi_aresetn (axi_resetn),
+//      .s_axi_awaddr  (S9_AXI_AWADDR),
+//      .s_axi_awprot  (),
+//      .s_axi_awvalid (S9_AXI_AWVALID),
+//      .s_axi_awready (S9_AXI_AWREADY),
+//      .s_axi_wdata   (S9_AXI_WDATA),
+//      .s_axi_wstrb   (S9_AXI_WSTRB),
+//      .s_axi_wvalid  (S9_AXI_WVALID),
+//      .s_axi_wready  (S9_AXI_WREADY),
+//      .s_axi_bresp   (S9_AXI_BRESP),
+//      .s_axi_bvalid  (S9_AXI_BVALID),
+//      .s_axi_bready  (S9_AXI_BREADY),
+//      .s_axi_araddr  (S9_AXI_ARADDR),
+//      .s_axi_arprot  (),
+//      .s_axi_arvalid (S9_AXI_ARVALID),
+//      .s_axi_arready (S9_AXI_ARREADY),
+//      .s_axi_rdata   (S9_AXI_RDATA),
+//      .s_axi_rresp   (S9_AXI_RRESP),
+//      .s_axi_rvalid  (S9_AXI_RVALID),
+//      .s_axi_rready  (S9_AXI_RREADY),
+//      .bram_rst_a    (axi_resetn),
+//      .bram_clk_a    (axi_aclk),
+//      .bram_en_a     (h2ip_en1),
+//      .bram_we_a     (h2ip_we1),
+//      .bram_addr_a   (h2ip_addr1),
+//      .bram_wrdata_a (h2ip_wrdata1),
+//      .bram_rddata_a (h2ip_rddata1)
+//    );
   //Inter Packet Delay
   osnt_inter_packet_delay_ip  u_osnt_inter_packet_delay_0  (
       .axis_aclk(axis_aclk),
@@ -686,12 +686,12 @@ module nf_datapath #(
   input_arbiter_ip  input_arbiter_0 (
       .axis_aclk(axis_aclk), 
       .axis_resetn(axis_resetn), 
-      .m_axis_tdata (s_axis_opl_tdata), 
-      .m_axis_tkeep (s_axis_opl_tkeep), 
-      .m_axis_tuser (s_axis_opl_tuser), 
-      .m_axis_tvalid(s_axis_opl_tvalid), 
-      .m_axis_tready(s_axis_opl_tready), 
-      .m_axis_tlast (s_axis_opl_tlast), 
+      .m_axis_tdata (m_axis_2_tdata), 
+      .m_axis_tkeep (m_axis_2_tkeep), 
+      .m_axis_tuser (m_axis_2_tuser), 
+      .m_axis_tvalid(m_axis_2_tvalid), 
+      .m_axis_tready(m_axis_2_tready), 
+      .m_axis_tlast (m_axis_2_tlast), 
       .s_axis_0_tdata (s_axis_0_tdata), 
       .s_axis_0_tkeep (s_axis_0_tkeep), 
       .s_axis_0_tuser (s_axis_0_tuser), 

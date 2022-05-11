@@ -87,28 +87,28 @@ wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]       fifo_s_out_tkeep;
 wire  [C_M_AXIS_TUSER_WIDTH-1:0]          fifo_s_out_tuser;
 wire                                      fifo_s_out_tlast;
 
-wire  s_conv_256to128_tready;
+wire  s_conv_512to128_tready;
 
-wire  [(C_M_AXIS_DATA_WIDTH/2)-1:0]       m_conv_256to128_tdata;
-wire  [((C_M_AXIS_DATA_WIDTH/2)/8)-1:0]   m_conv_256to128_tkeep;
-wire  [(C_M_AXIS_TUSER_WIDTH*2)-1:0]      m_conv_256to128_tuser;
-wire                                      m_conv_256to128_tlast;
-wire                                      m_conv_256to128_tvalid;
-reg                                       m_conv_256to128_tready;
+wire  [(C_M_AXIS_DATA_WIDTH/2)-1:0]       m_conv_512to128_tdata;
+wire  [((C_M_AXIS_DATA_WIDTH/2)/8)-1:0]   m_conv_512to128_tkeep;
+wire  [(C_M_AXIS_TUSER_WIDTH*2)-1:0]      m_conv_512to128_tuser;
+wire                                      m_conv_512to128_tlast;
+wire                                      m_conv_512to128_tvalid;
+reg                                       m_conv_512to128_tready;
 
-reg   [(C_M_AXIS_DATA_WIDTH/2)-1:0]       s_conv_128to256_tdata;
-reg   [((C_M_AXIS_DATA_WIDTH/2)/8)-1:0]   s_conv_128to256_tkeep;
-reg   [C_M_AXIS_TUSER_WIDTH-1:0]          s_conv_128to256_tuser, s_conv_128to256_tuser_next, s_conv_128to256_tuser_current;
-reg                                       s_conv_128to256_tlast;
-reg                                       s_conv_128to256_tvalid;
-wire                                      s_conv_128to256_tready;
+reg   [(C_M_AXIS_DATA_WIDTH/2)-1:0]       s_conv_128to512_tdata;
+reg   [((C_M_AXIS_DATA_WIDTH/2)/8)-1:0]   s_conv_128to512_tkeep;
+reg   [C_M_AXIS_TUSER_WIDTH-1:0]          s_conv_128to512_tuser, s_conv_128to512_tuser_next, s_conv_128to512_tuser_current;
+reg                                       s_conv_128to512_tlast;
+reg                                       s_conv_128to512_tvalid;
+wire                                      s_conv_128to512_tready;
 
-wire  [C_M_AXIS_DATA_WIDTH-1:0]           m_conv_128to256_tdata;
-wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]       m_conv_128to256_tkeep;
-wire  [(C_M_AXIS_TUSER_WIDTH*2)-1:0]      m_conv_128to256_tuser;
-wire                                      m_conv_128to256_tlast;
-wire                                      m_conv_128to256_tvalid;
-wire                                      m_conv_128to256_tready;
+wire  [C_M_AXIS_DATA_WIDTH-1:0]           m_conv_128to512_tdata;
+wire  [(C_M_AXIS_DATA_WIDTH/8)-1:0]       m_conv_128to512_tkeep;
+wire  [(C_M_AXIS_TUSER_WIDTH*2)-1:0]      m_conv_128to512_tuser;
+wire                                      m_conv_128to512_tlast;
+wire                                      m_conv_128to512_tvalid;
+wire                                      m_conv_128to512_tready;
 
 wire  ts_signature_en;
 wire  [127:0]  tuser_ts;
@@ -124,11 +124,11 @@ reg   [3:0] st_current, st_next;
 always @(posedge axis_aclk)
    if (~axis_aresetn) begin
       st_current                    <= 0;
-      s_conv_128to256_tuser_current <= 0;
+      s_conv_128to512_tuser_current <= 0;
    end
    else begin
       st_current                    <= st_next;
-      s_conv_128to256_tuser_current <= s_conv_128to256_tuser_next;
+      s_conv_128to512_tuser_current <= s_conv_128to512_tuser_next;
    end
 
 fallthrough_small_fifo
@@ -147,126 +147,126 @@ pcap_s_fifo
    //Inputs
    .din              (  {s_axis_tlast, s_axis_tuser, s_axis_tkeep, s_axis_tdata}                   ),
    .wr_en            (  s_axis_tvalid & ~fifo_s_full                                               ),
-   .rd_en            (  ~fifo_s_empty & s_conv_256to128_tready                                     ),
+   .rd_en            (  ~fifo_s_empty & s_conv_512to128_tready                                     ),
    .reset            (  ~axis_aresetn                                                              ),
    .clk              (  axis_aclk                                                                  )
 );
 
-bram_fifo_conv_256to128_0
-bram_fifo_conv_256to128_0
+bram_fifo_conv_512to128_0
+bram_fifo_conv_512to128_0
 (
    .aclk                   (  axis_aclk                     ),
    .aresetn                (  axis_aresetn                  ),
 
    .s_axis_tvalid          (  ~fifo_s_empty                 ),
-   .s_axis_tready          (  s_conv_256to128_tready        ),
+   .s_axis_tready          (  s_conv_512to128_tready        ),
    .s_axis_tdata           (  fifo_s_out_tdata              ),
    .s_axis_tkeep           (  fifo_s_out_tkeep              ),
    .s_axis_tlast           (  fifo_s_out_tlast              ),
    .s_axis_tuser           (  {128'b0, fifo_s_out_tuser}    ),
                                              
-   .m_axis_tvalid          (  m_conv_256to128_tvalid        ),
-   .m_axis_tready          (  m_conv_256to128_tready        ),
-   .m_axis_tdata           (  m_conv_256to128_tdata         ),
-   .m_axis_tkeep           (  m_conv_256to128_tkeep         ),
-   .m_axis_tlast           (  m_conv_256to128_tlast         ),
-   .m_axis_tuser           (  m_conv_256to128_tuser         )
+   .m_axis_tvalid          (  m_conv_512to128_tvalid        ),
+   .m_axis_tready          (  m_conv_512to128_tready        ),
+   .m_axis_tdata           (  m_conv_512to128_tdata         ),
+   .m_axis_tkeep           (  m_conv_512to128_tkeep         ),
+   .m_axis_tlast           (  m_conv_512to128_tlast         ),
+   .m_axis_tuser           (  m_conv_512to128_tuser         )
 );
 
-assign ts_signature_en = (m_conv_256to128_tdata[0+:64] == 64'h00000000_efbeadde);
-assign ts_value[0+:8]  = m_conv_256to128_tdata[120+:8];
-assign ts_value[8+:8]  = m_conv_256to128_tdata[112+:8];
-assign ts_value[16+:8] = m_conv_256to128_tdata[104+:8];
-assign ts_value[24+:8] = m_conv_256to128_tdata[96+:8];
+assign ts_signature_en = (m_conv_512to128_tdata[0+:64] == 64'h00000000_efbeadde);
+assign ts_value[0+:8]  = m_conv_512to128_tdata[120+:8];
+assign ts_value[8+:8]  = m_conv_512to128_tdata[112+:8];
+assign ts_value[16+:8] = m_conv_512to128_tdata[104+:8];
+assign ts_value[24+:8] = m_conv_512to128_tdata[96+:8];
 
-assign tuser_ts = {64'b0, ts_value, m_conv_256to128_tuser[0+:32]};
+assign tuser_ts = {64'b0, ts_value, m_conv_512to128_tuser[0+:32]};
 
 always @(*) begin
-   s_conv_128to256_tvalid     = 0;
-   s_conv_128to256_tdata      = 0;
-   s_conv_128to256_tkeep      = 0;
-   s_conv_128to256_tuser      = 0;
-   s_conv_128to256_tlast      = 0;
-   s_conv_128to256_tuser_next = 0;
-   m_conv_256to128_tready     = 0;
+   s_conv_128to512_tvalid     = 0;
+   s_conv_128to512_tdata      = 0;
+   s_conv_128to512_tkeep      = 0;
+   s_conv_128to512_tuser      = 0;
+   s_conv_128to512_tlast      = 0;
+   s_conv_128to512_tuser_next = 0;
+   m_conv_512to128_tready     = 0;
    st_next                    = `CONV_IDLE;
    case(st_current)
       `CONV_IDLE : begin
-         s_conv_128to256_tvalid     = 0;
-         s_conv_128to256_tdata      = 0;
-         s_conv_128to256_tkeep      = 0;
-         s_conv_128to256_tuser      = 0;
-         s_conv_128to256_tlast      = 0;
-         s_conv_128to256_tuser_next = 0;
-         m_conv_256to128_tready     = 0;
-         st_next                    = (m_conv_256to128_tvalid & ts_signature_en) ? `CONV_DROP :
-                                      (m_conv_256to128_tvalid                  ) ? `CONV_PASS : `CONV_IDLE;
+         s_conv_128to512_tvalid     = 0;
+         s_conv_128to512_tdata      = 0;
+         s_conv_128to512_tkeep      = 0;
+         s_conv_128to512_tuser      = 0;
+         s_conv_128to512_tlast      = 0;
+         s_conv_128to512_tuser_next = 0;
+         m_conv_512to128_tready     = 0;
+         st_next                    = (m_conv_512to128_tvalid & ts_signature_en) ? `CONV_DROP :
+                                      (m_conv_512to128_tvalid                  ) ? `CONV_PASS : `CONV_IDLE;
       end
       `CONV_DROP : begin
-         s_conv_128to256_tvalid     = 0;
-         s_conv_128to256_tdata      = 0;
-         s_conv_128to256_tkeep      = 0;
-         s_conv_128to256_tuser      = 0;
-         s_conv_128to256_tlast      = 0;
-         s_conv_128to256_tuser_next = (m_conv_256to128_tvalid) ? tuser_ts : s_conv_128to256_tuser_current;
-         m_conv_256to128_tready     = (m_conv_256to128_tvalid) ? 1 : 0;
-         st_next                    = (m_conv_256to128_tvalid & m_conv_256to128_tlast) ? `CONV_SEND :
-                                      (m_conv_256to128_tvalid                        ) ? `CONV_WAIT : `CONV_DROP;
+         s_conv_128to512_tvalid     = 0;
+         s_conv_128to512_tdata      = 0;
+         s_conv_128to512_tkeep      = 0;
+         s_conv_128to512_tuser      = 0;
+         s_conv_128to512_tlast      = 0;
+         s_conv_128to512_tuser_next = (m_conv_512to128_tvalid) ? tuser_ts : s_conv_128to512_tuser_current;
+         m_conv_512to128_tready     = (m_conv_512to128_tvalid) ? 1 : 0;
+         st_next                    = (m_conv_512to128_tvalid & m_conv_512to128_tlast) ? `CONV_SEND :
+                                      (m_conv_512to128_tvalid                        ) ? `CONV_WAIT : `CONV_DROP;
       end
       `CONV_WAIT : begin
-         s_conv_128to256_tvalid     = 0;
-         s_conv_128to256_tdata      = 0;
-         s_conv_128to256_tkeep      = 0;
-         s_conv_128to256_tuser      = 0;
-         s_conv_128to256_tlast      = 0;
-         s_conv_128to256_tuser_next = s_conv_128to256_tuser_current;
-         m_conv_256to128_tready     = (m_conv_256to128_tvalid) ? 1 : 0;
-         st_next                    = (m_conv_256to128_tvalid & m_conv_256to128_tlast) ? `CONV_SEND : `CONV_WAIT;
+         s_conv_128to512_tvalid     = 0;
+         s_conv_128to512_tdata      = 0;
+         s_conv_128to512_tkeep      = 0;
+         s_conv_128to512_tuser      = 0;
+         s_conv_128to512_tlast      = 0;
+         s_conv_128to512_tuser_next = s_conv_128to512_tuser_current;
+         m_conv_512to128_tready     = (m_conv_512to128_tvalid) ? 1 : 0;
+         st_next                    = (m_conv_512to128_tvalid & m_conv_512to128_tlast) ? `CONV_SEND : `CONV_WAIT;
       end
       `CONV_SEND : begin
-         s_conv_128to256_tvalid     =  m_conv_256to128_tvalid;
-         s_conv_128to256_tdata      =  m_conv_256to128_tdata;
-         s_conv_128to256_tkeep      =  m_conv_256to128_tkeep;
-         s_conv_128to256_tuser      =  {s_conv_128to256_tuser_current[32+:96], m_conv_256to128_tuser[0+:32]};
-         s_conv_128to256_tlast      =  m_conv_256to128_tlast;
-         s_conv_128to256_tuser_next = (m_conv_256to128_tvalid & s_conv_128to256_tready) ? 0 : s_conv_128to256_tuser_current;
-         m_conv_256to128_tready     = (m_conv_256to128_tvalid & s_conv_128to256_tready) ? 1 : 0;
-         st_next                    = (m_conv_256to128_tvalid & s_conv_128to256_tready & m_conv_256to128_tlast) ? `CONV_IDLE : `CONV_SEND;
+         s_conv_128to512_tvalid     =  m_conv_512to128_tvalid;
+         s_conv_128to512_tdata      =  m_conv_512to128_tdata;
+         s_conv_128to512_tkeep      =  m_conv_512to128_tkeep;
+         s_conv_128to512_tuser      =  {s_conv_128to512_tuser_current[32+:96], m_conv_512to128_tuser[0+:32]};
+         s_conv_128to512_tlast      =  m_conv_512to128_tlast;
+         s_conv_128to512_tuser_next = (m_conv_512to128_tvalid & s_conv_128to512_tready) ? 0 : s_conv_128to512_tuser_current;
+         m_conv_512to128_tready     = (m_conv_512to128_tvalid & s_conv_128to512_tready) ? 1 : 0;
+         st_next                    = (m_conv_512to128_tvalid & s_conv_128to512_tready & m_conv_512to128_tlast) ? `CONV_IDLE : `CONV_SEND;
       end
       `CONV_PASS : begin
-         s_conv_128to256_tvalid     =  m_conv_256to128_tvalid;
-         s_conv_128to256_tdata      =  m_conv_256to128_tdata;
-         s_conv_128to256_tkeep      =  m_conv_256to128_tkeep;
-         s_conv_128to256_tuser      =  m_conv_256to128_tuser;
-         s_conv_128to256_tlast      =  m_conv_256to128_tlast;
-         m_conv_256to128_tready     = (m_conv_256to128_tvalid & s_conv_128to256_tready) ? 1 : 0;
-         st_next                    = (m_conv_256to128_tvalid & s_conv_128to256_tready & m_conv_256to128_tlast) ? `CONV_IDLE : `CONV_PASS;
+         s_conv_128to512_tvalid     =  m_conv_512to128_tvalid;
+         s_conv_128to512_tdata      =  m_conv_512to128_tdata;
+         s_conv_128to512_tkeep      =  m_conv_512to128_tkeep;
+         s_conv_128to512_tuser      =  m_conv_512to128_tuser;
+         s_conv_128to512_tlast      =  m_conv_512to128_tlast;
+         m_conv_512to128_tready     = (m_conv_512to128_tvalid & s_conv_128to512_tready) ? 1 : 0;
+         st_next                    = (m_conv_512to128_tvalid & s_conv_128to512_tready & m_conv_512to128_tlast) ? `CONV_IDLE : `CONV_PASS;
       end
    endcase
 end
 
-bram_fifo_conv_128to256_0
-bram_fifo_conv_128to256_0
+bram_fifo_conv_128to512_0
+bram_fifo_conv_128to512_0
 (
    .aclk                   (  axis_aclk                     ),
    .aresetn                (  axis_aresetn                  ),
 
-   .s_axis_tvalid          (  s_conv_128to256_tvalid        ),
-   .s_axis_tready          (  s_conv_128to256_tready        ),
-   .s_axis_tdata           (  s_conv_128to256_tdata         ),
-   .s_axis_tkeep           (  s_conv_128to256_tkeep         ),
-   .s_axis_tlast           (  s_conv_128to256_tlast         ),
-   .s_axis_tuser           (  s_conv_128to256_tuser         ),
+   .s_axis_tvalid          (  s_conv_128to512_tvalid        ),
+   .s_axis_tready          (  s_conv_128to512_tready        ),
+   .s_axis_tdata           (  s_conv_128to512_tdata         ),
+   .s_axis_tkeep           (  s_conv_128to512_tkeep         ),
+   .s_axis_tlast           (  s_conv_128to512_tlast         ),
+   .s_axis_tuser           (  s_conv_128to512_tuser         ),
                                              
-   .m_axis_tvalid          (  m_conv_128to256_tvalid        ),
-   .m_axis_tready          (  m_conv_128to256_tready        ),
-   .m_axis_tdata           (  m_conv_128to256_tdata         ),
-   .m_axis_tkeep           (  m_conv_128to256_tkeep         ),
-   .m_axis_tlast           (  m_conv_128to256_tlast         ),
-   .m_axis_tuser           (  m_conv_128to256_tuser         )
+   .m_axis_tvalid          (  m_conv_128to512_tvalid        ),
+   .m_axis_tready          (  m_conv_128to512_tready        ),
+   .m_axis_tdata           (  m_conv_128to512_tdata         ),
+   .m_axis_tkeep           (  m_conv_128to512_tkeep         ),
+   .m_axis_tlast           (  m_conv_128to512_tlast         ),
+   .m_axis_tuser           (  m_conv_128to512_tuser         )
 );
 
-assign m_conv_128to256_tready = ~fifo_m_full;
+assign m_conv_128to512_tready = ~fifo_m_full;
 assign m_axis_tvalid = ~fifo_m_empty;
 
 fallthrough_small_fifo
@@ -283,8 +283,8 @@ pcap_m_fifo
    .prog_full        (                                                                                                        ),
    .empty            (  fifo_m_empty                                                                                          ),
    //Inputs
-   .din              (  {m_conv_128to256_tlast, m_conv_128to256_tuser[127:0], m_conv_128to256_tkeep, m_conv_128to256_tdata}   ),
-   .wr_en            (  m_conv_128to256_tvalid & ~fifo_m_full                                                                 ),
+   .din              (  {m_conv_128to512_tlast, m_conv_128to512_tuser[127:0], m_conv_128to512_tkeep, m_conv_128to512_tdata}   ),
+   .wr_en            (  m_conv_128to512_tvalid & ~fifo_m_full                                                                 ),
    .rd_en            (  m_axis_tready & ~fifo_m_empty                                                                         ),
    .reset            (  ~axis_aresetn                                                                                         ),
    .clk              (  axis_aclk                                                                                             )

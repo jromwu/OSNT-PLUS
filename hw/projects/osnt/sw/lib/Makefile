@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2016 University of Cambridge
-# Copyright (c) 2016 Jong Hun Han
+# Copyright (c) 2016-2017 University of Cambridge
+# Copyright (c) 2016-2017 Jong Hun Han
 # All rights reserved.
 #
 # This software was developed by University of Cambridge Computer Laboratory
@@ -25,9 +25,10 @@
 #
 # @NETFPGA_LICENSE_HEADER_END@
 
+.PHONY: all
 
 all: clean
-	vivado -mode tcl -source osnt_bram_pcap_replay_uengine.tcl 
+	$(CC) -Wall -Werror -o axilib osnt_nfplus_libaxi.c
 
 clean:
-	rm -rf vivado*.* *.xml xgui/ .Xil* pro* xsim* web* xvlog* *blk* ip_proj/ ip_user_files/
+	rm -f axilib 
