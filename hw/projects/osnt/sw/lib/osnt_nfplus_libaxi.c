@@ -161,7 +161,8 @@ main(int argc, char *argv[])
 	    		"READ ", sifr.addr, sifr.val);
 
 	if (req==NFDP_IOCTL_CMD_READ_REG){
-		printf("%x\n", sifr.val);
+		if(!verbose)
+			printf("%x\n", sifr.val);
 		return(sifr.val);
 	}
 	else
