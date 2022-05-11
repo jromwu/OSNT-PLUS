@@ -437,7 +437,7 @@ module nf_datapath #(
   //PCAP Reply  
   osnt_bram_pcap_replay_uengine_ip  u_osnt_bram_pcap_replay_uengine_0  (
       .axis_aclk(axis_aclk),
-      .axis_resetn(axis_resetn),
+      .axis_aresetn(axis_resetn),
       .m0_axis_tdata (m0_axis_pcap_tdata),
       .m0_axis_tkeep (m0_axis_pcap_tkeep),
       .m0_axis_tuser (m0_axis_pcap_tuser),
@@ -585,7 +585,7 @@ module nf_datapath #(
   //Inter Packet Delay
   osnt_inter_packet_delay_ip  u_osnt_inter_packet_delay_0  (
       .axis_aclk(axis_aclk),
-      .axis_resetn(axis_resetn),
+      .axis_aresetn(axis_resetn),
       .m0_axis_tdata (m0_axis_ipd_tdata),
       .m0_axis_tkeep (m0_axis_ipd_tkeep),
       .m0_axis_tuser (m0_axis_ipd_tuser),
@@ -633,7 +633,7 @@ module nf_datapath #(
   //Rate Limiter
   osnt_rate_limiter_ip  u_osnt_rate_limiter_0  (
       .axis_aclk(axis_aclk),
-      .axis_resetn(axis_resetn),
+      .axis_aresetn(axis_resetn),
       .m0_axis_tdata (m_axis_0_tdata),
       .m0_axis_tkeep (m_axis_0_tkeep),
       .m0_axis_tuser (m_axis_0_tuser),
