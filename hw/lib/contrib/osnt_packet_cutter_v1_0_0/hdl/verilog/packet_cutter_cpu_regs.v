@@ -36,6 +36,7 @@
 //
 // @NETFPGA_LICENSE_HEADER_END@
 //
+`timescale 1ns/1ps
 
 `include "packet_cutter_cpu_regs_defines.v"
 module packet_cutter_cpu_regs #

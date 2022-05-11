@@ -274,6 +274,7 @@ module osnt_inter_packet_delay
       .C_S_AXI_DATA_WIDTH(32),
       .C_S_AXI_ADDR_WIDTH(32)
       )
+   inst_cpu_regs
    (
     // General ports
     .clk(s_axi_aclk),

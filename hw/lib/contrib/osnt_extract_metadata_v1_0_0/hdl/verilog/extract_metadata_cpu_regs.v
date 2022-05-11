@@ -36,6 +36,7 @@
 //
 // @NETFPGA_LICENSE_HEADER_END@
 //
+`timescale 1ns/1ps
 
 `include "extract_metadata_cpu_regs_defines.v"
 module extract_metadata_cpu_regs #
