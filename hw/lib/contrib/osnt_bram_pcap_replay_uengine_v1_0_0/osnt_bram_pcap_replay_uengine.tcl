@@ -31,7 +31,7 @@ set design              osnt_bram_pcap_replay_uengine
 set top                 osnt_bram_pcap_replay_uengine
 set ip_version          1.00
 set ip_version_display  v1_00
-set proj_dir            ./ip_proj
+set proj_dir            ip_proj
 
 # Call common setting for ips
 source ../osnt_lib/osnt_ip_set_common.tcl
