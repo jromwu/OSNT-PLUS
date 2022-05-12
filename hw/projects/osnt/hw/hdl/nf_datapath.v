@@ -50,11 +50,12 @@ module nf_datapath #(
     parameter C_BASEADDR            = 32'h00000000,
 
     // Master AXI Stream Data Width
-    parameter C_M_AXIS_DATA_WIDTH=512,
-    parameter C_S_AXIS_DATA_WIDTH=512,
-    parameter C_M_AXIS_TUSER_WIDTH=128,
-    parameter C_S_AXIS_TUSER_WIDTH=128,
-    parameter NUM_QUEUES=5
+    parameter C_M_AXIS_DATA_WIDTH  = 512,
+    parameter C_S_AXIS_DATA_WIDTH  = 512,
+    parameter C_TX_DATA_WIDTH      = 512,
+    parameter C_M_AXIS_TUSER_WIDTH = 128,
+    parameter C_S_AXIS_TUSER_WIDTH = 128,
+    parameter NUM_QUEUES           = 3
 ) (
     //Datapath clock
     input                                     axis_aclk,
@@ -258,8 +259,8 @@ module nf_datapath #(
     input                                     s_axis_1_tvalid,
     output                                    s_axis_1_tready,
     input                                     s_axis_1_tlast,
-    input [C_S_AXIS_DATA_WIDTH - 1:0]         s_axis_2_tdata,
-    input [((C_S_AXIS_DATA_WIDTH / 8)) - 1:0] s_axis_2_tkeep,
+    input [C_TX_DATA_WIDTH-1:0]               s_axis_2_tdata,
+    input [((C_TX_DATA_WIDTH/8))-1:0]         s_axis_2_tkeep,
     input [C_S_AXIS_TUSER_WIDTH-1:0]          s_axis_2_tuser,
     input                                     s_axis_2_tvalid,
     output                                    s_axis_2_tready,
@@ -267,14 +268,14 @@ module nf_datapath #(
 
 
     // Master Stream Ports (interface to TX queues)
-    output [C_M_AXIS_DATA_WIDTH - 1:0]         m_axis_0_tdata,
-    output [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m_axis_0_tkeep,
+    output [C_TX_DATA_WIDTH-1:0]               m_axis_0_tdata,
+    output [((C_TX_DATA_WIDTH/8))-1:0]         m_axis_0_tkeep,
     output [C_M_AXIS_TUSER_WIDTH-1:0]          m_axis_0_tuser,
     output                                     m_axis_0_tvalid,
     input                                      m_axis_0_tready,
     output                                     m_axis_0_tlast,
-    output [C_M_AXIS_DATA_WIDTH - 1:0]         m_axis_1_tdata,
-    output [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m_axis_1_tkeep,
+    output [C_TX_DATA_WIDTH-1:0]               m_axis_1_tdata,
+    output [((C_TX_DATA_WIDTH/8))-1:0]         m_axis_1_tkeep,
     output [C_M_AXIS_TUSER_WIDTH-1:0]          m_axis_1_tuser,
     output                                     m_axis_1_tvalid,
     input                                      m_axis_1_tready,
@@ -295,25 +296,25 @@ module nf_datapath #(
     //internal connectivity
   
     // from Extract Metadata to NIC output port lookup
-    wire [C_M_AXIS_DATA_WIDTH - 1:0]         m_axis_meta_tdata;
-    wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m_axis_meta_tkeep;
+    wire [C_TX_DATA_WIDTH-1:0]               m_axis_meta_tdata;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m_axis_meta_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m_axis_meta_tuser;
     wire                                     m_axis_meta_tvalid;
     wire                                     m_axis_meta_tready;
     wire                                     m_axis_meta_tlast;
     // from NIC output port lookup to PCAP reply 
-    wire [C_M_AXIS_DATA_WIDTH - 1:0]         m_axis_opl_tdata;
-    wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m_axis_opl_tkeep;
+    wire [C_TX_DATA_WIDTH-1:0]               m_axis_opl_tdata;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m_axis_opl_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m_axis_opl_tuser;
     wire                                     m_axis_opl_tvalid;
     wire                                     m_axis_opl_tready;
     wire                                     m_axis_opl_tlast;
     // PCAP reply <-> BRAM mem port 0
-    wire [ADDR_WIDTH-1:0]		     ip2bram_addr0;
-    wire [DATA_WIDTH-1:0]		     ip2bram_dout0;
+    wire [ADDR_WIDTH-1:0]                    ip2bram_addr0;
+    wire [DATA_WIDTH-1:0]                    ip2bram_dout0;
     wire [DATA_WIDTH-1:0]                    ip2bram_din0;
-    wire				     ip2bram_en0;
-    wire				     ip2bram_we0;
+    wire                                     ip2bram_en0;
+    wire                                     ip2bram_we0;
     // PCAP reply <-> BRAM mem port 1
     wire [ADDR_WIDTH-1:0]                    ip2bram_addr1;
     wire [DATA_WIDTH-1:0]                    ip2bram_dout1;
@@ -333,27 +334,27 @@ module nf_datapath #(
 //    wire                                     h2ip_en1;
 //    wire                                     h2ip_we1;  
    // PCAP Reply to Inter Packet Delay
-    wire [C_M_AXIS_DATA_WIDTH - 1:0]         m0_axis_pcap_tdata;
-    wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m0_axis_pcap_tkeep;
+    wire [C_TX_DATA_WIDTH-1:0]               m0_axis_pcap_tdata;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m0_axis_pcap_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m0_axis_pcap_tuser;
     wire                                     m0_axis_pcap_tvalid;
     wire                                     m0_axis_pcap_tready;
     wire                                     m0_axis_pcap_tlast;
-    wire [C_M_AXIS_DATA_WIDTH - 1:0]         m1_axis_pcap_tdata;
-    wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m1_axis_pcap_tkeep;
+    wire [C_TX_DATA_WIDTH-1:0]               m1_axis_pcap_tdata;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m1_axis_pcap_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m1_axis_pcap_tuser;
     wire                                     m1_axis_pcap_tvalid;
     wire                                     m1_axis_pcap_tready;
     wire                                     m1_axis_pcap_tlast;
    // Inter Packet Delay to Rate Limiter
-    wire [C_M_AXIS_DATA_WIDTH - 1:0]         m0_axis_ipd_tdata;
-    wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m0_axis_ipd_tkeep;
+    wire [C_TX_DATA_WIDTH-1:0]               m0_axis_ipd_tdata;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m0_axis_ipd_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m0_axis_ipd_tuser;
     wire                                     m0_axis_ipd_tvalid;
     wire                                     m0_axis_ipd_tready;
     wire                                     m0_axis_ipd_tlast;
-    wire [C_M_AXIS_DATA_WIDTH - 1:0]         m1_axis_ipd_tdata;
-    wire [((C_M_AXIS_DATA_WIDTH / 8)) - 1:0] m1_axis_ipd_tkeep;
+    wire [C_TX_DATA_WIDTH-1:0]               m1_axis_ipd_tdata;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m1_axis_ipd_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m1_axis_ipd_tuser;
     wire                                     m1_axis_ipd_tvalid;
     wire                                     m1_axis_ipd_tready;
