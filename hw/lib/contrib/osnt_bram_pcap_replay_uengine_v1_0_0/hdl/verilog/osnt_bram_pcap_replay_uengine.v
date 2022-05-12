@@ -860,7 +860,7 @@ pre_pcap_bram_store
 assign sw_rst           = rw_regs[(C_S_AXI_DATA_WIDTH*0)+1-1:(C_S_AXI_DATA_WIDTH*0)]; //0x0000
 
 assign q0_start_replay  = rw_regs[(C_S_AXI_DATA_WIDTH*1)+1-1:(C_S_AXI_DATA_WIDTH*1)]; //0x0004
-assign q1_start_replay  = rw_regs[(C_S_AXI_DATA_WIDTH*2)+1-1:(C_S_AXI_DATA_WIDTH*2)]; //0x0008
+assign q1_start_replay  = q0_start_replay; //0x0008
 
 assign q0_replay_count  = rw_regs[(C_S_AXI_DATA_WIDTH*3)+REPLAY_COUNT_WIDTH-1:(C_S_AXI_DATA_WIDTH*3)]; //0x000c
 assign q1_replay_count  = rw_regs[(C_S_AXI_DATA_WIDTH*4)+REPLAY_COUNT_WIDTH-1:(C_S_AXI_DATA_WIDTH*4)]; //0x0010
