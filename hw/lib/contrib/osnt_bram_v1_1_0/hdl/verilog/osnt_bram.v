@@ -31,7 +31,7 @@
 
 module osnt_bram 
 #(
-	parameter	ADDR_WIDTH		= 20,
+	parameter	ADDR_WIDTH		= 16,
 	parameter	DATA_WIDTH		= 736 //32 bit aligned. (TDATA=512 + TUSER=128 + TKEEP=64 + TVALID=1 + TLAST=1: tot = 706)
 )
 (
@@ -44,7 +44,7 @@ module osnt_bram
    input   				bram_we
 );
 
-(* ram_style = "block" *) reg   [DATA_WIDTH-1:0]    bootmem[0:(2**ADDR_WIDTH)-1];
+(* ram_style = "ultra" *) reg   [DATA_WIDTH-1:0]    bootmem[0:(2**ADDR_WIDTH)-1];
 
 integer i;
 
