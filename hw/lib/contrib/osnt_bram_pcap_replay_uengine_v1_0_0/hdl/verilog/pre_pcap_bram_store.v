@@ -89,15 +89,15 @@ wire                                      fifo_s_out_tlast;
 
 wire  s_conv_512to128_tready;
 
-wire  [(C_M_AXIS_DATA_WIDTH/2)-1:0]       m_conv_512to128_tdata;
-wire  [((C_M_AXIS_DATA_WIDTH/2)/8)-1:0]   m_conv_512to128_tkeep;
-wire  [(C_M_AXIS_TUSER_WIDTH*2)-1:0]      m_conv_512to128_tuser;
+wire  [(C_M_AXIS_DATA_WIDTH/4)-1:0]       m_conv_512to128_tdata;
+wire  [((C_M_AXIS_DATA_WIDTH/4)/8)-1:0]   m_conv_512to128_tkeep;
+wire  [(C_M_AXIS_TUSER_WIDTH)-1:0]        m_conv_512to128_tuser;
 wire                                      m_conv_512to128_tlast;
 wire                                      m_conv_512to128_tvalid;
 reg                                       m_conv_512to128_tready;
 
-reg   [(C_M_AXIS_DATA_WIDTH/2)-1:0]       s_conv_128to512_tdata;
-reg   [((C_M_AXIS_DATA_WIDTH/2)/8)-1:0]   s_conv_128to512_tkeep;
+reg   [(C_M_AXIS_DATA_WIDTH/4)-1:0]       s_conv_128to512_tdata;
+reg   [((C_M_AXIS_DATA_WIDTH/4)/8)-1:0]   s_conv_128to512_tkeep;
 reg   [C_M_AXIS_TUSER_WIDTH-1:0]          s_conv_128to512_tuser, s_conv_128to512_tuser_next, s_conv_128to512_tuser_current;
 reg                                       s_conv_128to512_tlast;
 reg                                       s_conv_128to512_tvalid;
