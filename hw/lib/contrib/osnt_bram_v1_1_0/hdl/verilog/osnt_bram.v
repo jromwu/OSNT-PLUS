@@ -31,7 +31,7 @@
 
 module osnt_bram 
 #(
-	parameter	ADDR_WIDTH		= 16,
+	parameter	ADDR_WIDTH		= 14,
 	parameter	DATA_WIDTH		= 736 //32 bit aligned. (TDATA=512 + TUSER=128 + TKEEP=64 + TVALID=1 + TLAST=1: tot = 706)
 )
 (
@@ -49,14 +49,15 @@ module osnt_bram
 integer i;
 
 always @(posedge bram_clk) begin
-   if (bram_rst) begin
-   	for (i=0; i<2**ADDR_WIDTH; i=i+1)
-	     bootmem[i] <= {DATA_WIDTH{1'b0}};
-   end     
-   else if (bram_en) begin
+//   if (bram_rst) begin
+//   	for (i=0; i<2**ADDR_WIDTH; i=i+1)
+//	     bootmem[i] <= {DATA_WIDTH{1'b0}};
+//   end     
+//   else 
+   if (bram_en) begin
    	bram_rddata  <= bootmem[bram_addr];
-      		if (bram_we) 
-      			bootmem[bram_addr] <= bram_wrdata;
+      	if (bram_we) 
+      		bootmem[bram_addr] <= bram_wrdata;
    end
 end
 

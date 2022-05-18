@@ -46,7 +46,7 @@ module osnt_bram_pcap_replay_uengine
   parameter REPLAY_COUNT_WIDTH   = 32,
   parameter NUM_QUEUES           = 2,
   parameter SIM_ONLY             = 0,
-  parameter MEM_DEPTH            = 16 
+  parameter MEM_DEPTH            = 14 
 )
 (
   // Slave AXI Ports
