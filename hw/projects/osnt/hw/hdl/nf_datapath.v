@@ -209,42 +209,6 @@ module nf_datapath #(
     output     [1 :0]                         S7_AXI_BRESP,
     output                                    S7_AXI_BVALID,
     output                                    S7_AXI_AWREADY,
-    // Memory mapped BRAM (port 0)
-    input      [C_S_AXI_ADDR_WIDTH-1 : 0]     S8_AXI_AWADDR,
-    input                                     S8_AXI_AWVALID,
-    input      [C_S_AXI_DATA_WIDTH-1 : 0]     S8_AXI_WDATA,
-    input      [C_S_AXI_DATA_WIDTH/8-1 : 0]   S8_AXI_WSTRB,
-    input                                     S8_AXI_WVALID,
-    input                                     S8_AXI_BREADY,
-    input      [C_S_AXI_ADDR_WIDTH-1 : 0]     S8_AXI_ARADDR,
-    input                                     S8_AXI_ARVALID,
-    input                                     S8_AXI_RREADY,
-    output                                    S8_AXI_ARREADY,
-    output     [C_S_AXI_DATA_WIDTH-1 : 0]     S8_AXI_RDATA,
-    output     [1 : 0]                        S8_AXI_RRESP,
-    output                                    S8_AXI_RVALID,
-    output                                    S8_AXI_WREADY,
-    output     [1 :0]                         S8_AXI_BRESP,
-    output                                    S8_AXI_BVALID,
-    output                                    S8_AXI_AWREADY,
-    // Memory mapped BRAM (port 1)
-    input      [C_S_AXI_ADDR_WIDTH-1 : 0]     S9_AXI_AWADDR,
-    input                                     S9_AXI_AWVALID,
-    input      [C_S_AXI_DATA_WIDTH-1 : 0]     S9_AXI_WDATA,
-    input      [C_S_AXI_DATA_WIDTH/8-1 : 0]   S9_AXI_WSTRB,
-    input                                     S9_AXI_WVALID,
-    input                                     S9_AXI_BREADY,
-    input      [C_S_AXI_ADDR_WIDTH-1 : 0]     S9_AXI_ARADDR,
-    input                                     S9_AXI_ARVALID,
-    input                                     S9_AXI_RREADY,
-    output                                    S9_AXI_ARREADY,
-    output     [C_S_AXI_DATA_WIDTH-1 : 0]     S9_AXI_RDATA,
-    output     [1 : 0]                        S9_AXI_RRESP,
-    output                                    S9_AXI_RVALID,
-    output                                    S9_AXI_WREADY,
-    output     [1 :0]                         S9_AXI_BRESP,
-    output                                    S9_AXI_BVALID,
-    output                                    S9_AXI_AWREADY,
 
     // Slave Stream Ports (interface from Rx queues)
     input [C_S_AXIS_DATA_WIDTH - 1:0]         s_axis_0_tdata,
@@ -504,37 +468,6 @@ module nf_datapath #(
       .bram_wrdata(ip2bram_dout0),
       .bram_rddata(ip2bram_din0)
     );
-//   //BRAM memory port 0 (memory mapping) 
-//   axi_bram_ctrl_0 u_axi_bram_ctrl_0 (
-//      .s_axi_aclk    (axi_aclk),
-//      .s_axi_aresetn (axi_resetn),
-//      .s_axi_awaddr  (S8_AXI_AWADDR),
-//      .s_axi_awprot  (),
-//      .s_axi_awvalid (S8_AXI_AWVALID),
-//      .s_axi_awready (S8_AXI_AWREADY),
-//      .s_axi_wdata   (S8_AXI_WDATA),
-//      .s_axi_wstrb   (S8_AXI_WSTRB),
-//      .s_axi_wvalid  (S8_AXI_WVALID),
-//      .s_axi_wready  (S8_AXI_WREADY),
-//      .s_axi_bresp   (S8_AXI_BRESP),
-//      .s_axi_bvalid  (S8_AXI_BVALID),
-//      .s_axi_bready  (S8_AXI_BREADY),
-//      .s_axi_araddr  (S8_AXI_ARADDR),
-//      .s_axi_arprot  (),
-//      .s_axi_arvalid (S8_AXI_ARVALID),
-//      .s_axi_arready (S8_AXI_ARREADY),
-//      .s_axi_rdata   (S8_AXI_RDATA),
-//      .s_axi_rresp   (S8_AXI_RRESP),
-//      .s_axi_rvalid  (S8_AXI_RVALID),
-//      .s_axi_rready  (S8_AXI_RREADY),
-//      .bram_rst_a    (axi_resetn),
-//      .bram_clk_a    (axi_aclk),
-//      .bram_en_a     (h2ip_en0),
-//      .bram_we_a     (h2ip_we0),
-//      .bram_addr_a   (h2ip_addr0),
-//      .bram_wrdata_a (h2ip_wrdata0),
-//      .bram_rddata_a (h2ip_rddata0)
-//    );
   //BRAM memory port 1  
   osnt_bram_ip  u_osnt_bram_1  (
 //      .bram_clk_a(axi_aclk),
@@ -552,37 +485,7 @@ module nf_datapath #(
       .bram_wrdata(ip2bram_dout1),
       .bram_rddata(ip2bram_din1)
     );
-//   //BRAM memory port 1 (memory mapping) 
-//   axi_bram_ctrl_0 u_axi_bram_ctrl_1 (
-//      .s_axi_aclk    (axi_aclk),
-//      .s_axi_aresetn (axi_resetn),
-//      .s_axi_awaddr  (S9_AXI_AWADDR),
-//      .s_axi_awprot  (),
-//      .s_axi_awvalid (S9_AXI_AWVALID),
-//      .s_axi_awready (S9_AXI_AWREADY),
-//      .s_axi_wdata   (S9_AXI_WDATA),
-//      .s_axi_wstrb   (S9_AXI_WSTRB),
-//      .s_axi_wvalid  (S9_AXI_WVALID),
-//      .s_axi_wready  (S9_AXI_WREADY),
-//      .s_axi_bresp   (S9_AXI_BRESP),
-//      .s_axi_bvalid  (S9_AXI_BVALID),
-//      .s_axi_bready  (S9_AXI_BREADY),
-//      .s_axi_araddr  (S9_AXI_ARADDR),
-//      .s_axi_arprot  (),
-//      .s_axi_arvalid (S9_AXI_ARVALID),
-//      .s_axi_arready (S9_AXI_ARREADY),
-//      .s_axi_rdata   (S9_AXI_RDATA),
-//      .s_axi_rresp   (S9_AXI_RRESP),
-//      .s_axi_rvalid  (S9_AXI_RVALID),
-//      .s_axi_rready  (S9_AXI_RREADY),
-//      .bram_rst_a    (axi_resetn),
-//      .bram_clk_a    (axi_aclk),
-//      .bram_en_a     (h2ip_en1),
-//      .bram_we_a     (h2ip_we1),
-//      .bram_addr_a   (h2ip_addr1),
-//      .bram_wrdata_a (h2ip_wrdata1),
-//      .bram_rddata_a (h2ip_rddata1)
-//    );
+
   //Inter Packet Delay
   osnt_inter_packet_delay_ip  u_osnt_inter_packet_delay_0  (
       .axis_aclk(axis_aclk),
