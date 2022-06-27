@@ -279,12 +279,36 @@ module nf_datapath #(
     wire [DATA_WIDTH-1:0]                    ip2bram_din0;
     wire                                     ip2bram_en0;
     wire                                     ip2bram_we0;
+    // PCAP reply <-> BRAM mem port 0 (reg)
+    reg [ADDR_WIDTH-1:0]                     ip2bram_addr0_reg;
+    reg [DATA_WIDTH-1:0]                     ip2bram_dout0_reg;
+    reg [DATA_WIDTH-1:0]                     ip2bram_din0_reg;
+    reg                                      ip2bram_en0_reg;
+    reg                                      ip2bram_we0_reg;
+    // PCAP reply <-> BRAM mem port 0 (wire)
+    wire [ADDR_WIDTH-1:0]                    ip2bram_addr0_w;
+    wire [DATA_WIDTH-1:0]                    ip2bram_dout0_w;
+    wire [DATA_WIDTH-1:0]                    ip2bram_din0_w;
+    wire                                     ip2bram_en0_w;
+    wire                                     ip2bram_we0_w;    
     // PCAP reply <-> BRAM mem port 1
     wire [ADDR_WIDTH-1:0]                    ip2bram_addr1;
     wire [DATA_WIDTH-1:0]                    ip2bram_dout1;
     wire [DATA_WIDTH-1:0]                    ip2bram_din1;
     wire                                     ip2bram_en1;
     wire                                     ip2bram_we1;
+    // PCAP reply <-> BRAM mem port 1 (reg)
+    reg [ADDR_WIDTH-1:0]                     ip2bram_addr1_reg;
+    reg [DATA_WIDTH-1:0]                     ip2bram_dout1_reg;
+    reg [DATA_WIDTH-1:0]                     ip2bram_din1_reg;
+    reg                                      ip2bram_en1_reg;
+    reg                                      ip2bram_we1_reg;    
+    // PCAP reply <-> BRAM mem port 1 (wire)
+    wire [ADDR_WIDTH-1:0]                    ip2bram_addr1_w;
+    wire [DATA_WIDTH-1:0]                    ip2bram_dout1_w;
+    wire [DATA_WIDTH-1:0]                    ip2bram_din1_w;
+    wire                                     ip2bram_en1_w;
+    wire                                     ip2bram_we1_w;
 //   // Memory mapping for BRAM mem port 0
 //    wire [ADDR_WIDTH-1:0]                    h2ip_addr0;
 //    wire [DATA_WIDTH-1:0]                    h2ip_wrdata0;
@@ -324,6 +348,47 @@ module nf_datapath #(
     wire                                     m1_axis_ipd_tready;
     wire                                     m1_axis_ipd_tlast;
 
+  //----------------------------------------------------------
+  // Pipelining for improved timing
+  //---------------------------------------------------------
+ 
+   assign ip2bram_addr0_w = ip2bram_addr0_reg;
+   assign ip2bram_dout0_w = ip2bram_dout0_reg;
+   assign ip2bram_din0_w = ip2bram_din0_reg;
+   assign ip2bram_en0_w = ip2bram_en0_reg;
+   assign ip2bram_we0_w = ip2bram_we0_reg;
+   assign ip2bram_addr1_w = ip2bram_addr1_reg;
+   assign p2bram_dout1_w = p2bram_dout1_reg;
+   assign ip2bram_din1_w = ip2bram_din1_reg;
+   assign ip2bram_en1_w = ip2bram_en1_reg;
+   assign ip2bram_we1_w = ip2bram_we1_reg;
+
+   always @(posedge axis_aclk) begin
+    	if(!axis_resetn) begin
+    		ip2bram_addr0_reg <= 0;
+    		ip2bram_dout0_reg <= 0;
+    		ip2bram_din0_reg <= 0;
+    		ip2bram_en0_reg <= 0;
+    		ip2bram_we0_reg <= 0;
+                ip2bram_addr1_reg <= 0;
+                ip2bram_dout1_reg <= 0;
+                ip2bram_din1_reg <= 0;
+                ip2bram_en1_reg <= 0;
+                ip2bram_we1_reg <= 0;
+	end
+	else begin
+		ip2bram_addr0_reg <= ip2bram_addr0;
+                ip2bram_dout0_reg <= ip2bram_dout0;
+                ip2bram_din0_reg <= ip2bram_din0;
+                ip2bram_en0_reg <= ip2bram_en0;
+                ip2bram_we0_reg <= ip2bram_we0;
+                ip2bram_addr1_reg <= ip2bram_addr1;
+                ip2bram_dout1_reg <= ip2bram_dout1;
+                ip2bram_din1_reg <= ip2bram_din1;
+                ip2bram_en1_reg <= ip2bram_en1;
+                ip2bram_we1_reg <= ip2bram_we1;
+	end
+  end
   //----------------------------------------------------------
   // OSNT TX pipeline
   //---------------------------------------------------------
@@ -425,12 +490,12 @@ module nf_datapath #(
       .ena0(ip2bram_en0),
       .wea0(ip2bram_we0),
       .douta0(ip2bram_dout0),
-      .dina0(ip2bram_din0),
+      .dina0(ip2bram_din0_w),
       .addra1(ip2bram_addr1),
       .ena1(ip2bram_en1),
       .wea1(ip2bram_we1),
       .douta1(ip2bram_dout1),
-      .dina1(ip2bram_dout1),
+      .dina1(ip2bram_din1_w),
       .s_axi_awaddr(S2_AXI_AWADDR),
       .s_axi_awvalid(S2_AXI_AWVALID),
       .s_axi_wdata(S2_AXI_WDATA),
@@ -462,10 +527,10 @@ module nf_datapath #(
 //      .bram_rddata_a(h2ip_rddata0),
       .bram_clk(axi_aclk),
       .bram_rst(axi_resetn), 
-      .bram_addr(ip2bram_addr0),
-      .bram_en(ip2bram_en0),
-      .bram_we(ip2bram_we0),            
-      .bram_wrdata(ip2bram_dout0),
+      .bram_addr(ip2bram_addr0_w),
+      .bram_en(ip2bram_en0_w),
+      .bram_we(ip2bram_we0_w),            
+      .bram_wrdata(ip2bram_dout0_w),
       .bram_rddata(ip2bram_din0)
     );
   //BRAM memory port 1  
@@ -479,10 +544,10 @@ module nf_datapath #(
 //      .bram_rddata_a(h2ip_rddata1),
       .bram_clk(axi_aclk),
       .bram_rst(axi_resetn),
-      .bram_addr(ip2bram_addr1),
-      .bram_en(ip2bram_en1),
-      .bram_we(ip2bram_we1),
-      .bram_wrdata(ip2bram_dout1),
+      .bram_addr(ip2bram_addr1_w),
+      .bram_en(ip2bram_en1_w),
+      .bram_we(ip2bram_we1_w),
+      .bram_wrdata(ip2bram_dout1_w),
       .bram_rddata(ip2bram_din1)
     );
 

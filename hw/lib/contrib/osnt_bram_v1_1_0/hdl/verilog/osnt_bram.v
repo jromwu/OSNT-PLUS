@@ -47,29 +47,29 @@ module osnt_bram
 (* ram_style = "ultra" *) reg   [DATA_WIDTH-1:0]    bootmem[0:(2**ADDR_WIDTH)-1];
 
 integer i;
-reg 			bram_en_reg;
-reg 			bram_we_reg;
-reg [DATA_WIDTH-1:0]	bram_tmp_read;
-reg [DATA_WIDTH-1:0]    bram_tmp_write;
+//reg 			bram_en_reg;
+//reg 			bram_we_reg;
+//reg [DATA_WIDTH-1:0]	bram_tmp_read;
+//reg [DATA_WIDTH-1:0]    bram_tmp_write;
 
 always @(posedge bram_clk) begin
-	bram_en_reg <= bram_en;
-	bram_we_reg <= bram_en && bram_we;
-	if(bram_en) begin
-		bram_tmp_read <= bootmem[bram_addr];
-		if(bram_we)
-			bram_tmp_write <= bram_wrdata;
-	end
-	if(bram_en_reg)
-		bram_rddata <= bram_tmp_read;
-	if(bram_we_reg)
-		bootmem[bram_addr] <= bram_tmp_write;
-end
-//   if (bram_en) begin
-//   	bram_rddata  <= bootmem[bram_addr];
-//      	if (bram_we) 
-//      		bootmem[bram_addr] <= bram_wrdata;
-//   end
+//	bram_en_reg <= bram_en;
+//	bram_we_reg <= bram_en && bram_we;
+//	if(bram_en) begin
+//		bram_tmp_read <= bootmem[bram_addr];
+//		if(bram_we)
+//			bram_tmp_write <= bram_wrdata;
+//	end
+//	if(bram_en_reg)
+//		bram_rddata <= bram_tmp_read;
+//	if(bram_we_reg)
+//		bootmem[bram_addr] <= bram_tmp_write;
 //end
+	if (bram_en) begin
+		bram_rddata  <= bootmem[bram_addr];
+      		if (bram_we) 
+      			bootmem[bram_addr] <= bram_wrdata;
+   	end
+end
 
 endmodule
