@@ -358,7 +358,7 @@ module nf_datapath #(
    assign ip2bram_en0_w = ip2bram_en0_reg;
    assign ip2bram_we0_w = ip2bram_we0_reg;
    assign ip2bram_addr1_w = ip2bram_addr1_reg;
-   assign ip2bram_dout1_w = p2bram_dout1_reg;
+   assign ip2bram_dout1_w = ip2bram_dout1_reg;
    assign ip2bram_din1_w = ip2bram_din1_reg;
    assign ip2bram_en1_w = ip2bram_en1_reg;
    assign ip2bram_we1_w = ip2bram_we1_reg;
