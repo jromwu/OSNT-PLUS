@@ -105,6 +105,7 @@ osnt-cores:
 	make -C $(LIB_HW_DIR)/contrib/osnt_stamp_counter_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_mac_attachment_v1_0_0/
 	make -C $(LIB_HW_DIR)/contrib/osnt_rate_limiter_v1_0_0/
+	make -C $(LIB_HW_DIR)/contrib/osnt_bram_v1_1_0/
 	@echo "/////////////////////////////////////////";
 	@echo "//\tOSNT library cores created.";
 	@echo "/////////////////////////////////////////";
