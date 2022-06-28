@@ -586,7 +586,7 @@ module top #(
     .s_axi_rvalid  (s_axil_rvalid  ),
     .s_axi_rready  (s_axil_rready  ),
     .m_axi_awaddr  ({S7_AXI_AWADDR ,S6_AXI_AWADDR ,S5_AXI_AWADDR ,S4_AXI_AWADDR ,S3_AXI_AWADDR ,S2_AXI_AWADDR ,S1_AXI_AWADDR ,S0_AXI_AWADDR }),
-    .m_axi_awprot  ()
+    .m_axi_awprot  (),
     .m_axi_awvalid ({S7_AXI_AWVALID,S6_AXI_AWVALID,S5_AXI_AWVALID,S4_AXI_AWVALID,S3_AXI_AWVALID,S2_AXI_AWVALID,S1_AXI_AWVALID,S0_AXI_AWVALID}),
     .m_axi_awready ({S7_AXI_AWREADY,S6_AXI_AWREADY,S5_AXI_AWREADY,S4_AXI_AWREADY,S3_AXI_AWREADY,S2_AXI_AWREADY,S1_AXI_AWREADY,S0_AXI_AWREADY}),
     .m_axi_wdata   ({S7_AXI_WDATA  ,S6_AXI_WDATA  ,S5_AXI_WDATA  ,S4_AXI_WDATA  ,S3_AXI_WDATA  ,S2_AXI_WDATA  ,S1_AXI_WDATA  ,S0_AXI_WDATA  }),
