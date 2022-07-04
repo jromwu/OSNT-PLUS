@@ -31,7 +31,7 @@
 
 module osnt_bram 
 #(
-	parameter	ADDR_WIDTH		= 14,
+	parameter	ADDR_WIDTH		= 11,
 	parameter	DATA_WIDTH		= 736 //32 bit aligned. (TDATA=512 + TUSER=128 + TKEEP=64 + TVALID=1 + TLAST=1: tot = 706)
 )
 (

@@ -255,7 +255,7 @@ module nf_datapath #(
     
 
 
-    localparam ADDR_WIDTH = 14; //hardcoded. Need to be consistent with osnt_bram module
+    localparam ADDR_WIDTH = 11; //hardcoded. Need to be consistent with osnt_bram module
     localparam DATA_WIDTH = 736;//hardcoded. Need to be consistent with osnt_bram module
     //internal connectivity
   
