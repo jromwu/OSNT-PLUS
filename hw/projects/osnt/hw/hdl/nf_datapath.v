@@ -334,7 +334,33 @@ module nf_datapath #(
     wire                                     m1_axis_pcap_tvalid;
     wire                                     m1_axis_pcap_tready;
     wire                                     m1_axis_pcap_tlast;
-   // Inter Packet Delay to Rate Limiter
+   // PCAP Reply to Inter Packet Delay (reg)
+    reg [C_TX_DATA_WIDTH-1:0]                m0_axis_pcap_tdata_reg;
+    reg [((C_TX_DATA_WIDTH/8))-1:0]          m0_axis_pcap_tkeep_reg;
+    reg [C_M_AXIS_TUSER_WIDTH-1:0]           m0_axis_pcap_tuser_reg;
+    reg					     m0_axis_pcap_tvalid_reg;
+    reg                                      m0_axis_pcap_tready_reg;
+    reg                                      m0_axis_pcap_tlast_reg;
+    reg [C_TX_DATA_WIDTH-1:0]                m1_axis_pcap_tdata_reg;
+    reg [((C_TX_DATA_WIDTH/8))-1:0]          m1_axis_pcap_tkeep_reg;
+    reg [C_M_AXIS_TUSER_WIDTH-1:0]           m1_axis_pcap_tuser_reg;
+    reg                                      m1_axis_pcap_tvalid_reg;
+    reg                                      m1_axis_pcap_tready_reg;
+    reg                                      m1_axis_pcap_tlast_reg;
+   // PCAP Reply to Inter Packet Delay (wire)
+    wire [C_TX_DATA_WIDTH-1:0]               m0_axis_pcap_tdata_w;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m0_axis_pcap_tkeep_w;
+    wire [C_M_AXIS_TUSER_WIDTH-1:0]          m0_axis_pcap_tuser_w;
+    wire                                     m0_axis_pcap_tvalid_w;
+    wire                                     m0_axis_pcap_tready_w;
+    wire                                     m0_axis_pcap_tlast_w;
+    wire [C_TX_DATA_WIDTH-1:0]               m1_axis_pcap_tdata_w;
+    wire [((C_TX_DATA_WIDTH/8))-1:0]         m1_axis_pcap_tkeep_w;
+    wire [C_M_AXIS_TUSER_WIDTH-1:0]          m1_axis_pcap_tuser_w;
+    wire                                     m1_axis_pcap_tvalid_w;
+    wire                                     m1_axis_pcap_tready_w;
+    wire                                     m1_axis_pcap_tlast_w;   
+    // Inter Packet Delay to Rate Limiter
     wire [C_TX_DATA_WIDTH-1:0]               m0_axis_ipd_tdata;
     wire [((C_TX_DATA_WIDTH/8))-1:0]         m0_axis_ipd_tkeep;
     wire [C_M_AXIS_TUSER_WIDTH-1:0]          m0_axis_ipd_tuser;
@@ -363,6 +389,20 @@ module nf_datapath #(
    assign ip2bram_en1_w = ip2bram_en1_reg;
    assign ip2bram_we1_w = ip2bram_we1_reg;
 
+   assign m0_axis_pcap_tdata_w = m0_axis_pcap_tdata_reg;
+   assign m0_axis_pcap_tkeep_w = m0_axis_pcap_tkeep_reg;
+   assign m0_axis_pcap_tuser_w = m0_axis_pcap_tuser_reg;
+   assign m0_axis_pcap_tvalid_w = m0_axis_pcap_tvalid_reg;
+   assign m0_axis_pcap_tready_w = m0_axis_pcap_tready_reg;
+   assign m0_axis_pcap_tlast_w = m0_axis_pcap_tlast_reg;
+
+   assign m1_axis_pcap_tdata_w = m1_axis_pcap_tdata_reg;
+   assign m1_axis_pcap_tkeep_w = m1_axis_pcap_tkeep_reg;
+   assign m1_axis_pcap_tuser_w = m1_axis_pcap_tuser_reg;
+   assign m1_axis_pcap_tvalid_w = m1_axis_pcap_tvalid_reg;
+   assign m1_axis_pcap_tready_w = m1_axis_pcap_tready_reg;
+   assign m1_axis_pcap_tlast_w = m1_axis_pcap_tlast_reg;
+
    always @(posedge axis_aclk) begin
     	if(!axis_resetn) begin
     		ip2bram_addr0_reg <= 0;
@@ -375,6 +415,20 @@ module nf_datapath #(
                 ip2bram_din1_reg <= 0;
                 ip2bram_en1_reg <= 0;
                 ip2bram_we1_reg <= 0;
+
+		m0_axis_pcap_tdata_reg   <= 0;	
+		m0_axis_pcap_tkeep_reg   <= 0;
+		m0_axis_pcap_tuser_reg   <= 0;
+		m0_axis_pcap_tvalid_reg  <= 0;
+		m0_axis_pcap_tready_reg  <= 0;
+		m0_axis_pcap_tlast_reg   <= 0;
+
+		m1_axis_pcap_tdata_reg   <= 0;
+		m1_axis_pcap_tkeep_reg   <= 0;
+		m1_axis_pcap_tuser_reg   <= 0;
+		m1_axis_pcap_tvalid_reg  <= 0;
+		m1_axis_pcap_tready_reg  <= 0;
+		m1_axis_pcap_tlast_reg   <= 0;
 	end
 	else begin
 		ip2bram_addr0_reg <= ip2bram_addr0;
@@ -387,6 +441,20 @@ module nf_datapath #(
                 ip2bram_din1_reg <= ip2bram_din1;
                 ip2bram_en1_reg <= ip2bram_en1;
                 ip2bram_we1_reg <= ip2bram_we1;
+
+		m0_axis_pcap_tdata_reg <= m0_axis_pcap_tdata;
+		m0_axis_pcap_tkeep_reg <= m0_axis_pcap_tkeep;
+		m0_axis_pcap_tuser_reg <= m0_axis_pcap_tuser;
+		m0_axis_pcap_tvalid_reg<= m0_axis_pcap_tvalid;
+		m0_axis_pcap_tready_reg<= m0_axis_pcap_tready;
+		m0_axis_pcap_tlast_reg <= m0_axis_pcap_tlast;
+
+		m1_axis_pcap_tdata_reg <= m1_axis_pcap_tdata;
+		m1_axis_pcap_tkeep_reg <= m1_axis_pcap_tkeep;
+		m1_axis_pcap_tuser_reg <= m1_axis_pcap_tuser;
+		m1_axis_pcap_tvalid_reg<= m1_axis_pcap_tvalid;
+		m1_axis_pcap_tready_reg<= m1_axis_pcap_tready;
+		m1_axis_pcap_tlast_reg <= m1_axis_pcap_tlast;
 	end
   end
   //----------------------------------------------------------
@@ -472,13 +540,13 @@ module nf_datapath #(
       .m0_axis_tkeep (m0_axis_pcap_tkeep),
       .m0_axis_tuser (m0_axis_pcap_tuser),
       .m0_axis_tvalid(m0_axis_pcap_tvalid),
-      .m0_axis_tready(m0_axis_pcap_tready),
+      .m0_axis_tready(m0_axis_pcap_tready_w),
       .m0_axis_tlast (m0_axis_pcap_tlast),
       .m1_axis_tdata (m1_axis_pcap_tdata),
       .m1_axis_tkeep (m1_axis_pcap_tkeep),
       .m1_axis_tuser (m1_axis_pcap_tuser),
       .m1_axis_tvalid(m1_axis_pcap_tvalid),
-      .m1_axis_tready(m1_axis_pcap_tready),
+      .m1_axis_tready(m1_axis_pcap_tready_w),
       .m1_axis_tlast (m1_axis_pcap_tlast),
       .s_axis_tdata (m_axis_opl_tdata),
       .s_axis_tkeep (m_axis_opl_tkeep),
@@ -567,18 +635,18 @@ module nf_datapath #(
       .m1_axis_tvalid(m1_axis_ipd_tvalid),
       .m1_axis_tready(m1_axis_ipd_tready),
       .m1_axis_tlast (m1_axis_ipd_tlast),      
-      .s0_axis_tdata (m0_axis_pcap_tdata),
-      .s0_axis_tkeep (m0_axis_pcap_tkeep),
-      .s0_axis_tuser (m0_axis_pcap_tuser),
-      .s0_axis_tvalid(m0_axis_pcap_tvalid),
+      .s0_axis_tdata (m0_axis_pcap_tdata_w),
+      .s0_axis_tkeep (m0_axis_pcap_tkeep_w),
+      .s0_axis_tuser (m0_axis_pcap_tuser_w),
+      .s0_axis_tvalid(m0_axis_pcap_tvalid_w),
       .s0_axis_tready(m0_axis_pcap_tready),
-      .s0_axis_tlast (m0_axis_pcap_tlast),
-      .s1_axis_tdata (m1_axis_pcap_tdata),
-      .s1_axis_tkeep (m1_axis_pcap_tkeep),
-      .s1_axis_tuser (m1_axis_pcap_tuser),
-      .s1_axis_tvalid(m1_axis_pcap_tvalid),
+      .s0_axis_tlast (m0_axis_pcap_tlast_w),
+      .s1_axis_tdata (m1_axis_pcap_tdata_w),
+      .s1_axis_tkeep (m1_axis_pcap_tkeep_w),
+      .s1_axis_tuser (m1_axis_pcap_tuser_w),
+      .s1_axis_tvalid(m1_axis_pcap_tvalid_w),
       .s1_axis_tready(m1_axis_pcap_tready),
-      .s1_axis_tlast (m1_axis_pcap_tlast),
+      .s1_axis_tlast (m1_axis_pcap_tlast_w),
       .s_axi_awaddr(S3_AXI_AWADDR),
       .s_axi_awvalid(S3_AXI_AWVALID),
       .s_axi_wdata(S3_AXI_WDATA),
