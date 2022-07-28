@@ -45,6 +45,8 @@ input_arg = argparse.ArgumentParser()
 input_arg.add_argument("-new", action="store_true", help="new command set (clear old parameters) eg. -new")
 input_arg.add_argument("-ifp0", type=str, help="OSNT PLUS generator load packet into port 0. eg. -if0 <pcap file>")
 input_arg.add_argument("-ifp1", type=str, help="OSNT PLUS generator load packet into port 1. eg. -if1 <pcap file>")
+input_arg.add_argument("-ifpt0", type=str, help="OSNT SUME generator load packet into nf0 with timestamp. eg. -if0 <pcap file>")
+input_arg.add_argument("-ifpt1", type=str, help="OSNT SUME generator load packet into nf1 with timestamp. eg. -if1 <pcap file>")
 input_arg.add_argument("-rpn0", type=int, help="OSNT PLUS generator packet replay no. on port 0. eg. -rpn0 <integer number>")
 input_arg.add_argument("-rpn1", type=int, help="OSNT PLUS generator packet replay no. on port 1. eg. -rpn1 <integer number>")
 input_arg.add_argument("-ipg0", type=int, help="OSNT PLUS generator inter packet gap on port 0. eg. -ipg0 <integer number>")
@@ -114,10 +116,10 @@ if (args.new):
 
 ## ==============================================
 
-if (args.clear):
-    set_clear()
-    clear()
-    sys.exit(1)
+#if (args.clear):
+#    set_clear()
+#    clear()
+#    sys.exit(1)
 
 # Set no packet for latency measure ment 
 #if (args.lpn or args.lpn == 0):
@@ -322,7 +324,7 @@ if (args.run):
     print(" --------- Packet Generator Started With The Following Configuration ------------")
     print(" --------------------------------------------------------------------------------")
     print("                                 ")
-    print("       replay,     delay,     rxts,     txts,     pcap or pcap_ts,")
+    print("             replay,     delay,     rxts,     txts,     pcap or pcap_ts,")
     print("                                 ")
     for i in range(2):
         port_name = " [ens1f"+str(i)+"]"
@@ -342,7 +344,8 @@ if (args.run):
 #            rxtss[i] = "- "
 #        if txtss[i] == "nullstr":
 #            txtss[i] = "-"
-        print((port_name+"   "+ str(replays[i])+"           "+str(delays[i])+"         "+str(rxtss[i])+"        "+str(txtss[i])+"      " + pcap_print))
+#        print((port_name+"   "+ str(replays[i])+"           "+str(delays[i])+"         "+str(rxtss[i])+"        "+str(txtss[i])+"      " + pcap_print))
+        print((port_name+"   "+ str(replays[i])+"           "+str(delays[i])+"        n/a""        n/a""      " + pcap_print))
         print("                                 ")
     
     print((datetime.now()))
@@ -351,8 +354,8 @@ if (args.run):
     ###########################################################
 
 # Show the stats in monitor
-if (args.st):
-    cli_display_stats("show")
+#if (args.st):
+#    cli_display_stats("show")
 
-if (args.ds):
-    run_stats()
+#if (args.ds):
+#    run_stats()
