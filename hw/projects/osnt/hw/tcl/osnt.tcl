@@ -488,7 +488,7 @@ set_property write_incremental_synth_checkpoint true [get_runs synth_1]
 set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs synth_1]
 #Setting Implementation options
 create_run impl -parent_run synth -flow {Vivado Implementation 2020}
-set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
+set_property strategy Performance_BalanceSLRs [get_runs impl_1]
 #set_property steps.phys_opt_design.is_enabled true [get_runs impl_1]
 #set_property STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE ExploreWithHoldFix [get_runs impl_1]
 #set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore [get_runs impl_1]
