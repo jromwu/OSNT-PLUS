@@ -45,15 +45,15 @@ from subprocess import Popen, PIPE
 #TO ADJUST BASED ON HW:
 DATAPATH_FREQUENCY = 250000000
 
-PCAP_ENGINE_BASE_ADDR = "0x76000000"
+PCAP_ENGINE_BASE_ADDR = "0x12000"
 
-INTER_PKT_DELAY_BASE_ADDR = {"ens1f0" : "0x76600000",
-                             "ens1f1" : "0x76600030"}
+INTER_PKT_DELAY_BASE_ADDR = {"ens1f0" : "0x13000",
+                             "ens1f1" : "0x13030"}
 
-RATE_LIMITER_BASE_ADDR = {"ens1f0" : "0x77e00000",
-                          "ens1f1" : "0x77e00024"}
+RATE_LIMITER_BASE_ADDR = {"ens1f0" : "0x14000",
+                          "ens1f1" : "0x14024"}
 
-DELAY_HEADER_EXTRACTOR_BASE_ADDR = "0x76e00000"
+DELAY_HEADER_EXTRACTOR_BASE_ADDR = "0x10000"
 
 
 TS_SIGNATURE = '\xde\xad\xbe\xef\x00\x00\x00\x00'
@@ -203,12 +203,12 @@ class OSNTGeneratorPcapEngine:
             sleep(1)
             if iface == 'ens1f0':
                 print(iface)
-                wraxi("0x7600002C", 0x1)
-                wraxi("0x7600002C", 0x0)
+                wraxi("0x1202C", 0x1)
+                wraxi("0x1202C", 0x0)
             if iface == 'ens1f1':
                 print(iface)
-                wraxi("0x76000030", 0x1)
-                wraxi("0x76000030", 0x0)
+                wraxi("0x12030", 0x1)
+                wraxi("0x12030", 0x0)
 
 
     def load_pcap(self, pcaps):
@@ -252,13 +252,13 @@ class OSNTGeneratorPcapEngine:
         
             sleep(1)
             if iface == 'ens1f0':
-                wraxi("0x7600002C", 0x1)
+                wraxi("0x1202C", 0x1)
                 sleep(0.5)
-                wraxi("0x7600002C", 0x0)
+                wraxi("0x1202C", 0x0)
             if iface == 'ens1f1':
-                wraxi("0x76000030", 0x1)
+                wraxi("0x12030", 0x1)
                 sleep(0.5)
-                wraxi("0x76000030", 0x0)
+                wraxi("0x12030", 0x0)
 
         return {'average_pkt_len':average_pkt_len, 'average_word_cnt':average_word_cnt, 'pkts_loaded':pkts_loaded}
 
@@ -323,13 +323,13 @@ class OSNTGeneratorPcapEngine:
 
             sleep(1)
             if iface == 'ens1f0':
-                wraxi("0x7600002C", 0x1)
+                wraxi("0x1202C", 0x1)
                 sleep(0.5)
-                wraxi("0x7600002C", 0x0)
+                wraxi("0x1202C", 0x0)
             if iface == 'ens1f1':
-                wraxi("0x76000030", 0x1)
+                wraxi("0x12030", 0x1)
                 sleep(0.5)
-                wraxi("0x76000030", 0x0)
+                wraxi("0x12030", 0x0)
 
         return {'average_pkt_len':average_pkt_len, 'average_word_cnt':average_word_cnt, 'pkts_loaded':pkts_loaded}
 

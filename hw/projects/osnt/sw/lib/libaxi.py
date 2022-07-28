@@ -65,7 +65,7 @@ from struct import *
 from binascii import hexlify
 
 def rdaxi(addr):
-    value=subprocess.getoutput('./axilib -i ens1f0 -a ' +str(addr))
+    value=subprocess.getoutput('../lib/axilib -i ens1f0 -a ' +str(addr))
     read_data = int(value, 16);
     value = hex(read_data & int("0xffffffff", 16))
     
@@ -77,7 +77,7 @@ def rdaxi(addr):
     return value
 
 def wraxi(addr, value):
-    os.system("./axilib -i ens1f0 -a "+str(addr)+" -w "+str(value))
+    os.system("../lib/axilib -i ens1f0 -a "+str(addr)+" -w "+str(value))
     content = "write to "+str(addr)+" with "+str(value)+" \r\n"
     f=open("axitrack.txt", "a")
     f.write(content)

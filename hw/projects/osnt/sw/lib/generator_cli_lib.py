@@ -28,7 +28,7 @@
 ################################################################################
 
 import os, argparse, datetime, subprocess
-from axi import *
+from libaxi import *
 from generator import *
 
 #TARGET_BASE_ADDR = "0x79000000" # TO UPDATE (10g_axi_if)
