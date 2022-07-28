@@ -175,7 +175,7 @@ wire  [NUM_RW_REGS*C_S_AXI_DATA_WIDTH:0]           rw_regs;
 //REG10 enable q1	(0x0028) note: not used at the moment
 //REG11 wr_done q0	(0x002c)
 //REG12 wr_done q1	(0x0030)
-//REG13 conf_path	(0x0034)
+//REG13 conf_path	(0x0034) note: removed.
 
 wire                            sw_rst;
 
@@ -199,7 +199,7 @@ reg   [REPLAY_COUNT_WIDTH-1:0]  q1_count, q1_count_next;
 wire                            q0_start_replay;
 wire                            q1_start_replay;
 
-wire  [C_S_AXI_DATA_WIDTH-1:0]  conf_path;
+//wire  [C_S_AXI_DATA_WIDTH-1:0]  conf_path;
 
 // ------------- Regs/ wires -----------
 
@@ -306,10 +306,10 @@ always @(*) begin
    st0_wr_next       = 0;
    case (st0_wr_current)
       `ST0_WR_IDLE : begin
-         tmp0_addr_next    = (pre_axis_tvalid && (tuser_src_port == 8'h02) && !conf_path[0]) ? tmp0_addr + 1 : 1;
-         tmp0_we           = (pre_axis_tvalid && (tuser_src_port == 8'h02) && !conf_path[0]) ? 1 : 0;
-         tmp0_data         = (pre_axis_tvalid && (tuser_src_port == 8'h02) && !conf_path[0]) ? {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata} : 0;
-         st0_wr_next       = (pre_axis_tvalid && (tuser_src_port == 8'h02) && !conf_path[0]) ? `ST0_WR : `ST0_WR_IDLE;
+         tmp0_addr_next    = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? tmp0_addr + 1 : 1;
+         tmp0_we           = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? 1 : 0;
+         tmp0_data         = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata} : 0;
+         st0_wr_next       = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? `ST0_WR : `ST0_WR_IDLE;
       end
       `ST0_WR : begin
          if (sw_rst) begin
@@ -374,10 +374,10 @@ always @(*) begin
    st1_wr_next       = 0;
    case (st1_wr_current)
       `ST1_WR_IDLE : begin
-         tmp1_addr_next    = (pre_axis_tvalid && (tuser_src_port == 8'h08) && !conf_path[1]) ? tmp1_addr + 1 : 1;
-         tmp1_we           = (pre_axis_tvalid && (tuser_src_port == 8'h08) && !conf_path[1]) ? 1 : 0;
-         tmp1_data         = (pre_axis_tvalid && (tuser_src_port == 8'h08) && !conf_path[1]) ? {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata} : 0;
-         st1_wr_next       = (pre_axis_tvalid && (tuser_src_port == 8'h08) && !conf_path[1]) ? `ST1_WR : `ST1_WR_IDLE;
+         tmp1_addr_next    = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? tmp1_addr + 1 : 1;
+         tmp1_we           = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? 1 : 0;
+         tmp1_data         = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata} : 0;
+         st1_wr_next       = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? `ST1_WR : `ST1_WR_IDLE;
       end
       `ST1_WR : begin
          if (sw_rst) begin
@@ -519,10 +519,10 @@ always @(*) begin
    st0_rd_next             = 0;
    case (st0_rd_current)
       `ST0_RD_IDLE : begin
-         r_mem_rd_addr_next[0]   = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0) && !conf_path[0]) ? r_mem_rd_addr[0] + 1 : 1;
-         r_mem_rden[0]           = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0) && !conf_path[0]) ? 1 : 0;
+         r_mem_rd_addr_next[0]   = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0)) ? r_mem_rd_addr[0] + 1 : 1;
+         r_mem_rden[0]           = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0)) ? 1 : 0;
          q0_count_next           = 0;
-         st0_rd_next             = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0) && !conf_path[0]) ? `ST0_RD : `ST0_RD_IDLE;
+         st0_rd_next             = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0)) ? `ST0_RD : `ST0_RD_IDLE;
       end
       `ST0_RD : begin
          if (sw_rst) begin
@@ -605,10 +605,10 @@ always @(*) begin
    st1_rd_next             = 0;
    case (st1_rd_current)
       `ST1_RD_IDLE : begin
-         r_mem_rd_addr_next[1]   = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0) && !conf_path[1]) ? r_mem_rd_addr[1] + 1 : 1;
-         r_mem_rden[1]           = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0) && !conf_path[1]) ? 1 : 0;
+         r_mem_rd_addr_next[1]   = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0)) ? r_mem_rd_addr[1] + 1 : 1;
+         r_mem_rden[1]           = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0)) ? 1 : 0;
          q1_count_next           = 0;
-         st1_rd_next             = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0) && !conf_path[1]) ? `ST1_RD : `ST1_RD_IDLE;
+         st1_rd_next             = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0)) ? `ST1_RD : `ST1_RD_IDLE;
       end
       `ST1_RD : begin
          if (sw_rst) begin
@@ -680,50 +680,50 @@ assign src_port[1] = 8'h08;
 assign dst_port[0] = 8'h01;
 assign dst_port[1] = 8'h04;
 
-generate
-   genvar k;
-      for (k=0; k<NUM_QUEUES; k=k+1) begin
-         always @(*) begin
-            fifo_dir_tdata[k]    = 0;
-            fifo_dir_tkeep[k]    = 0;
-            fifo_dir_tuser[k]    = 0;
-            fifo_dir_tlast[k]    = 0;
-            fifo_dir_tvalid[k]   = 0;
-            st_dir_next[k]        = `ST_DIR_IDLE;
-            case(st_dir_current[k])
-               `ST_DIR_IDLE : begin
-                  fifo_dir_tdata[k]    = s_axis_tdata;
-                  fifo_dir_tkeep[k]    = s_axis_tkeep;
-                  fifo_dir_tuser[k]    = {s_axis_tuser[32+:96],dst_port[0],s_axis_tuser[0+:24]};
-                  fifo_dir_tlast[k]    = s_axis_tlast;
-                  fifo_dir_tvalid[k]   = (s_axis_tvalid && (tuser_src_port == src_port[k]) && conf_path[k]) ? 1 : 0;
-                  st_dir_next[k]       = (s_axis_tvalid && (tuser_src_port == src_port[k]) && conf_path[k]) ? `ST_DIR_WR : `ST_DIR_IDLE;
-               end
-               `ST_DIR_WR : begin
-                  fifo_dir_tdata[k]    = s_axis_tdata;
-                  fifo_dir_tkeep[k]    = s_axis_tkeep;
-                  fifo_dir_tuser[k]    = s_axis_tuser;
-                  fifo_dir_tlast[k]    = s_axis_tlast;
-                  fifo_dir_tvalid[k]   = s_axis_tvalid;
-                  st_dir_next[k]       = (s_axis_tvalid & s_axis_tlast) ? `ST_DIR_IDLE : `ST_DIR_WR;
-               end
-            endcase
-         end
-      end
-endgenerate
+//generate
+//   genvar k;
+//      for (k=0; k<NUM_QUEUES; k=k+1) begin
+//         always @(*) begin
+//            fifo_dir_tdata[k]    = 0;
+//            fifo_dir_tkeep[k]    = 0;
+//            fifo_dir_tuser[k]    = 0;
+//            fifo_dir_tlast[k]    = 0;
+//            fifo_dir_tvalid[k]   = 0;
+//            st_dir_next[k]        = `ST_DIR_IDLE;
+//            case(st_dir_current[k])
+//               `ST_DIR_IDLE : begin
+//                  fifo_dir_tdata[k]    = s_axis_tdata;
+//                  fifo_dir_tkeep[k]    = s_axis_tkeep;
+//                  fifo_dir_tuser[k]    = {s_axis_tuser[32+:96],dst_port[0],s_axis_tuser[0+:24]};
+//                  fifo_dir_tlast[k]    = s_axis_tlast;
+//                  fifo_dir_tvalid[k]   = (s_axis_tvalid && (tuser_src_port == src_port[k]) && conf_path[k]) ? 1 : 0;
+//                  st_dir_next[k]       = (s_axis_tvalid && (tuser_src_port == src_port[k]) && conf_path[k]) ? `ST_DIR_WR : `ST_DIR_IDLE;
+//               end
+//               `ST_DIR_WR : begin
+//                  fifo_dir_tdata[k]    = s_axis_tdata;
+//                  fifo_dir_tkeep[k]    = s_axis_tkeep;
+//                  fifo_dir_tuser[k]    = s_axis_tuser;
+//                  fifo_dir_tlast[k]    = s_axis_tlast;
+//                  fifo_dir_tvalid[k]   = s_axis_tvalid;
+//                  st_dir_next[k]       = (s_axis_tvalid & s_axis_tlast) ? `ST_DIR_IDLE : `ST_DIR_WR;
+//               end
+//            endcase
+//         end
+//      end
+//endgenerate
 
 
-assign fifo_in_tdata[0]  = (conf_path[0]) ? fifo_dir_tdata[0]  :((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[0+:C_M_AXIS_DATA_WIDTH] : 0;
-assign fifo_in_tkeep[0]  = (conf_path[0]) ? fifo_dir_tkeep[0]  :((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
-assign fifo_in_tuser[0]  = (conf_path[0]) ? fifo_dir_tuser[0]  :((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
-assign fifo_in_tlast[0]  = (conf_path[0]) ? fifo_dir_tlast[0]  :((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS] : 0;
-assign fifo_in_tvalid[0] = (conf_path[0]) ? fifo_dir_tvalid[0] :((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS+1] : 0;
+assign fifo_in_tdata[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[0+:C_M_AXIS_DATA_WIDTH] : 0;
+assign fifo_in_tkeep[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
+assign fifo_in_tuser[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
+assign fifo_in_tlast[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS] : 0;
+assign fifo_in_tvalid[0] = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS+1] : 0;
 
-assign fifo_in_tdata[1]  = (conf_path[1]) ? fifo_dir_tdata[1]  :((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[0+:C_M_AXIS_DATA_WIDTH] : 0;
-assign fifo_in_tkeep[1]  = (conf_path[1]) ? fifo_dir_tkeep[1]  :((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
-assign fifo_in_tuser[1]  = (conf_path[1]) ? fifo_dir_tuser[1]  :((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
-assign fifo_in_tlast[1]  = (conf_path[1]) ? fifo_dir_tlast[1]  :((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[MEM_TLAST_POS] : 0;
-assign fifo_in_tvalid[1] = (conf_path[1]) ? fifo_dir_tvalid[1] :((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[MEM_TLAST_POS+1] : 0;
+assign fifo_in_tdata[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[0+:C_M_AXIS_DATA_WIDTH] : 0;
+assign fifo_in_tkeep[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
+assign fifo_in_tuser[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
+assign fifo_in_tlast[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[MEM_TLAST_POS] : 0;
+assign fifo_in_tvalid[1] = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[MEM_TLAST_POS+1] : 0;
 
 
 
@@ -780,8 +780,7 @@ always @(*) begin
          m0_axis_tlast        = 0;
          m0_axis_tvalid       = 0;
          fifo_rden[0]         = 0;
-         m0_st_next           = (m0_axis_tready & ~fifo_empty[0] & conf_path[0])           ? `M0_SEND :
-                                (m0_axis_tready & ~fifo_empty[0] & (q0_replay_count != 0)) ? `M0_SEND : `M0_IDLE;
+         m0_st_next           = (m0_axis_tready & ~fifo_empty[0] & (q0_replay_count != 0)) ? `M0_SEND : `M0_IDLE;
       end
       `M0_SEND : begin
          m0_axis_tdata        = fifo_out_tdata[0];
@@ -811,8 +810,7 @@ always @(*) begin
          m1_axis_tlast        = 0;
          m1_axis_tvalid       = 0;
          fifo_rden[1]         = 0;
-         m1_st_next           = (m1_axis_tready & ~fifo_empty[1] & conf_path[1])           ? `M1_SEND :
-                                (m1_axis_tready & ~fifo_empty[1] & (q1_replay_count != 0)) ? `M1_SEND : `M1_IDLE;
+         m1_st_next           = (m1_axis_tready & ~fifo_empty[1] & (q1_replay_count != 0)) ? `M1_SEND : `M1_IDLE;
       end
       `M1_SEND : begin
          m1_axis_tdata        = fifo_out_tdata[1];
@@ -869,7 +867,7 @@ assign q0_wr_done       = rw_regs[(C_S_AXI_DATA_WIDTH*11)+1-1:(C_S_AXI_DATA_WIDT
 assign q1_wr_done       = rw_regs[(C_S_AXI_DATA_WIDTH*12)+1-1:(C_S_AXI_DATA_WIDTH*12)]; //0x0030
 
 // 0x0 : default, 0x1: path 0, 0x2: path 1, 0x4: path 2, 0x8: path 3.
-assign conf_path        = rw_regs[(C_S_AXI_DATA_WIDTH*13)+32-1:(C_S_AXI_DATA_WIDTH*13)]; //0x0034
+//assign conf_path        = rw_regs[(C_S_AXI_DATA_WIDTH*13)+32-1:(C_S_AXI_DATA_WIDTH*13)]; //0x0034
 
 // ------------- CPU Register -----------
 
