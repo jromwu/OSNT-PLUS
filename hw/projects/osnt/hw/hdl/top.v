@@ -273,27 +273,46 @@ module top #(
   wire                                  S5_AXI_AWREADY, S4_AXI_AWREADY, S3_AXI_AWREADY, S2_AXI_AWREADY, S1_AXI_AWREADY, S0_AXI_AWREADY;
   wire                                  S9_AXI_AWREADY, S8_AXI_AWREADY, S7_AXI_AWREADY, S6_AXI_AWREADY;
 
-  wire [C_NF_DATA_WIDTH-1:0]      axis_i_0_tdata,  axis_o_0_tdata;
-  wire                            axis_i_0_tvalid, axis_o_0_tvalid;
-  wire                            axis_i_0_tlast,  axis_o_0_tlast;
-  wire [C_NF_TUSER_WIDTH-1:0]     axis_i_0_tuser,  axis_o_0_tuser;
-  wire [(C_NF_DATA_WIDTH/8)-1:0]  axis_i_0_tkeep,  axis_o_0_tkeep;
-  wire                            axis_i_0_tready, axis_o_0_tready;
+  wire [C_NF_DATA_WIDTH-1:0]      axis_i_0_tdata;
+  wire                            axis_i_0_tvalid;
+  wire                            axis_i_0_tlast;
+  wire [C_NF_TUSER_WIDTH-1:0]     axis_i_0_tuser;
+  wire [(C_NF_DATA_WIDTH/8)-1:0]  axis_i_0_tkeep;
+  wire                            axis_i_0_tready;
+  wire [C_IF_DATA_WIDTH-1:0]      axis_o_0_tdata;
+  wire                            axis_o_0_tvalid;
+  wire                            axis_o_0_tlast;
+  wire [C_NF_TUSER_WIDTH-1:0]     axis_o_0_tuser;
+  wire [(C_IF_DATA_WIDTH/8)-1:0]  axis_o_0_tkeep;
+  wire                            axis_o_0_tready;
 
-  wire [C_NF_DATA_WIDTH-1:0]      axis_i_1_tdata,  axis_o_1_tdata;
-  wire                            axis_i_1_tvalid, axis_o_1_tvalid;
-  wire                            axis_i_1_tlast,  axis_o_1_tlast;
-  wire [C_NF_TUSER_WIDTH-1:0]     axis_i_1_tuser,  axis_o_1_tuser;
-  wire [(C_NF_DATA_WIDTH/8)-1:0]  axis_i_1_tkeep,  axis_o_1_tkeep;
-  wire                            axis_i_1_tready, axis_o_1_tready;
+  wire [C_NF_DATA_WIDTH-1:0]      axis_i_1_tdata;
+  wire                            axis_i_1_tvalid;
+  wire                            axis_i_1_tlast;
+  wire [C_NF_TUSER_WIDTH-1:0]     axis_i_1_tuser;
+  wire [(C_NF_DATA_WIDTH/8)-1:0]  axis_i_1_tkeep;
+  wire                            axis_i_1_tready;
+  wire [C_IF_DATA_WIDTH-1:0]      axis_o_1_tdata;
+  wire                            axis_o_1_tvalid;
+  wire                            axis_o_1_tlast;
+  wire [C_NF_TUSER_WIDTH-1:0]     axis_o_1_tuser;
+  wire [(C_IF_DATA_WIDTH/8)-1:0]  axis_o_1_tkeep;
+  wire                            axis_o_1_tready;
 
-  wire [C_NF_DATA_WIDTH-1:0]      axis_dma_i_tdata , axis_dma_o_tdata ;
-  wire [(C_NF_DATA_WIDTH/8)-1:0]  axis_dma_i_tkeep , axis_dma_o_tkeep ;
-  wire                            axis_dma_i_tlast , axis_dma_o_tlast ;
-  wire                            axis_dma_i_tready, axis_dma_o_tready;
-  wire [C_NF_TUSER_WIDTH-1:0]     axis_dma_i_tuser , axis_dma_o_tuser ;
-  wire                            axis_dma_i_tvalid, axis_dma_o_tvalid;
-  // ----------------------------------------------------------
+  wire [C_IF_DATA_WIDTH-1:0]      axis_dma_i_tdata;
+  wire                            axis_dma_i_tvalid;
+  wire                            axis_dma_i_tlast;
+  wire [C_NF_TUSER_WIDTH-1:0]     axis_dma_i_tuser;
+  wire [(C_IF_DATA_WIDTH/8)-1:0]  axis_dma_i_tkeep;
+  wire                            axis_dma_i_tready;
+  wire [C_NF_DATA_WIDTH-1:0]      axis_dma_o_tdata;
+  wire                            axis_dma_o_tvalid;
+  wire                            axis_dma_o_tlast;
+  wire [C_NF_TUSER_WIDTH-1:0]     axis_dma_o_tuser;
+  wire [(C_NF_DATA_WIDTH/8)-1:0]  axis_dma_o_tkeep;
+  wire                            axis_dma_o_tready;
+
+ // ----------------------------------------------------------
   //      nf_datapath 
   // ----------------------------------------------------------
   nf_datapath #(

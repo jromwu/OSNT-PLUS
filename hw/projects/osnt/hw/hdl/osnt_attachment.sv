@@ -39,23 +39,23 @@ module osnt_attachment #(
 	input                            axis_dma_o_tlast, 
 	
 	// Master Stream Ports
-	output [C_NF_TDATA_WIDTH-1:0]    axis_dma_i_tdata,
-	output [(C_NF_TDATA_WIDTH/8)-1:0]axis_dma_i_tkeep,
-	output [C_NF_TUSER_WIDTH-1:0]    axis_dma_i_tuser,
+	output [C_TDATA_WIDTH-1:0]       axis_dma_i_tdata,
+	output [(C_TDATA_WIDTH/8)-1:0]   axis_dma_i_tkeep,
+	output [C_TUSER_WIDTH-1:0]       axis_dma_i_tuser,
 	output                           axis_dma_i_tvalid,
 	input                            axis_dma_i_tready,
 	output                           axis_dma_i_tlast, 
 
 	// Slave Stream Ports
-	input [C_NF_TDATA_WIDTH-1:0]     axis_o_0_tdata,
-	input [(C_NF_TDATA_WIDTH/8)-1:0] axis_o_0_tkeep,
+	input [C_TDATA_WIDTH-1:0]        axis_o_0_tdata,
+	input [(C_TDATA_WIDTH/8)-1:0]    axis_o_0_tkeep,
 	input [C_NF_TUSER_WIDTH-1:0]     axis_o_0_tuser,
 	input                            axis_o_0_tvalid,
 	output                           axis_o_0_tready,
 	input                            axis_o_0_tlast, 
 	// Slave Stream Ports
-	input [C_NF_TDATA_WIDTH-1:0]     axis_o_1_tdata,
-	input [(C_NF_TDATA_WIDTH/8)-1:0] axis_o_1_tkeep,
+	input [C_TDATA_WIDTH-1:0]        axis_o_1_tdata,
+	input [(C_TDATA_WIDTH/8)-1:0]    axis_o_1_tkeep,
 	input [C_NF_TUSER_WIDTH-1:0]     axis_o_1_tuser,
 	input                            axis_o_1_tvalid,
 	output                           axis_o_1_tready,
