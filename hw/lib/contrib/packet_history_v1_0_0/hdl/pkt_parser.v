@@ -90,7 +90,7 @@
 
          IDLE: begin
             if(tvalid) begin
-               tuple_next = {tdata[SRC_IP_POS-1:SRC_IP_POS-32],tdata[DST_IP_POS-1:DST_IP_POS-32],tdata[SRC_L4_PORT_POS-1:SRC_L4_PORT-16],tdata[DST_L4_PORT-1:DST_L4_PORT-16],tuser[15:0]}; //{src_ip,dst_ip,src_l4_port,dst_l4_port,pkt_length}
+               tuple_next = {tdata[SRC_IP_POS-1:SRC_IP_POS-32],tdata[DST_IP_POS-1:DST_IP_POS-32],tdata[SRC_L4_PORT_POS-1:SRC_L4_PORT_POS-16],tdata[DST_L4_PORT_POS-1:DST_L4_PORT_POS-16],tuser[15:0]}; //{src_ip,dst_ip,src_l4_port,dst_l4_port,pkt_length}
                tuple_valid_next = 1;
                if(!tlast)
                   state_next	= WAIT_NEXT;
