@@ -110,7 +110,7 @@ module packet_history
   wire [TUPLE_WIDTH-1:0]   tuple_fifo_out;
 
   // variables related to the internal memory
-  reg [TUPLE_WIDTH-1:0]    mem_history[NUM_CORES_BITS-1:0];
+  reg [TUPLE_WIDTH-1:0]    mem_history[NUM_CORES_HISTORY-1:0];
   reg [NUM_CORES_BITS-1:0] ptr_pos, ptr_pos_next;
   reg wr_mem_en, wr_mem_en_next;
 
@@ -290,7 +290,7 @@ module packet_history
                m_axis_tdata = {mem_history[9],mem_history[10],mem_history[11],mem_history[12],mem_history[13],mem_history[14],mem_history[15],240'b0};
                tuple_fifo_rd_en = 1;
                ptr_pos_next = ptr_pos + 1;
-               state_next = THIRD_BATCH;
+               state_next = SEND_PACKET;
             end   
          end
 
