@@ -57,19 +57,19 @@
    );
 
    //------------------ Internal Parameter ---------------------------
-   //localparam	ETH_ARP	= 16'h0806;	// byte order = Big Endian
-   //localparam	ETH_IP 	= 16'h0800;	// byte order = Big Endian
-   //localparam  DST_MAC_POS = C_S_AXIS_DATA_WIDTH;
-   //localparam  ETHTYPE_POS = C_S_AXIS_DATA_WIDTH - 96; (not used but useful reminder for parsing: taken from the NetFPGA router project)
+   //localparam	ETH_ARP	= 16'h0608;	// byte order = Little Endian
+   //localparam	ETH_IP 	= 16'h0008;	// byte order = Little Endian
+   //localparam  DST_MAC_POS = 0;
+   //localparam  ETHTYPE_POS = 96; (not used but useful reminder for parsing: taken from the NetFPGA router project)
 
 
    localparam  IDLE		   = 1;
    localparam  WAIT_NEXT	= 2;
 
-   localparam  SRC_IP_POS = C_S_AXIS_DATA_WIDTH - 208; // L2 header = 48+48+16; L3 header before IPs is 32+32+32
-   localparam  DST_IP_POS = C_S_AXIS_DATA_WIDTH - 240; // SRC_IP_POS + 32
-   localparam  SRC_L4_PORT_POS = C_S_AXIS_DATA_WIDTH - 272; // DST_IP_POS + 32
-   localparam  DST_L4_PORT_POS = C_S_AXIS_DATA_WIDTH - 288; // SRC_L4_PORT_POS + 16
+   localparam  SRC_IP_POS = 208; // L2 header = 48+48+16; L3 header before IPs is 32+32+32
+   localparam  DST_IP_POS = 240; // SRC_IP_POS + 32
+   localparam  SRC_L4_PORT_POS = 272; // DST_IP_POS + 32
+   localparam  DST_L4_PORT_POS = 288; // SRC_L4_PORT_POS + 16
 
 
    //---------------------- Wires/Regs -------------------------------
@@ -90,7 +90,7 @@
 
          IDLE: begin
             if(tvalid) begin
-               tuple_next = {tdata[SRC_IP_POS-1:SRC_IP_POS-32],tdata[DST_IP_POS-1:DST_IP_POS-32],tdata[SRC_L4_PORT_POS-1:SRC_L4_PORT_POS-16],tdata[DST_L4_PORT_POS-1:DST_L4_PORT_POS-16],tuser[15:0]}; //{src_ip,dst_ip,src_l4_port,dst_l4_port,pkt_length}
+               tuple_next = {tdata[SRC_IP_POS+31:SRC_IP_POS],tdata[DST_IP_POS+31:DST_IP_POS],tdata[SRC_L4_PORT_POS+15:SRC_L4_PORT_POS],tdata[DST_L4_PORT_POS+15:DST_L4_PORT_POS],tuser[15:0]}; //{src_ip,dst_ip,src_l4_port,dst_l4_port,pkt_length}
                tuple_valid_next = 1;
                if(!tlast)
                   state_next	= WAIT_NEXT;
