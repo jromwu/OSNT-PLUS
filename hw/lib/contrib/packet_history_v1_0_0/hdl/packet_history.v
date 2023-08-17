@@ -274,7 +274,7 @@ module packet_history
                       m_axis_tuser[DST_PORT_POS] = 1'b1;
                   m_axis_tvalid = 1;
                   m_axis_tlast = 0;
-                  m_axis_tkeep = 64'b1;
+                  m_axis_tkeep = {128{1'b1}};
                   m_axis_tdata = {mem_history[0],mem_history[1],mem_history[2],mem_history[3],mem_history[4],mem_history[5],mem_history[6],mem_history[7],mem_history[8],ptr_pos};
                   wr_mem_en_next = 1;
                   state_next = SECOND_BATCH;
@@ -286,7 +286,7 @@ module packet_history
             if(m_axis_tready) begin
                m_axis_tvalid = 1;
                m_axis_tlast = 0;
-               m_axis_tkeep = 64'b1;
+               m_axis_tkeep = {128{1'b1}};
                m_axis_tdata = {mem_history[9],mem_history[10],mem_history[11],mem_history[12],mem_history[13],mem_history[14],mem_history[15],240'b0};
                tuple_fifo_rd_en = 1;
                ptr_pos_next = ptr_pos + 1;
@@ -313,7 +313,7 @@ module packet_history
          ptr_pos     <= 0;
          wr_mem_en   <= 0;
          for(i=0;i<NUM_CORES_HISTORY;i=i+1)
-            mem_history[i] <= 112'b0;
+            mem_history[i] <= {112{1'b0}};
       end
       else begin
          state		<= state_next;
