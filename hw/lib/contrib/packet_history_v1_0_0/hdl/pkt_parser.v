@@ -73,10 +73,10 @@
 
 
    //---------------------- Wires/Regs -------------------------------
-   reg [TUPLE_WIDTH-1]  tuple_next;
-   reg                  tuple_valid_next;
+   reg [TUPLE_WIDTH-1:0]	tuple_next;
+   reg                  	tuple_valid_next;
 
-   reg [1:0]            state, state_next;
+   reg [1:0]            	state, state_next;
 
    /******************************************************************
     * Get the L3/L4 destination, source and length of the pkt

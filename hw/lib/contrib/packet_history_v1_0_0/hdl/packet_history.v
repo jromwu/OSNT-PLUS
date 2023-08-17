@@ -324,9 +324,9 @@ module packet_history
       endcase
    end                     
 
-   always @(posedge clk) begin
-      if(reset) begin
-         state	      <= IDLE;
+   always @(posedge axis_aclk) begin
+      if(~axis_resetn) begin
+         state	      <= FIRST_BATCH;
          ptr_pos     <= 0;
          wr_mem_en   <= 0;
          for(i=0;i<NUM_CORES_HISTORY;i=i+1)
