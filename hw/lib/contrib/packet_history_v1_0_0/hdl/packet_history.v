@@ -222,6 +222,9 @@ module packet_history
       .dbiterr         () 
    );
 
+
+   assign s_axis_tready = !in_fifo_nearly_full && !tuple_fifo_nearly_full;
+
    pkt_parser
      #(.C_S_AXIS_DATA_WIDTH (C_S_AXIS_DATA_WIDTH),
        .C_M_AXIS_TUSER_WIDTH (C_S_AXIS_TUSER_WIDTH),
@@ -259,6 +262,8 @@ module packet_history
 
       tuple_fifo_rd_en = 0;
       in_fifo_rd_en = 0;
+
+      state_next = state;
       
       case(state)
 
