@@ -31,9 +31,10 @@
 module osnt_bram_pcap_replay_uengine
 #(
   parameter C_S_AXI_DATA_WIDTH   = 32,
-  parameter C_S_AXI_ADDR_WIDTH   = 32,
-  parameter C_BASEADDR           = 32'hFFFFFFFF,
-  parameter C_HIGHADDR           = 32'h00000000,
+  parameter C_S_AXI_ADDR_WIDTH   = 12,
+  parameter C_BASEADDR           = 32'h00000000,
+//   parameter C_BASEADDR           = 32'hFFFFFFFF,
+//   parameter C_HIGHADDR           = 32'h00000000,
   parameter C_USE_WSTRB          = 0,
   parameter C_DPHASE_TIMEOUT     = 0,
   parameter C_S_AXI_ACLK_FREQ_HZ = 100,
@@ -132,10 +133,6 @@ localparam MEM_TLAST_POS = C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_
 localparam MEM_TVALID_POS = 1 + C_S_AXIS_TUSER_WIDTH + (C_S_AXIS_DATA_WIDTH/8) + C_S_AXIS_DATA_WIDTH;
 
 `define  WR_IDLE  0
-`define  WR_0     1
-`define  WR_1     2
-`define  WR_2     3
-`define  WR_3     4
 
 `define  M0_IDLE  0
 `define  M0_SEND  1
@@ -904,8 +901,8 @@ assign rw_regs[C_S_AXI_DATA_WIDTH * 14 - 1:C_S_AXI_DATA_WIDTH * 13] = cpu2ip_ctr
 bram_pcap_replay_uengine_cpu_regs
 #(
     .C_BASE_ADDRESS(C_BASEADDR),
-    .C_S_AXI_DATA_WIDTH(32),
-    .C_S_AXI_ADDR_WIDTH(32)
+    .C_S_AXI_DATA_WIDTH(C_S_AXI_DATA_WIDTH),
+    .C_S_AXI_ADDR_WIDTH(C_S_AXI_ADDR_WIDTH)
 )
 bram_pcap_replay_uengine_cpu_regs
 (

@@ -263,7 +263,7 @@ bram_fifo_conv_128to512_0
    .m_axis_tdata           (  m_conv_128to512_tdata         ),
    .m_axis_tkeep           (  m_conv_128to512_tkeep         ),
    .m_axis_tlast           (  m_conv_128to512_tlast         ),
-   .m_axis_tuser           (  m_conv_128to512_tuser         )
+   .m_axis_tuser           (  m_conv_128to512_tuser         ) // TODO: A warning showing width mismatch (256 and 512)
 );
 
 assign m_conv_128to512_tready = ~fifo_m_full;

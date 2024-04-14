@@ -111,6 +111,7 @@ generate_target all [get_ips osnt_extract_metadata_ip]
 create_ip -name nic_output_port_lookup -vendor NetFPGA -library NetFPGA -module_name nic_output_port_lookup_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips nic_output_port_lookup_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${tx_datapath_width_bit} [get_ips nic_output_port_lookup_ip]
+set_property CONFIG.C_S_AXI_ADDR_WIDTH 12 [get_ips nic_output_port_lookup_ip]
 set_property generate_synth_checkpoint false [get_files nic_output_port_lookup_ip.xci]
 reset_target all [get_ips nic_output_port_lookup_ip]
 generate_target all [get_ips nic_output_port_lookup_ip]
@@ -147,6 +148,7 @@ generate_target all [get_ips osnt_rate_limiter_ip]
 create_ip -name input_arbiter -vendor NetFPGA -library NetFPGA -module_name input_arbiter_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips input_arbiter_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips input_arbiter_ip]
+set_property CONFIG.C_S_AXI_ADDR_WIDTH 12 [get_ips input_arbiter_ip]
 set_property generate_synth_checkpoint false [get_files input_arbiter_ip.xci]
 reset_target all [get_ips input_arbiter_ip]
 generate_target all [get_ips input_arbiter_ip]
@@ -186,7 +188,7 @@ generate_target all [get_ips nf_mac_attachment_dma_ip]
 # AXI for memory map
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -module_name axi_crossbar_0
 set_property -dict [list \
-CONFIG.NUM_MI {10}                           \
+CONFIG.NUM_MI {8}                           \
 CONFIG.PROTOCOL {AXI4LITE}                   \
 CONFIG.CONNECTIVITY_MODE {SASD}              \
 CONFIG.R_REGISTER {1}                        \

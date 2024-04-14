@@ -73,16 +73,16 @@ ipx::add_subcore NetFPGA:NetFPGA:fallthrough_small_fifo:1.0 [ipx::get_file_group
 ipx::infer_user_parameters [ipx::current_core]
 
 ipx::add_user_parameter {C_AXIS_DATA_WIDTH} [ipx::current_core]
-set_property value_resolve_type {user} [ipx::get_user_parameter C_AXIS_DATA_WIDTH [ipx::current_core]]
-set_property display_name {C_AXIS_DATA_WIDTH} [ipx::get_user_parameter C_AXIS_DATA_WIDTH [ipx::current_core]]
-set_property value {64} [ipx::get_user_parameter C_AXIS_DATA_WIDTH [ipx::current_core]]
-set_property value_format {long} [ipx::get_user_parameter C_AXIS_DATA_WIDTH [ipx::current_core]]
-
+set_property value_resolve_type {user} [ipx::get_user_parameters C_AXIS_DATA_WIDTH]
+set_property display_name {C_AXIS_DATA_WIDTH} [ipx::get_user_parameters C_AXIS_DATA_WIDTH]
+set_property value {64} [ipx::get_user_parameters C_AXIS_DATA_WIDTH]
+set_property value_format {long} [ipx::get_user_parameters C_AXIS_DATA_WIDTH]
+  
 ipx::add_user_parameter {C_AXIS_TUSER_WIDTH} [ipx::current_core]
-set_property value_resolve_type {user} [ipx::get_user_parameter C_AXIS_TUSER_WIDTH [ipx::current_core]]
-set_property display_name {C_AXIS_TUSER_WIDTH} [ipx::get_user_parameter C_AXIS_TUSER_WIDTH [ipx::current_core]]
-set_property value {128} [ipx::get_user_parameter C_AXIS_TUSER_WIDTH [ipx::current_core]]
-set_property value_format {long} [ipx::get_user_parameter C_AXIS_TUSER_WIDTH [ipx::current_core]]
+set_property value_resolve_type {user} [ipx::get_user_parameters C_AXIS_TUSER_WIDTH]
+set_property display_name {C_AXIS_TUSER_WIDTH} [ipx::get_user_parameters C_AXIS_TUSER_WIDTH]
+set_property value {128} [ipx::get_user_parameters C_AXIS_TUSER_WIDTH]
+set_property value_format {long} [ipx::get_user_parameters C_AXIS_TUSER_WIDTH]
 
 ipx::check_integrity [ipx::current_core]
 ipx::save_core [ipx::current_core]

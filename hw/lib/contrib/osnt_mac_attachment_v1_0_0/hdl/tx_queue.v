@@ -106,7 +106,8 @@ module tx_queue
        .FIFO_MEMORY_TYPE     ("auto"),
        .ECC_MODE             ("no_ecc"),
        .FIFO_WRITE_DEPTH     (128),
-       .WRITE_DATA_WIDTH     (AXI_DATA_WIDTH+(AXI_DATA_WIDTH/8)+1+AXI_DATA_WIDTH),
+       .WRITE_DATA_WIDTH     (AXI_DATA_WIDTH+(AXI_DATA_WIDTH/8)+1+C_S_AXIS_TUSER_WIDTH),
+    //    .WRITE_DATA_WIDTH     (AXI_DATA_WIDTH+(AXI_DATA_WIDTH/8)+1+AXI_DATA_WIDTH),
        .WR_DATA_COUNT_WIDTH  (1),
        .PROG_FULL_THRESH     (128-10),
        .FULL_RESET_VALUE     (0),
@@ -130,7 +131,7 @@ module tx_queue
        // Read Domain ports
        .rd_clk       (clk156),
        .rd_en        (fifo_rd_en),
-       .dout         ({tlast_axi_o, o_tkeep, o_tdata, o_tuser}),
+       .dout         ({tlast_axi_o, o_tkeep, o_tdata, o_tuser}), // TODO: Width mismatch 705, 1089
        .empty        (fifo_empty),
        .prog_empty   (),
        .rd_data_count(),

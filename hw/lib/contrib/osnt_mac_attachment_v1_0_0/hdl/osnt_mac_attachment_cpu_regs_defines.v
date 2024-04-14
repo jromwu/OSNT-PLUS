@@ -31,7 +31,7 @@
 
            `define  REG_ID_BITS				31:0
            `define  REG_ID_WIDTH				32
-           `define  REG_ID_DEFAULT			32'h0000DA04
+           `define  REG_ID_DEFAULT			32'h0000DA0f
            `define  REG_ID_ADDR				32'h0
 
            `define  REG_VERSION_BITS				31:0

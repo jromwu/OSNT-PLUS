@@ -42,9 +42,10 @@
 module osnt_inter_packet_delay
 #(
   parameter C_S_AXI_DATA_WIDTH    = 32,
-  parameter C_S_AXI_ADDR_WIDTH    = 32,
-  parameter C_BASEADDR            = 32'hFFFFFFFF,
-  parameter C_HIGHADDR            = 32'h00000000,
+  parameter C_S_AXI_ADDR_WIDTH    = 12,
+  parameter C_BASEADDR            = 32'h00000000,
+  // parameter C_BASEADDR            = 32'hFFFFFFFF,
+  // parameter C_HIGHADDR            = 32'h00000000,
   parameter C_USE_WSTRB           = 0,
   parameter C_DPHASE_TIMEOUT      = 0,
   parameter C_S_AXI_ACLK_FREQ_HZ  = 100,
@@ -271,8 +272,8 @@ module osnt_inter_packet_delay
    inter_packet_delay_cpu_regs #
      (
       .C_BASE_ADDRESS(C_BASEADDR),
-      .C_S_AXI_DATA_WIDTH(32),
-      .C_S_AXI_ADDR_WIDTH(32)
+      .C_S_AXI_DATA_WIDTH(C_S_AXI_DATA_WIDTH),
+      .C_S_AXI_ADDR_WIDTH(C_S_AXI_ADDR_WIDTH)
       )
    inst_cpu_regs
    (

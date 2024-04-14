@@ -45,7 +45,7 @@
 module osnt_extract_metadata
 #(
   parameter C_S_AXI_DATA_WIDTH    = 32,
-  parameter C_S_AXI_ADDR_WIDTH    = 32,
+  parameter C_S_AXI_ADDR_WIDTH    = 12,
   parameter C_BASEADDR            = 32'hFFFFFFFF,
   parameter C_HIGHADDR            = 32'h00000000,
   parameter C_USE_WSTRB           = 0,
@@ -170,8 +170,8 @@ module osnt_extract_metadata
    extract_metadata_cpu_regs #
      (
       .C_BASE_ADDRESS(C_BASEADDR),
-      .C_S_AXI_DATA_WIDTH(32),
-      .C_S_AXI_ADDR_WIDTH(32)
+      .C_S_AXI_DATA_WIDTH(C_S_AXI_DATA_WIDTH),
+      .C_S_AXI_ADDR_WIDTH(C_S_AXI_ADDR_WIDTH)
       )extract_metadata_cpu_regs
        (
       // General ports
