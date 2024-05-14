@@ -47,10 +47,10 @@ from generator import *
 
 class InitGCli:
     def __init__(self):
-        self.average_pkt_len = {'ens1f0':1500, 'ens1f1':1500}
+        self.average_pkt_len = {'nf0':1500, 'nf1':1500}
         #check 47.
-        self.average_word_cnt = {'ens1f0':47, 'ens1f1':47}
-        self.pkts_loaded = {'ens1f0':0, 'ens1f1':0}
+        self.average_word_cnt = {'nf0':47, 'nf1':47}
+        self.pkts_loaded = {'nf0':0, 'nf1':0}
         self.pcaps = {}
         self.rate_limiters = [None]*2
         self.delays = [None]*2
@@ -65,7 +65,7 @@ class InitGCli:
         #    self.tx_pos_wr[i] = tx_pos_addr[i] 
         
         for i in range(2):
-            iface = 'ens1f' + str(i)
+            iface = 'nf' + str(i)
             self.rate_limiters[i] = OSNTRateLimiter(iface)
             self.delays[i] = OSNTDelay(iface)
     
@@ -108,6 +108,7 @@ def set_load_pcap(mypcaps):
         print((key, value))
     initgcli.pcaps = mypcaps
     result = initgcli.pcap_engine.load_pcap(initgcli.pcaps)
+    print(result)
 
 def set_load_pcap_ts(mypcaps):
     print("  ")
@@ -116,6 +117,7 @@ def set_load_pcap_ts(mypcaps):
         print((key, value))
     initgcli.pcaps = mypcaps
     result = initgcli.pcap_engine.load_pcap_ts(initgcli.pcaps)
+    print(result)
 
 def set_load_pcap_only(pcap_file):
     print("  ")
@@ -123,6 +125,7 @@ def set_load_pcap_only(pcap_file):
     for key, value in list(mypcaps.items()):
         print((key, value))
     result = initgcli.pcap_engine.load_pcap_only(initgcli.pcaps)
+    print(result)
 
 #def set_tx_ts(interface, value):
 #   print("  ")
@@ -137,14 +140,14 @@ def set_load_pcap_only(pcap_file):
 
 def set_ipg(interface, value):
    print("  ")
-   print("[CLI: Inter Packet Gap delay setting... " + "ens1f" + str(interface) + ", "+ str(value) +"]")     
+   print("[CLI: Inter Packet Gap delay setting... " + "nf" + str(interface) + ", "+ str(value) +"]")     
    initgcli.delays[interface].set_delay(value)
    initgcli.delays[interface].set_enable(True)
    initgcli.delays[interface].set_use_reg(True)
 
 def set_ipg_ts(interface, value):
    print("  ")
-   print("[CLI: Inter Packet Gap delay setting with Timestamp... " + "ens1f" + str(interface) + ", "+ str(value) +"]")     
+   print("[CLI: Inter Packet Gap delay setting with Timestamp... " + "nf" + str(interface) + ", "+ str(value) +"]")     
    initgcli.delays[interface].set_delay(value)
    initgcli.delays[interface].set_enable(True)
    initgcli.delays[interface].set_use_reg(False)
@@ -153,9 +156,7 @@ def set_replay_cnt(values):
     print("  ")
     print("[CLI: Packet Replay counter setting ...]")    
     for i in range(2):
-        print("(ens1f" + str(i) +", "+ str(values[i]) +")")
-    for i in range(2):
-        initgcli.pcap_engine.replay_cnt[i] = values[i]        
-    initgcli.pcap_engine.set_replay_cnt()
+        print("(nf" + str(i) +", "+ str(values[i]) +")")
+    initgcli.pcap_engine.set_replay_cnt(values)
 
 initgcli = InitGCli()

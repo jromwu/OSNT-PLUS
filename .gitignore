@@ -47,3 +47,6 @@ hw/projects/reference_nic/sw/
 hw/projects/reference_switch/sw/
 hw/projects/reference_switch_lite/sw/
 tools/scripts/NFTest/testcheck.pyc
+hw/projects/osnt/sw/cli/pickle/
+hw/projects/osnt/sw/lib/axilib
+axitrack.txt

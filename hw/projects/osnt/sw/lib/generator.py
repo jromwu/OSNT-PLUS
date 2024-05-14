@@ -47,11 +47,11 @@ DATAPATH_FREQUENCY = 250000000
 
 PCAP_ENGINE_BASE_ADDR = "0x12000"
 
-INTER_PKT_DELAY_BASE_ADDR = {"ens1f0" : "0x13000",
-                             "ens1f1" : "0x13030"}
+INTER_PKT_DELAY_BASE_ADDR = {"nf0" : "0x13000",
+                             "nf1" : "0x13030"}
 
-RATE_LIMITER_BASE_ADDR = {"ens1f0" : "0x14000",
-                          "ens1f1" : "0x14024"}
+RATE_LIMITER_BASE_ADDR = {"nf0" : "0x14000",
+                          "nf1" : "0x14024"}
 
 DELAY_HEADER_EXTRACTOR_BASE_ADDR = "0x10000"
 
@@ -151,14 +151,6 @@ class OSNTGeneratorPcapEngine:
 
         # use axi.get_base_addr for better extensibility
         self.module_base_addr = PCAP_ENGINE_BASE_ADDR
-
-        self.reset = False
-        self.begin_replay = False
-        self.replay_cnt = [0, 0]
-        
-        self.get_reset()
-        self.get_begin_replay()
-        self.get_replay_cnt()
         
     def get_reset(self):
         value = rdaxi(self.reg_addr(self.reset_reg_offset))
@@ -170,7 +162,6 @@ class OSNTGeneratorPcapEngine:
 
     #Reset the module. reset is boolean.
     def set_reset(self, reset):
-
         if(reset):
             value = 1
         else:
@@ -179,16 +170,44 @@ class OSNTGeneratorPcapEngine:
         wraxi(self.reg_addr(self.reset_reg_offset), hex(value))
         self.get_reset()
 
+    def get_replay_cnt(self):
+        for i in range(2):
+            replay_cnt = rdaxi(self.reg_addr(self.replay_cnt_reg_offsets[i]))
+            self.replay_cnt[i] = int(replay_cnt, 16)
+
+    #replay_cnt is an integer array with size 2
+    def set_replay_cnt(self, replay_cnt):
+        for i in range(2):
+            wraxi(self.reg_addr(self.replay_cnt_reg_offsets[i]), hex(replay_cnt[i]))
+
+    def get_begin_replay(self):
+        value = rdaxi(self.reg_addr(self.begin_replay_reg_offset)) # use 0x4 to trigger all ports
+        value = int(value,16)
+        if value == 0:
+            self.begin_replay = False
+        else:
+            self.begin_replay = True          
+
+    # begin_replay is a boolean.
+    def set_begin_replay(self, begin_replay):
+        if begin_replay:
+            value = 1
+        else:
+            value = 0
+        wraxi(self.reg_addr(self.begin_replay_reg_offset), hex(value))
+
+    def run(self):
+        self.set_begin_replay(True)
+        # sleep(0.1)
+        # self.set_begin_replay(False)
+
     def clear(self):
         # reset
         self.set_reset(True)
+        self.set_begin_replay(False)
+        self.set_replay_cnt([0, 0])
 
-        self.begin_replay = False
-        self.replay_cnt = [0, 0]
-
-        self.set_begin_replay()
-        self.set_replay_cnt()
-
+        sleep(0.1)
         self.set_reset(False)
 
     def load_pcap_only(self, pcaps):
@@ -201,11 +220,11 @@ class OSNTGeneratorPcapEngine:
             sendp(pkt, iface=iface, verbose=False)
 
             sleep(1)
-            if iface == 'ens1f0':
+            if iface == 'nf0':
                 print(iface)
                 wraxi("0x1202C", 0x1)
                 wraxi("0x1202C", 0x0)
-            if iface == 'ens1f1':
+            if iface == 'nf1':
                 print(iface)
                 wraxi("0x12030", 0x1)
                 wraxi("0x12030", 0x0)
@@ -214,25 +233,25 @@ class OSNTGeneratorPcapEngine:
     def load_pcap(self, pcaps):
         # reset
         self.set_reset(True)
+        self.set_begin_replay(False)
+        sleep(0.1)
+        self.set_reset(False)
 
         # read packets in
         pkts = {}
         pkt_time = {}
-        self.begin_replay = False
-        self.set_begin_replay()
-        self.set_reset(False)
 
         pkts_loaded = {}
         for i in range(2):
-            iface = 'ens1f'+str(i)
-            if ('ens1f'+str(i)) in pcaps:
+            iface = 'nf'+str(i)
+            if ('nf'+str(i)) in pcaps:
                 self.begin_replay = True
-                pkts.update({'ens1f'+str(i): rdpcap(pcaps['ens1f'+str(i)])})
+                pkts.update({'nf'+str(i): rdpcap(pcaps['nf'+str(i)])})
                 pkts_loaded[iface] = 0
-                for pkt in pkts['ens1f'+str(i)]:
+                for pkt in pkts['nf'+str(i)]:
                     pkts_loaded[iface] = pkts_loaded[iface] + 1
 
-                pkt_time['ens1f'+str(i)] = [pkt.time for pkt in pkts['ens1f'+str(i)]]
+                pkt_time['nf'+str(i)] = [pkt.time for pkt in pkts['nf'+str(i)]]
 
         average_pkt_len = {}
         average_word_cnt = {}
@@ -245,17 +264,18 @@ class OSNTGeneratorPcapEngine:
                 pkt = pkts[iface][i]
                 average_pkt_len[iface] = average_pkt_len[iface] + len(pkt)
                 average_word_cnt[iface] = average_word_cnt[iface] + ceil(len(pkt)/64.0)
+                print(pkt.show(dump=True))
                 s.send(pkt)
 
             average_pkt_len[iface] = float(average_pkt_len[iface])/len(pkts[iface])
             average_word_cnt[iface] = float(average_word_cnt[iface])/len(pkts[iface])
         
             sleep(1)
-            if iface == 'ens1f0':
+            if iface == 'nf0':
                 wraxi("0x1202C", 0x1)
                 sleep(0.5)
                 wraxi("0x1202C", 0x0)
-            if iface == 'ens1f1':
+            if iface == 'nf1':
                 wraxi("0x12030", 0x1)
                 sleep(0.5)
                 wraxi("0x12030", 0x0)
@@ -277,23 +297,23 @@ class OSNTGeneratorPcapEngine:
 
         pkts_loaded = {}
         for i in range(2):
-            iface = 'ens1f'+str(i)
-            if ('ens1f'+str(i)) in pcaps:
+            iface = 'nf'+str(i)
+            if ('nf'+str(i)) in pcaps:
                 self.begin_replay = True
-                pkts.update({'ens1f'+str(i): rdpcap(pcaps['ens1f'+str(i)])})
+                pkts.update({'nf'+str(i): rdpcap(pcaps['nf'+str(i)])})
                 pkts_loaded[iface] = 0
-                for pkt in pkts['ens1f'+str(i)]:
+                for pkt in pkts['nf'+str(i)]:
                     pkts_loaded[iface] = pkts_loaded[iface] + 1
 
-                pkt_time['ens1f'+str(i)] = [pkt.time for pkt in pkts['ens1f'+str(i)]]
+                pkt_time['nf'+str(i)] = [pkt.time for pkt in pkts['nf'+str(i)]]
 
         average_pkt_len = {}
         average_word_cnt = {}
         pkt_time_diff = {} 
 
         for i in range(2):
-            iface = 'ens1f'+str(i)
-            if ('ens1f'+str(i)) in pkt_time:
+            iface = 'nf'+str(i)
+            if ('nf'+str(i)) in pkt_time:
                 temp_pkt_time_0 = pkt_time[iface]
                 temp_pkt_time_1 = list(range(len(pkt_time[iface]))) 
                 for pkt_no in range(len(pkt_time[iface])):
@@ -322,53 +342,16 @@ class OSNTGeneratorPcapEngine:
             average_word_cnt[iface] = float(average_word_cnt[iface])/len(pkts[iface])
 
             sleep(1)
-            if iface == 'ens1f0':
+            if iface == 'nf0':
                 wraxi("0x1202C", 0x1)
                 sleep(0.5)
                 wraxi("0x1202C", 0x0)
-            if iface == 'ens1f1':
+            if iface == 'nf1':
                 wraxi("0x12030", 0x1)
                 sleep(0.5)
                 wraxi("0x12030", 0x0)
 
         return {'average_pkt_len':average_pkt_len, 'average_word_cnt':average_word_cnt, 'pkts_loaded':pkts_loaded}
-
-    def run(self):
-        begin_replay = self.begin_replay
-        self.begin_replay = False
-        self.set_begin_replay()
-
-    def stop_replay(self):
-        begin_replay = self.begin_replay
-        self.begin_replay = False
-        self.set_begin_replay()
-        self.begin_replay = begin_replay
-
-    def get_replay_cnt(self):
-        for i in range(2):
-            replay_cnt = rdaxi(self.reg_addr(self.replay_cnt_reg_offsets[i]))
-            self.replay_cnt[i] = int(replay_cnt, 16)
-
-    #replay_cnt is an integer
-    def set_replay_cnt(self):
-        for i in range(2):
-            wraxi(self.reg_addr(self.replay_cnt_reg_offsets[i]), hex(self.replay_cnt[i]))
-        self.get_replay_cnt()
-
-    def get_begin_replay(self):
-        value = rdaxi(self.reg_addr(self.begin_replay_reg_offset)) # use 0x4 to trigger all ports
-        value = int(value,16)
-        if value == 0:
-            self.begin_replay = False
-        else:
-            self.begin_replay = True          
-
-    def set_begin_replay(self):
-        value = 1
-        wraxi(self.reg_addr(self.begin_replay_reg_offset), hex(value))
-        sleep(0.1)
-        value = 0
-        wraxi(self.reg_addr(self.begin_replay_reg_offset), hex(value)) # deassert        
 
     def reg_addr(self, offset):
         return add_hex(self.module_base_addr, offset)
@@ -514,7 +497,6 @@ class OSNTDelay:
         wraxi(self.reg_addr(self.use_reg_reg_offset), hex(value))
         self.get_use_reg()
 
-    # delay is stored as an integer value
     def get_delay(self):
         delay = rdaxi(self.reg_addr(self.delay_reg_offset))
         self.delay = int(delay, 16)
@@ -525,15 +507,15 @@ class OSNTDelay:
     # delay is an interger value
     def set_delay(self, delay):
         wraxi(self.reg_addr(self.delay_reg_offset), hex(delay*DATAPATH_FREQUENCY//1000000000))
-        self.get_delay()
+        self.delay = delay*DATAPATH_FREQUENCY//1000000000
 
     def get_reset(self):
         value = rdaxi(self.reg_addr(self.reset_reg_offset))
         value = int(value, 16)
         if value == 0:
-            self.reset = False;
+            self.reset = False
         else:
-            self.reset = True;
+            self.reset = True
 
     def set_reset(self, reset):
         if reset:
@@ -541,10 +523,14 @@ class OSNTDelay:
         else:
             value = 0
         wraxi(self.reg_addr(self.reset_reg_offset), hex(value))
-        self.get_reset()
+
+    def clear(self):
+        self.set_reset(True)
         self.set_enable(False)
         self.set_delay(0)
         self.set_use_reg(False)
+        sleep(0.1)
+        self.set_reset(False)
 
     def reg_addr(self, offset):
         return add_hex(self.module_base_addr, offset)
@@ -561,10 +547,10 @@ if __name__=="__main__":
     poissonEngines = {}
     pcaps = {}
     
-    pcaps = {'ens1f0' : 'ens1f0.cap'#,
-             #'ens1f1' : 'ens1f1.cap',
-             #'ens1f2' : 'ens1f2.cap',
-             #'ens1f3' : 'ens1f3.cap'
+    pcaps = {'nf0' : 'nf0.cap'#,
+             #'nf1' : 'nf1.cap',
+             #'nf2' : 'nf2.cap',
+             #'nf3' : 'nf3.cap'
             }
     # instantiate pcap engine
     pcap_engine = OSNTGeneratorPcapEngine()

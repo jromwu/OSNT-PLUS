@@ -241,7 +241,7 @@ if (args.run):
         v = pickle.load(open(pickle_fname_str, "rb"))
         if v != nullstr:
             change = 1
-            portstr = "ens1f" + str(i)
+            portstr = "nf" + str(i)
             mypcaps[portstr] = v
             pcaps[i] = v
         else:
@@ -249,23 +249,23 @@ if (args.run):
     if change == 1:
         set_load_pcap(mypcaps)  
     # ### load pcap file with timestamp ###
-    pickle_fname_prefix = "./pickle/pcapfilets_"
-    flag_pcapfilets = 0
-    mypcaps = {}
-    change = 0
-    for i in range(2):
-        pickle_fname_str = pickle_fname_prefix + str(i) + pickle_fname_suffix
-        v = pickle.load(open(pickle_fname_str, "rb"))
-        if v != nullstr:
-            change = 1
-            flag_pcapfilets = 1
-            portstr = "ens1f" + str(i)
-            mypcaps[portstr] = v
-            pcaps_ts[i] = v
-        else:
-            pcaps_ts[i] = "n/a"        
-    if change == 1:
-        set_load_pcap_ts(mypcaps)  
+    # pickle_fname_prefix = "./pickle/pcapfilets_"
+    # flag_pcapfilets = 0
+    # mypcaps = {}
+    # change = 0
+    # for i in range(2):
+    #     pickle_fname_str = pickle_fname_prefix + str(i) + pickle_fname_suffix
+    #     v = pickle.load(open(pickle_fname_str, "rb"))
+    #     if v != nullstr:
+    #         change = 1
+    #         flag_pcapfilets = 1
+    #         portstr = "nf" + str(i)
+    #         mypcaps[portstr] = v
+    #         pcaps_ts[i] = v
+    #     else:
+    #         pcaps_ts[i] = "n/a"        
+    # if change == 1:
+    #     set_load_pcap_ts(mypcaps)  
     # ### set packet replay number ###
     pickle_fname_prefix = "./pickle/rpn_"
     values = [0, 0]
@@ -276,21 +276,21 @@ if (args.run):
         replays[i] = pickle.load(open(pickle_fname_str, "rb"))
     set_replay_cnt(values)
     # ### set inter packet delays ###   
-    pickle_fname_prefix = "./pickle/delay_"
-    values = [0, 0]
-    for i in range(2):
-        pickle_fname_str = pickle_fname_prefix + str(i) + pickle_fname_suffix
-        values[i] = pickle.load(open(pickle_fname_str, "rb"))
-        delays[i] = values[i]
-        #print('copied interpacket delay: ' + str(i) + ' with value: ' + str(values[i]))
-    if flag_pcapfilets == 1:
-        #print('inter packet delay: pcap TS')
-        for i in range(2):  
-            set_ipg_ts(i, values[i])
-    else:
-        #print('inter packet delay: normal')
-        for i in range(2):  
-            set_ipg(i, values[i])
+    # pickle_fname_prefix = "./pickle/delay_"
+    # values = [0, 0]
+    # for i in range(2):
+    #     pickle_fname_str = pickle_fname_prefix + str(i) + pickle_fname_suffix
+    #     values[i] = pickle.load(open(pickle_fname_str, "rb"))
+    #     delays[i] = values[i]
+    #     #print('copied interpacket delay: ' + str(i) + ' with value: ' + str(values[i]))
+    # if flag_pcapfilets == 1:
+    #     #print('inter packet delay: pcap TS')
+    #     for i in range(2):  
+    #         set_ipg_ts(i, values[i])
+    # else:
+    #     #print('inter packet delay: normal')
+    #     for i in range(2):  
+    #         set_ipg(i, values[i])
 
     # ### -> before setting rx and tx timestamp position
     # configure 10g_axi_if's indirect access
@@ -327,7 +327,7 @@ if (args.run):
     print("             replay,     delay,     rxts,     txts,     pcap or pcap_ts,")
     print("                                 ")
     for i in range(2):
-        port_name = " [ens1f"+str(i)+"]"
+        port_name = " [nf"+str(i)+"]"
         pcap_local = pcaps[i]
         pcap_ts_local = pcaps_ts[i]
         if pcap_local == "n/a" and pcap_ts_local == "n/a":
