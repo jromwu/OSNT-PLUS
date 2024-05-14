@@ -110,6 +110,12 @@ osnt-cores:
 	@echo "//\tOSNT library cores created.";
 	@echo "/////////////////////////////////////////";
 
+pkt-vomiter-cores:
+	make -C $(LIB_HW_DIR)/contrib/packet_vomiter_v1_0_0/
+	@echo "/////////////////////////////////////////";
+	@echo "//\tPacket vomiter library cores created.";
+	@echo "/////////////////////////////////////////";
+
 libclean:
 	@rm -rf $(LIB_REPO)
 	@for lib in $(LIB_HW_DIR_INSTANCES) ; do \
