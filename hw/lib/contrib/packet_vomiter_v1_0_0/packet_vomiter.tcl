@@ -119,6 +119,12 @@ set_property display_name {DST_PORT_VALUE} [ipx::get_user_parameters DST_PORT_VA
 set_property value {0x00} [ipx::get_user_parameters DST_PORT_VALUE]
 set_property value_format {bitstring} [ipx::get_user_parameters DST_PORT_VALUE]
 
+ipx::add_user_parameter {SRC_PORT_VALUE} [ipx::current_core]
+set_property value_resolve_type {user} [ipx::get_user_parameters SRC_PORT_VALUE]
+set_property display_name {SRC_PORT_VALUE} [ipx::get_user_parameters SRC_PORT_VALUE]
+set_property value {0x00} [ipx::get_user_parameters SRC_PORT_VALUE]
+set_property value_format {bitstring} [ipx::get_user_parameters SRC_PORT_VALUE]
+
 ipx::add_user_parameter {ETH_ADDR} [ipx::current_core]
 set_property value_resolve_type {user} [ipx::get_user_parameters ETH_ADDR]
 set_property display_name {ETH_ADDR} [ipx::get_user_parameters ETH_ADDR]

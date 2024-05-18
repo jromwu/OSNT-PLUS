@@ -42,7 +42,8 @@ set_param synth.elaboration.rodinMoreOptions "rt::set_parameter max_loop_limit 2
 # Design Parameters on NF_DATAPATH
 #####################################
 set datapath_width_bit    512
-set datapath_freq_mhz     250
+set datapath_freq_mhz     200
+# set datapath_freq_mhz     250
 #####################################
 # Project Settings
 #####################################
@@ -109,6 +110,7 @@ create_ip -name packet_vomiter -vendor NetFPGA -library NetFPGA -module_name pac
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_1_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_1_ip]
 set_property CONFIG.DST_PORT_VALUE 0x02 [get_ips packet_vomiter_1_ip]
+set_property CONFIG.SRC_PORT_VALUE 0x01 [get_ips packet_vomiter_1_ip]
 set_property CONFIG.ETH_ADDR 0x000003350a00 [get_ips packet_vomiter_1_ip]
 set_property generate_synth_checkpoint false [get_files packet_vomiter_1_ip.xci]
 reset_target all [get_ips packet_vomiter_1_ip]
