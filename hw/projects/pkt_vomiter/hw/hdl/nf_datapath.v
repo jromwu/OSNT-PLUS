@@ -53,7 +53,9 @@ module nf_datapath #(
     parameter C_S_AXIS_DATA_WIDTH=512,
     parameter C_M_AXIS_TUSER_WIDTH=128,
     parameter C_S_AXIS_TUSER_WIDTH=128,
-    parameter NUM_QUEUES = 3
+    parameter NUM_QUEUES = 3,
+
+    parameter TIMESTAMP_WIDTH = 64
 ) (
     //Datapath clock
     input                                     axis_aclk,
@@ -161,9 +163,242 @@ module nf_datapath #(
 
     );
 
+    wire [TIMESTAMP_WIDTH-1:0] stamp_counter;
+
+    stamp_counter_ip stamp_counter_0 (
+      .ACLK(axis_aclk), 
+      .ARESETN(axis_resetn), 
+      .STAMP_COUNTER(stamp_counter)
+    );
+
+    // TODO: make this a module
+
+    // Pass CMAC 1 RX to DMA but add timestamp
+    localparam IN_FIFO_DEPTH = 256;
+    localparam TIMESTAMP_POS = 304;
+    localparam DST_PORT_POS = 24;
+
+    wire [C_S_AXIS_DATA_WIDTH - 1:0] fifo_in_tdata;
+    assign fifo_in_tdata[TIMESTAMP_POS - 1:0] = s_axis_1_tdata[TIMESTAMP_POS - 1:0];
+    assign fifo_in_tdata[C_S_AXIS_DATA_WIDTH - 1:TIMESTAMP_POS + TIMESTAMP_WIDTH] = s_axis_1_tdata[C_S_AXIS_DATA_WIDTH - 1:TIMESTAMP_POS + TIMESTAMP_WIDTH];
+    genvar i;
+    generate for (i = 0; i < TIMESTAMP_WIDTH; i = i + 8) begin : KEEP_GEN
+      // flip endianness
+      assign fifo_in_tdata[TIMESTAMP_POS + TIMESTAMP_WIDTH - i - 1:TIMESTAMP_POS + TIMESTAMP_WIDTH - i - 8] = stamp_counter[i +: 8];
+    end endgenerate;
+
+    wire [C_S_AXIS_TUSER_WIDTH - 1:0] fifo_in_tuser;
+    assign fifo_in_tuser[DST_PORT_POS-1:0] = s_axis_1_tuser[DST_PORT_POS-1:0];
+    assign fifo_in_tuser[DST_PORT_POS+7:DST_PORT_POS] = 8'h08; // DMA 1 (nf1)
+    assign fifo_in_tuser[C_S_AXIS_TUSER_WIDTH-1:DST_PORT_POS+8] = s_axis_1_tuser[C_S_AXIS_TUSER_WIDTH-1:DST_PORT_POS+8];
+
+    assign s_axis_1_tready = m_axis_2_tready;
+    assign m_axis_2_tdata = fifo_in_tdata;
+    assign m_axis_2_tkeep = s_axis_1_tkeep;
+    assign m_axis_2_tuser = fifo_in_tuser;
+    assign m_axis_2_tvalid = s_axis_1_tvalid;
+    assign m_axis_2_tlast = s_axis_1_tlast;
+
+
+    // wire [TIMESTAMP_WIDTH:0] stamp_counter;
+
+    // stamp_counter_ip stamp_counter_0 (
+    //   .ACLK(axis_aclk), 
+    //   .ARESETN(axis_resetn), 
+    //   .STAMP_COUNTER(stamp_counter)
+    // );
+
+    // // Pass CMAC 1 RX to DMA but add timestamp
+    // localparam IN_FIFO_DEPTH = 256;
+    // localparam TIMESTAMP_ADDR = 176;
+    // localparam DST_PORT_POS = 24;
+
+    // wire [C_S_AXIS_DATA_WIDTH - 1:0] fifo_in_tdata;
+    // wire [C_S_AXIS_TUSER_WIDTH - 1:0] fifo_in_tuser;
+    // wire [C_S_AXIS_DATA_WIDTH / 8 - 1:0] fifo_in_tkeep;
+    // wire fifo_in_tlast, fifo_in_tvalid;
+
+    // wire fifo_empty, fifo_nearly_full, fifo_rden;
+
+
+    // packet_vomiter_1_ip packet_vomiter_2 (
+    //   .axis_aclk(axis_aclk), 
+    //   .axis_resetn(axis_resetn), 
+    //   .m_axis_tdata (fifo_in_tdata), 
+    //   .m_axis_tkeep (fifo_in_tkeep), 
+    //   .m_axis_tuser (fifo_in_tuser), 
+    //   .m_axis_tvalid(fifo_in_tvalid), 
+    //   .m_axis_tready(~fifo_nearly_full), 
+    //   .m_axis_tlast (fifo_in_tlast), 
+    //   .S_AXI_AWADDR(S2_AXI_AWADDR), 
+    //   .S_AXI_AWVALID(S2_AXI_AWVALID),
+    //   .S_AXI_WDATA(S2_AXI_WDATA),  
+    //   .S_AXI_WSTRB(S2_AXI_WSTRB),  
+    //   .S_AXI_WVALID(S2_AXI_WVALID), 
+    //   .S_AXI_BREADY(S2_AXI_BREADY), 
+    //   .S_AXI_ARADDR(S2_AXI_ARADDR), 
+    //   .S_AXI_ARVALID(S2_AXI_ARVALID),
+    //   .S_AXI_RREADY(S2_AXI_RREADY), 
+    //   .S_AXI_ARREADY(S2_AXI_ARREADY),
+    //   .S_AXI_RDATA(S2_AXI_RDATA),  
+    //   .S_AXI_RRESP(S2_AXI_RRESP),  
+    //   .S_AXI_RVALID(S2_AXI_RVALID), 
+    //   .S_AXI_WREADY(S2_AXI_WREADY), 
+    //   .S_AXI_BRESP(S2_AXI_BRESP),  
+    //   .S_AXI_BVALID(S2_AXI_BVALID), 
+    //   .S_AXI_AWREADY(S2_AXI_AWREADY),
+    //   .S_AXI_ACLK (axi_aclk), 
+    //   .S_AXI_ARESETN(axi_resetn)
+    // );
+    
+
+    // xpm_fifo_sync #(
+    //   .FIFO_MEMORY_TYPE     ("auto"),
+    //   .ECC_MODE             ("no_ecc"),
+    //   .FIFO_WRITE_DEPTH     (IN_FIFO_DEPTH),
+    //   .WRITE_DATA_WIDTH     (1+1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH),
+    //   .WR_DATA_COUNT_WIDTH  (1),
+    //   .PROG_FULL_THRESH     (IN_FIFO_DEPTH - 12),
+    //   .FULL_RESET_VALUE     (0),
+    //   .USE_ADV_FEATURES     ("0707"),
+    //   .READ_MODE            ("fwft"),
+    //   .FIFO_READ_LATENCY    (0),
+    //   .READ_DATA_WIDTH      (1+1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH),
+    //   .RD_DATA_COUNT_WIDTH  (1),
+    //   .PROG_EMPTY_THRESH    (10),
+    //   .DOUT_RESET_VALUE     ("0"),
+    //   .WAKEUP_TIME          (0)
+    // ) u_xpm_fifo_sync (
+    //   // Common module ports
+    //   .sleep           (),
+    //   .rst             (~axis_resetn),
+      
+    //   // Write Domain ports
+    //   .wr_clk          (axis_aclk),
+    //   .wr_en           (s_axis_1_tvalid),
+    //   .din             ({fifo_in_tvalid, fifo_in_tlast, fifo_in_tuser, fifo_in_tkeep, fifo_in_tdata}),
+    //   .full            (),
+    //   .prog_full       (fifo_nearly_full),
+    //   .wr_data_count   (),
+    //   .overflow        (),
+    //   .wr_rst_busy     (),
+    //   .almost_full     (),
+    //   .wr_ack          (),
+      
+    //   // Read Domain ports
+    //   .rd_en           (m_axis_2_tready & ~fifo_empty),
+    //   .dout            ({m_axis_2_tvalid, m_axis_2_tlast, m_axis_2_tuser, m_axis_2_tkeep, m_axis_2_tdata}),
+    //   .empty           (fifo_empty),
+    //   .prog_empty      (),
+    //   .rd_data_count   (),
+    //   .underflow       (),
+    //   .rd_rst_busy     (),
+    //   .almost_empty    (),
+    //   .data_valid      (),
+      
+    //   // ECC Related ports
+    //   .injectsbiterr   (),
+    //   .injectdbiterr   (),
+    //   .sbiterr         (),
+    //   .dbiterr         () 
+    // );
+    // // we can stop overflowing the fifo by negating tready, but doing so would impact the timestamp accuracy
+    // // what is best is to mark packets when the fifo is nearly full, but let's not bother with that for now 
+    // assign s_axis_1_tready = 1;
+    // // in this case, we will just drop packets when the fifo is full
+    // // assign s_axis_1_tready = 1;
+    
+
+    // wire [TIMESTAMP_WIDTH:0] stamp_counter;
+
+    // stamp_counter_ip stamp_counter_0 (
+    //   .ACLK(axis_aclk), 
+    //   .ARESETN(axis_resetn), 
+    //   .STAMP_COUNTER(stamp_counter)
+    // );
+
+    // // Pass CMAC 1 RX to DMA but add timestamp
+    // localparam IN_FIFO_DEPTH = 256;
+    // localparam TIMESTAMP_ADDR = 176;
+    // localparam DST_PORT_POS = 24;
+
+    // wire [C_S_AXIS_DATA_WIDTH - 1:0] fifo_in_tdata;
+    // assign fifo_in_tdata[TIMESTAMP_ADDR - 1:0] = s_axis_1_tdata[TIMESTAMP_ADDR - 1:0];
+    // assign fifo_in_tdata[C_S_AXIS_DATA_WIDTH - 1:TIMESTAMP_ADDR + TIMESTAMP_WIDTH] = s_axis_1_tdata[C_S_AXIS_DATA_WIDTH - 1:TIMESTAMP_ADDR + TIMESTAMP_WIDTH];
+    // genvar i;
+    // generate for (i = 0; i < TIMESTAMP_WIDTH; i = i + 8) begin : KEEP_GEN
+    //   // flip endianness
+    //   assign fifo_in_tdata[TIMESTAMP_ADDR + TIMESTAMP_WIDTH - i:TIMESTAMP_ADDR + TIMESTAMP_WIDTH - i - 8] = stamp_counter[i +: 8];
+    // end endgenerate;
+
+    // wire [C_S_AXIS_TUSER_WIDTH - 1:0] fifo_in_tuser;
+    // assign fifo_in_tuser[DST_PORT_POS-1:0] = s_axis_1_tuser[DST_PORT_POS-1:0];
+    // assign fifo_in_tuser[DST_PORT_POS+7:DST_PORT_POS] = 8'h08; // DMA 1 (nf1)
+    // assign fifo_in_tuser[C_S_AXIS_TUSER_WIDTH-1:DST_PORT_POS+8] = s_axis_1_tuser[C_S_AXIS_TUSER_WIDTH-1:DST_PORT_POS+8];
+
+    // wire fifo_empty, fifo_nearly_full, fifo_rden;
+
+    // xpm_fifo_sync #(
+    //   .FIFO_MEMORY_TYPE     ("auto"),
+    //   .ECC_MODE             ("no_ecc"),
+    //   .FIFO_WRITE_DEPTH     (IN_FIFO_DEPTH),
+    //   .WRITE_DATA_WIDTH     (1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH),
+    //   .WR_DATA_COUNT_WIDTH  (1),
+    //   .PROG_FULL_THRESH     (IN_FIFO_DEPTH - 12),
+    //   .FULL_RESET_VALUE     (0),
+    //   .USE_ADV_FEATURES     ("0707"),
+    //   .READ_MODE            ("fwft"),
+    //   .FIFO_READ_LATENCY    (0),
+    //   .READ_DATA_WIDTH      (1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH),
+    //   .RD_DATA_COUNT_WIDTH  (1),
+    //   .PROG_EMPTY_THRESH    (10),
+    //   .DOUT_RESET_VALUE     ("0"),
+    //   .WAKEUP_TIME          (0)
+    // ) u_xpm_fifo_sync (
+    //   // Common module ports
+    //   .sleep           (),
+    //   .rst             (~axis_resetn),
+      
+    //   // Write Domain ports
+    //   .wr_clk          (axis_aclk),
+    //   .wr_en           (s_axis_1_tvalid),
+    //   .din             ({s_axis_1_tlast, fifo_in_tuser, s_axis_1_tkeep, fifo_in_tdata}),
+    //   .full            (),
+    //   .prog_full       (fifo_nearly_full),
+    //   .wr_data_count   (),
+    //   .overflow        (),
+    //   .wr_rst_busy     (),
+    //   .almost_full     (),
+    //   .wr_ack          (),
+      
+    //   // Read Domain ports
+    //   .rd_en           (fifo_rden),
+    //   .dout            ({m_axis_2_tlast, m_axis_2_tuser, m_axis_2_tkeep, m_axis_2_tdata}),
+    //   .empty           (fifo_empty),
+    //   .prog_empty      (),
+    //   .rd_data_count   (),
+    //   .underflow       (),
+    //   .rd_rst_busy     (),
+    //   .almost_empty    (),
+    //   .data_valid      (),
+      
+    //   // ECC Related ports
+    //   .injectsbiterr   (),
+    //   .injectdbiterr   (),
+    //   .sbiterr         (),
+    //   .dbiterr         () 
+    // );
+    // assign fifo_rden = m_axis_2_tready & ~fifo_empty;
+    // assign m_axis_2_tvalid = fifo_rden;
+    // // we can stop overflowing the fifo by negating tready, but doing so would impact the timestamp accuracy
+    // // what is best is to mark packets when the fifo is nearly full, but let's not bother with that for now 
+    // // assign s_axis_1_tready = ~fifo_nearly_full;
+    // // in this case, we will just drop packets when the fifo is full
+    // assign s_axis_1_tready = 1;
+    
+
     // Accept RX from CMAC and DMA but do nothing with them
     assign s_axis_0_tready = 1;
-    assign s_axis_1_tready = 1;
     assign s_axis_2_tready = 1;
     
     packet_vomiter_0_ip packet_vomiter_0 (
@@ -175,6 +410,7 @@ module nf_datapath #(
       .m_axis_tvalid(m_axis_0_tvalid), 
       .m_axis_tready(m_axis_0_tready), 
       .m_axis_tlast (m_axis_0_tlast), 
+      .stamp_counter(stamp_counter),
       .S_AXI_AWADDR(S0_AXI_AWADDR), 
       .S_AXI_AWVALID(S0_AXI_AWVALID),
       .S_AXI_WDATA(S0_AXI_WDATA),  
@@ -205,6 +441,7 @@ module nf_datapath #(
       .m_axis_tvalid(m_axis_1_tvalid), 
       .m_axis_tready(m_axis_1_tready), 
       .m_axis_tlast (m_axis_1_tlast), 
+      .stamp_counter(stamp_counter),
       .S_AXI_AWADDR(S1_AXI_AWADDR), 
       .S_AXI_AWVALID(S1_AXI_AWVALID),
       .S_AXI_WDATA(S1_AXI_WDATA),  
@@ -226,34 +463,34 @@ module nf_datapath #(
       .S_AXI_ARESETN(axi_resetn)
     );
 
-    packet_vomiter_1_ip packet_vomiter_2 (
-      .axis_aclk(axis_aclk), 
-      .axis_resetn(axis_resetn), 
-      .m_axis_tdata (m_axis_2_tdata), 
-      .m_axis_tkeep (m_axis_2_tkeep), 
-      .m_axis_tuser (m_axis_2_tuser), 
-      .m_axis_tvalid(m_axis_2_tvalid), 
-      .m_axis_tready(m_axis_2_tready), 
-      .m_axis_tlast (m_axis_2_tlast), 
-      .S_AXI_AWADDR(S2_AXI_AWADDR), 
-      .S_AXI_AWVALID(S2_AXI_AWVALID),
-      .S_AXI_WDATA(S2_AXI_WDATA),  
-      .S_AXI_WSTRB(S2_AXI_WSTRB),  
-      .S_AXI_WVALID(S2_AXI_WVALID), 
-      .S_AXI_BREADY(S2_AXI_BREADY), 
-      .S_AXI_ARADDR(S2_AXI_ARADDR), 
-      .S_AXI_ARVALID(S2_AXI_ARVALID),
-      .S_AXI_RREADY(S2_AXI_RREADY), 
-      .S_AXI_ARREADY(S2_AXI_ARREADY),
-      .S_AXI_RDATA(S2_AXI_RDATA),  
-      .S_AXI_RRESP(S2_AXI_RRESP),  
-      .S_AXI_RVALID(S2_AXI_RVALID), 
-      .S_AXI_WREADY(S2_AXI_WREADY), 
-      .S_AXI_BRESP(S2_AXI_BRESP),  
-      .S_AXI_BVALID(S2_AXI_BVALID), 
-      .S_AXI_AWREADY(S2_AXI_AWREADY),
-      .S_AXI_ACLK (axi_aclk), 
-      .S_AXI_ARESETN(axi_resetn)
-    );
+    // packet_vomiter_1_ip packet_vomiter_2 (
+    //   .axis_aclk(axis_aclk), 
+    //   .axis_resetn(axis_resetn), 
+    //   .m_axis_tdata (m_axis_2_tdata), 
+    //   .m_axis_tkeep (m_axis_2_tkeep), 
+    //   .m_axis_tuser (m_axis_2_tuser), 
+    //   .m_axis_tvalid(m_axis_2_tvalid), 
+    //   .m_axis_tready(m_axis_2_tready), 
+    //   .m_axis_tlast (m_axis_2_tlast), 
+    //   .S_AXI_AWADDR(S2_AXI_AWADDR), 
+    //   .S_AXI_AWVALID(S2_AXI_AWVALID),
+    //   .S_AXI_WDATA(S2_AXI_WDATA),  
+    //   .S_AXI_WSTRB(S2_AXI_WSTRB),  
+    //   .S_AXI_WVALID(S2_AXI_WVALID), 
+    //   .S_AXI_BREADY(S2_AXI_BREADY), 
+    //   .S_AXI_ARADDR(S2_AXI_ARADDR), 
+    //   .S_AXI_ARVALID(S2_AXI_ARVALID),
+    //   .S_AXI_RREADY(S2_AXI_RREADY), 
+    //   .S_AXI_ARREADY(S2_AXI_ARREADY),
+    //   .S_AXI_RDATA(S2_AXI_RDATA),  
+    //   .S_AXI_RRESP(S2_AXI_RRESP),  
+    //   .S_AXI_RVALID(S2_AXI_RVALID), 
+    //   .S_AXI_WREADY(S2_AXI_WREADY), 
+    //   .S_AXI_BRESP(S2_AXI_BRESP),  
+    //   .S_AXI_BVALID(S2_AXI_BVALID), 
+    //   .S_AXI_AWREADY(S2_AXI_AWREADY),
+    //   .S_AXI_ACLK (axi_aclk), 
+    //   .S_AXI_ARESETN(axi_resetn)
+    // );
     
 endmodule

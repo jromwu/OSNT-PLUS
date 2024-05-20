@@ -131,6 +131,18 @@ set_property display_name {ETH_ADDR} [ipx::get_user_parameters ETH_ADDR]
 set_property value {0x000000000000} [ipx::get_user_parameters ETH_ADDR]
 set_property value_format {bitstring} [ipx::get_user_parameters ETH_ADDR]
 
+ipx::add_user_parameter {TIMESTAMP_POS} [ipx::current_core]
+set_property value_resolve_type {user} [ipx::get_user_parameters TIMESTAMP_POS]
+set_property display_name {TIMESTAMP_POS} [ipx::get_user_parameters TIMESTAMP_POS]
+set_property value {240} [ipx::get_user_parameters TIMESTAMP_POS]
+set_property value_format {long} [ipx::get_user_parameters TIMESTAMP_POS]
+
+ipx::add_user_parameter {TIMESTAMP_WIDTH} [ipx::current_core]
+set_property value_resolve_type {user} [ipx::get_user_parameters TIMESTAMP_WIDTH]
+set_property display_name {TIMESTAMP_WIDTH} [ipx::get_user_parameters TIMESTAMP_WIDTH]
+set_property value {64} [ipx::get_user_parameters TIMESTAMP_WIDTH]
+set_property value_format {long} [ipx::get_user_parameters TIMESTAMP_WIDTH]
+
 ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces m_axis -of_objects [ipx::current_core]]
 # ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axis_0 -of_objects [ipx::current_core]]
 # ipx::add_bus_parameter FREQ_HZ [ipx::get_bus_interfaces s_axis_1 -of_objects [ipx::current_core]]

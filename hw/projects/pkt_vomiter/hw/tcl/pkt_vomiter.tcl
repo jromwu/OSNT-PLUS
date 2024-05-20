@@ -42,8 +42,8 @@ set_param synth.elaboration.rodinMoreOptions "rt::set_parameter max_loop_limit 2
 # Design Parameters on NF_DATAPATH
 #####################################
 set datapath_width_bit    512
-set datapath_freq_mhz     200
-# set datapath_freq_mhz     250
+set datapath_freq_mhz     250
+set timestamp_width_bit   64
 #####################################
 # Project Settings
 #####################################
@@ -97,6 +97,7 @@ set_property constrset constraints [get_runs impl_1]
 #####################################
 update_ip_catalog
 # packet_vomiter
+# CMAC 0
 create_ip -name packet_vomiter -vendor NetFPGA -library NetFPGA -module_name packet_vomiter_0_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_0_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_0_ip]
@@ -106,6 +107,7 @@ set_property generate_synth_checkpoint false [get_files packet_vomiter_0_ip.xci]
 reset_target all [get_ips packet_vomiter_0_ip]
 generate_target all [get_ips packet_vomiter_0_ip]
 
+# DMA 
 create_ip -name packet_vomiter -vendor NetFPGA -library NetFPGA -module_name packet_vomiter_1_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_1_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_1_ip]
@@ -116,6 +118,7 @@ set_property generate_synth_checkpoint false [get_files packet_vomiter_1_ip.xci]
 reset_target all [get_ips packet_vomiter_1_ip]
 generate_target all [get_ips packet_vomiter_1_ip]
 
+# CMAC 1
 create_ip -name packet_vomiter -vendor NetFPGA -library NetFPGA -module_name packet_vomiter_2_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_2_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips packet_vomiter_2_ip]
@@ -124,6 +127,13 @@ set_property CONFIG.ETH_ADDR 0x23e0f6ae6d94 [get_ips packet_vomiter_2_ip]
 set_property generate_synth_checkpoint false [get_files packet_vomiter_2_ip.xci]
 reset_target all [get_ips packet_vomiter_2_ip]
 generate_target all [get_ips packet_vomiter_2_ip]
+
+# timestamping
+create_ip -name osnt_stamp_counter -vendor NetFPGA -library NetFPGA -module_name stamp_counter_ip
+set_property CONFIG.TIMESTAMP_WIDTH ${timestamp_width_bit} [get_ips stamp_counter_ip]
+set_property generate_synth_checkpoint false [get_files stamp_counter_ip.xci]
+reset_target all [get_ips stamp_counter_ip]
+generate_target all [get_ips osnt_stamp_counter_ip]
 
 create_ip -name xilinx_shell -vendor xilinx -library xilinx -module_name xilinx_shell_ip
 set_property CONFIG.MAX_PKT_LEN 1518 [get_ips xilinx_shell_ip]
