@@ -71,7 +71,7 @@ set_property description ${design} [ipx::current_core]
 
 ipx::add_user_parameter {TIMESTAMP_WIDTH} [ipx::current_core]
 set_property value_resolve_type {user} [ipx::get_user_parameters TIMESTAMP_WIDTH]
-set_property display_name {C_M_AXIS_DATA_WIDTH} [ipx::get_user_parameters TIMESTAMP_WIDTH]
+set_property display_name {TIMESTAMP_WIDTH} [ipx::get_user_parameters TIMESTAMP_WIDTH]
 set_property value {64} [ipx::get_user_parameters TIMESTAMP_WIDTH]
 set_property value_format {long} [ipx::get_user_parameters TIMESTAMP_WIDTH]
 
