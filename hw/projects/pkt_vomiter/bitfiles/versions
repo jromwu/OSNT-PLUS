@@ -1,0 +1,26 @@
+    7_10: remove pipelining
+    7_9: tried to fix timing by pipelining (broken)
+    7_8: reenable timestamping in nf_datapath.v
+    7_7: inline the rx queue timestamp (guess no difference)
+    7_6: change fifo to use a cmac timing 
+    7_5: change fifo to be reg (timing more broken)
+    7_4: adjust ts position
+    7_3: adjust ts position, reenable timestamp
+    7_2: replace time stamper with a stub (timing still broken)
+    7_1: add timestamp in pkt_vomiter_attachment (broken timing closure)
+7: change to use pkt_vomiter_mac_attachment
+    6_9: add tx timestamp
+    6_8: add timestamp
+    6_7: remove fifo (working)
+    6_6: fix wrong fifo reset signal
+    6_5: use a pkt_vomiter to make sure the fifo is working
+    6_3: change to dma 0 (nf0), as it does not work
+    6_2: fix forget tvalid
+    6_1: fix forget to set tuser dest
+6: redirect cmac 1 to dma (nf1) with timestamp
+    5_1: add debug payload, seems like everything is sent to cmac 0
+5: try fixing vomiter to qdma
+4: add packet counter, add shorter packet, add another vomiter to qdma nf0
+2: add timestamping
+1: try to fix it to be 64 bytes
+0: seems to output 124 bytes frames due to 1024 nf_datapath_width
