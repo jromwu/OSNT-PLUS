@@ -268,6 +268,8 @@ module nf_datapath #(
 
     );
     
+    wire [C_M_AXIS_DATA_WIDTH - 1:0] m_axis_2_oq_tdata;
+    assign m_axis_2_tdata = {m_axis_2_oq_tdata[C_M_AXIS_DATA_WIDTH-1:112+C_M_AXIS_TUSER_WIDTH+C_M_AXIS_DATA_WIDTH/8+8], 7'b0, m_axis_2_tlast, m_axis_2_tkeep, m_axis_2_tuser, m_axis_2_oq_tdata[111:0]};
        
       //Output queues
        output_queues_ip  bram_output_queues_1 (
@@ -291,7 +293,7 @@ module nf_datapath #(
       .m_axis_1_tvalid(m_axis_1_tvalid), 
       .m_axis_1_tready(m_axis_1_tready), 
       .m_axis_1_tlast (m_axis_1_tlast), 
-      .m_axis_2_tdata (m_axis_2_tdata), 
+      .m_axis_2_tdata (m_axis_2_oq_tdata), 
       .m_axis_2_tkeep (m_axis_2_tkeep), 
       .m_axis_2_tuser (m_axis_2_tuser), 
       .m_axis_2_tvalid(m_axis_2_tvalid), 

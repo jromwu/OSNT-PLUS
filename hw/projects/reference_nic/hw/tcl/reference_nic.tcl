@@ -41,7 +41,8 @@ set_param synth.elaboration.rodinMoreOptions "rt::set_parameter max_loop_limit 2
 #####################################
 # Design Parameters on NF_DATAPATH
 #####################################
-set datapath_width_bit    1024
+set datapath_width_bit    512
+# set datapath_width_bit    1024
 set datapath_freq_mhz     250
 #####################################
 # Project Settings

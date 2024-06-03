@@ -112,6 +112,7 @@ osnt-cores:
 
 pkt-vomiter-cores:
 	make -C $(LIB_HW_DIR)/contrib/packet_vomiter_v1_0_0/
+	make -C $(LIB_HW_DIR)/contrib/pkt_vomiter_mac_attachment_v1_0_0/
 	@echo "/////////////////////////////////////////";
 	@echo "//\tPacket vomiter library cores created.";
 	@echo "/////////////////////////////////////////";

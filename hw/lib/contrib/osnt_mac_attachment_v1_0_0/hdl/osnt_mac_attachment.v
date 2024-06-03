@@ -333,7 +333,7 @@ module osnt_mac_attachment #(
     // IMPORTANT: FIFO36_72 requires rst to be asserted for at least 5 clks. 
     // RDEN and WREN should be ONLY 1'b0 at that time. 
     //------------------------------------------------------------------------- 
-    tx_queue #(
+    osnt_tx_queue #(
      .AXI_DATA_WIDTH                     (C_S_AXIS_DATA_WIDTH_INTERNAL), 
      .C_S_AXIS_TUSER_WIDTH               (C_S_AXIS_TUSER_WIDTH)
     ) tx_fifo_intf (    

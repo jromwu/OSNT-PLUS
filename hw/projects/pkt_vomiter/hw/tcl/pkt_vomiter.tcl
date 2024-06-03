@@ -144,6 +144,25 @@ set_property generate_synth_checkpoint false [get_files xilinx_shell_ip.xci]
 reset_target all [get_ips xilinx_shell_ip]
 generate_target all [get_ips xilinx_shell_ip]
 
+# create_ip -name pkt_vomiter_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf0_mac_attachment_ip
+# set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf0_mac_attachment_ip]
+# set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf0_mac_attachment_ip]
+# # set_property CONFIG.C_TX_TIMESTAMP_ENABLE 0 [get_ips nf0_mac_attachment_ip]
+# set_property CONFIG.C_TX_TIMESTAMP_ENABLE 1 [get_ips nf0_mac_attachment_ip]
+# set_property CONFIG.C_RX_TIMESTAMP_ENABLE 0 [get_ips nf0_mac_attachment_ip]
+# set_property generate_synth_checkpoint false [get_files nf0_mac_attachment_ip.xci]
+# reset_target all [get_ips nf0_mac_attachment_ip]
+# generate_target all [get_ips nf0_mac_attachment_ip]
+
+# create_ip -name pkt_vomiter_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf1_mac_attachment_ip
+# set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf1_mac_attachment_ip]
+# set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf1_mac_attachment_ip]
+# set_property CONFIG.C_TX_TIMESTAMP_ENABLE 0 [get_ips nf1_mac_attachment_ip]
+# set_property CONFIG.C_RX_TIMESTAMP_ENABLE 1 [get_ips nf1_mac_attachment_ip]
+# set_property generate_synth_checkpoint false [get_files nf1_mac_attachment_ip.xci]
+# reset_target all [get_ips nf1_mac_attachment_ip]
+# generate_target all [get_ips nf1_mac_attachment_ip]
+
 create_ip -name nf_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
 set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
@@ -348,8 +367,8 @@ reset_target all [get_ips clk_wiz_1]
 generate_target all [get_ips clk_wiz_1]
 
 read_verilog     "./hdl/nf_datapath.v"
-read_verilog -sv "${public_repo_dir}/common/hdl/top_wrapper.sv"
-read_verilog -sv "${public_repo_dir}/common/hdl/nf_attachment.sv"
+read_verilog -sv "./hdl/top_wrapper.sv"
+read_verilog -sv "./hdl/pkt_vomiter_attachment.sv"
 read_verilog     "${public_repo_dir}/common/hdl/top.v"
 
 #Setting Synthesis options

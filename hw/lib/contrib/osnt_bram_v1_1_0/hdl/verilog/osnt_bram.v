@@ -65,11 +65,14 @@ always @(posedge bram_clk) begin
 //	if(bram_we_reg)
 //		bootmem[bram_addr] <= bram_tmp_write;
 //end
-	if (bram_en) begin
-		bram_rddata  <= bootmem[bram_addr];
-      		if (bram_we) 
-      			bootmem[bram_addr] <= bram_wrdata;
+   if (bram_en) begin
+      if (bram_we) 
+         bootmem[bram_addr] <= bram_wrdata;
+      else
+		   bram_rddata  <= bootmem[bram_addr];
    	end
+   else 
+      bram_rddata <= 0;
 end
 
 endmodule

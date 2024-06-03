@@ -162,6 +162,19 @@ module nf_datapath #(
     output                                     m_axis_2_tlast
 
     );
+    // localparam DST_PORT_POS = 24;
+    // wire [C_S_AXIS_TUSER_WIDTH - 1:0] fifo_in_tuser;
+    // assign fifo_in_tuser[DST_PORT_POS-1:0] = s_axis_1_tuser[DST_PORT_POS-1:0];
+    // assign fifo_in_tuser[DST_PORT_POS+7:DST_PORT_POS] = 8'h08; // DMA 1 (nf1)
+    // assign fifo_in_tuser[C_S_AXIS_TUSER_WIDTH-1:DST_PORT_POS+8] = s_axis_1_tuser[C_S_AXIS_TUSER_WIDTH-1:DST_PORT_POS+8];
+
+    // assign s_axis_1_tready = m_axis_2_tready;
+    // assign m_axis_2_tdata = s_axis_1_tdata;
+    // assign m_axis_2_tkeep = s_axis_1_tkeep;
+    // assign m_axis_2_tuser = fifo_in_tuser;
+    // assign m_axis_2_tvalid = s_axis_1_tvalid;
+    // assign m_axis_2_tlast = s_axis_1_tlast;
+    
 
     wire [TIMESTAMP_WIDTH-1:0] stamp_counter;
 
@@ -199,6 +212,8 @@ module nf_datapath #(
     assign m_axis_2_tvalid = s_axis_1_tvalid;
     assign m_axis_2_tlast = s_axis_1_tlast;
 
+
+//////////////////////////////////////////////////////
 
     // wire [TIMESTAMP_WIDTH:0] stamp_counter;
 

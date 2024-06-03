@@ -150,6 +150,8 @@ reg   [3:0] m1_st_current, m1_st_next;
 // ------------ Internal Params --------
 localparam  MAX_PKT_SIZE      = 2000; // In bytes
 localparam  IN_FIFO_DEPTH_BIT = log2(MAX_PKT_SIZE/(C_M_AXIS_DATA_WIDTH / 8));
+localparam  IN_FIFO_DEPTH = 64;
+localparam  DEBUG_PAYLOAD_POS = 112; // After 48 + 48 ethernet src dst, and 16 bit type 
 
 // -- Internal Parameters
 localparam NUM_RW_REGS = 14;
@@ -275,7 +277,18 @@ wire [`REG_CTRL12_BITS] cpu2ip_ctrl12;
 wire [`REG_CTRL13_BITS]	ip2cpu_ctrl13;
 wire [`REG_CTRL13_BITS] cpu2ip_ctrl13;
 
+// reg      [31:0] time_counter;
+// always @(posedge axis_aclk)
+//     if (~axis_aresetn | sw_rst) begin
+//       time_counter <= #1 32'h0;
+//     end
+//     else begin
+//       time_counter <= #1 (time_counter==32'hFFFFFFFF) ? 32'h0 : time_counter + 32'h1;
+//     end
+
 assign pre_axis_tready = 1;
+
+reg   [MEM_DEPTH-1:0]             	tmp0_last_addr, tmp0_last_addr_next, tmp1_last_addr, tmp1_last_addr_next;
 
 `define  ST0_WR_IDLE    0
 `define  ST0_WR         1
@@ -286,14 +299,17 @@ always @(posedge axis_aclk)
    if (~axis_aresetn) begin
       tmp0_addr      <= 1;
       st0_wr_current <= 0;
+      tmp0_last_addr <= 1;
    end
    else if (sw_rst) begin
       tmp0_addr      <= 1;
       st0_wr_current <= 0;
+      tmp0_last_addr <= 1;
    end
    else begin
       tmp0_addr      <= tmp0_addr_next;
       st0_wr_current <= st0_wr_next;
+      tmp0_last_addr <= (tmp0_last_addr_next != 1) ? tmp0_last_addr_next : tmp0_last_addr;
    end
 
 always @(*) begin
@@ -301,12 +317,14 @@ always @(*) begin
    tmp0_we           = 0;
    tmp0_data         = 0;
    st0_wr_next       = 0;
+   tmp0_last_addr_next = 1;
    case (st0_wr_current)
       `ST0_WR_IDLE : begin
          tmp0_addr_next    = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? tmp0_addr + 1 : 1;
          tmp0_we           = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? 1 : 0;
          tmp0_data         = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata} : 0;
          st0_wr_next       = (pre_axis_tvalid && (tuser_src_port == 8'h02)) ? `ST0_WR : `ST0_WR_IDLE;
+         tmp0_last_addr_next = 1;
       end
       `ST0_WR : begin
          if (sw_rst) begin
@@ -314,24 +332,28 @@ always @(*) begin
             tmp0_we           = 1;
             tmp0_data         = 0;
             st0_wr_next       = `ST0_WR_IDLE;
+            tmp0_last_addr_next = 1;
          end
          else if (q0_wr_done) begin
             tmp0_addr_next    = tmp0_addr + 1;
             tmp0_we           = 1;
             tmp0_data         = {{(MEM_NILL_BIT_NO-1){1'b0}}, 1'b1, 2'b0, {(C_S_AXIS_TUSER_WIDTH+(C_S_AXIS_DATA_WIDTH/8)+C_S_AXIS_DATA_WIDTH){1'b0}}};
             st0_wr_next       = `ST0_WR_DONE;
+            tmp0_last_addr_next = tmp0_addr; 
          end
          else if (pre_axis_tvalid) begin
             tmp0_addr_next    = tmp0_addr + 1;
             tmp0_we           = 1;
             tmp0_data         = {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata};
             st0_wr_next       = `ST0_WR;
+            tmp0_last_addr_next = 1;
          end
          else begin
             tmp0_addr_next    = tmp0_addr;
             tmp0_we           = 0;
             tmp0_data         = 0;
             st0_wr_next       = `ST0_WR;
+            tmp0_last_addr_next = 1;
          end
       end
       `ST0_WR_DONE : begin
@@ -339,8 +361,10 @@ always @(*) begin
          tmp0_we           = 1;
          tmp0_data         = 0;
          st0_wr_next       = `ST0_WR_IDLE;
+         tmp0_last_addr_next = 1;
       end
    endcase
+   // tmp0_data[DEBUG_PAYLOAD_POS+:64] = {tmp0_last_addr_next[7:0], tmp0_last_addr_next[10:8], 5'b0, st0_wr_current, st0_wr_next, tmp0_addr_next[7:0], tmp0_addr[3:0], 1'b0, tmp0_addr_next[10:8], 1'b0, tmp0_addr[10:4]};
 end
 
 
@@ -354,14 +378,17 @@ always @(posedge axis_aclk)
    if (~axis_aresetn) begin
       tmp1_addr      <= 1;
       st1_wr_current <= 0;
+      tmp1_last_addr <= 1;
    end
    else if (sw_rst) begin
       tmp1_addr      <= 1;
       st1_wr_current <= 0;
+      tmp1_last_addr <= 1;
    end
    else begin
       tmp1_addr      <= tmp1_addr_next;
       st1_wr_current <= st1_wr_next;
+      tmp1_last_addr <= (tmp1_last_addr_next != 1) ? tmp1_last_addr_next : tmp1_last_addr;
    end
 
 always @(*) begin
@@ -369,12 +396,14 @@ always @(*) begin
    tmp1_we           = 0;
    tmp1_data         = 0;
    st1_wr_next       = 0;
+   tmp1_last_addr_next = 1;
    case (st1_wr_current)
       `ST1_WR_IDLE : begin
          tmp1_addr_next    = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? tmp1_addr + 1 : 1;
          tmp1_we           = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? 1 : 0;
          tmp1_data         = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata} : 0;
          st1_wr_next       = (pre_axis_tvalid && (tuser_src_port == 8'h08)) ? `ST1_WR : `ST1_WR_IDLE;
+         tmp1_last_addr_next = 1;
       end
       `ST1_WR : begin
          if (sw_rst) begin
@@ -382,24 +411,28 @@ always @(*) begin
             tmp1_we           = 1;
             tmp1_data         = 0;
             st1_wr_next       = `ST1_WR_IDLE;
+            tmp1_last_addr_next = 1;
          end
          else if (q1_wr_done) begin
             tmp1_addr_next    = tmp1_addr + 1;
             tmp1_we           = 1;
             tmp1_data         = {{(MEM_NILL_BIT_NO-1){1'b0}}, 1'b1, 2'b0, {(C_S_AXIS_TUSER_WIDTH+(C_S_AXIS_DATA_WIDTH/8)+C_S_AXIS_DATA_WIDTH){1'b0}}};
             st1_wr_next       = `ST1_WR_DONE;
+            tmp1_last_addr_next = tmp1_addr; 
          end
          else if (pre_axis_tvalid) begin
             tmp1_addr_next    = tmp1_addr + 1;
             tmp1_we           = 1;
             tmp1_data         = {{MEM_NILL_BIT_NO{1'b0}}, 1'b1, pre_axis_tlast, pre_axis_tuser, pre_axis_tkeep, pre_axis_tdata};
             st1_wr_next       = `ST1_WR;
+            tmp1_last_addr_next = 1; 
          end
          else begin
             tmp1_addr_next    = tmp1_addr;
             tmp1_we           = 0;
             tmp1_data         = 0;
             st1_wr_next       = `ST1_WR;
+            tmp1_last_addr_next = 1;
          end
       end
       `ST1_WR_DONE : begin
@@ -407,8 +440,10 @@ always @(*) begin
          tmp1_we           = 1;
          tmp1_data         = 0;
          st1_wr_next       = `ST1_WR_IDLE;
+         tmp1_last_addr_next = 1;
       end
    endcase
+   // tmp1_data[DEBUG_PAYLOAD_POS+:64] = {time_counter, st1_wr_current, st1_wr_next, tmp1_addr_next[7:0], tmp1_addr[3:0], 1'b0, tmp1_addr_next[10:8], 1'b0, tmp1_addr[10:4]};
 end
 
 always @(posedge axis_aclk)
@@ -459,19 +494,19 @@ wire  w_q0_start = q0_start_replay & ~r_q0_start_replay;
 wire  w_q1_start = q1_start_replay & ~r_q1_start_replay;
 
 
-reg   [4:0]    replay_counter;
-always @(posedge axis_aclk)
-   if (~axis_aresetn) begin
-      replay_counter    <= 0;
-   end
-   else if (w_q0_start) begin
-      replay_counter    <= replay_counter + 1;
-   end
-   else if (replay_counter > 0) begin
-      replay_counter    <= replay_counter + 1;
-   end
+// reg   [4:0]    replay_counter;
+// always @(posedge axis_aclk)
+//    if (~axis_aresetn) begin
+//       replay_counter    <= 0;
+//    end
+//    else if (w_q0_start) begin
+//       replay_counter    <= replay_counter + 1;
+//    end
+//    else if (replay_counter > 0) begin
+//       replay_counter    <= replay_counter + 1;
+//    end
 
-assign replay_start_out = |replay_counter;
+// assign replay_start_out = |replay_counter;
 
 reg   r_replay_in_0, r_replay_in_1;
 always @(posedge axis_aclk)
@@ -513,63 +548,67 @@ always @(*) begin
    r_mem_rd_addr_next[0]   = 1;
    r_mem_rden[0]           = 0;
    q0_count_next           = 0;
-   st0_rd_next             = 0;
-   case (st0_rd_current)
-      `ST0_RD_IDLE : begin
-         r_mem_rd_addr_next[0]   = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0)) ? r_mem_rd_addr[0] + 1 : 1;
-         r_mem_rden[0]           = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0)) ? 1 : 0;
+   st0_rd_next             = `ST0_RD_IDLE;
+   if (st0_rd_current == `ST0_RD_IDLE && (!w_q0_start || (q0_replay_count == 0))) begin
+      // idle
+      r_mem_rd_addr_next[0]   = 1;
+      r_mem_rden[0]           = 0;
+      q0_count_next           = 0;
+      st0_rd_next             = `ST0_RD_IDLE;
+   end 
+   else begin
+      if (sw_rst) begin
+         r_mem_rd_addr_next[0]   = 1;
+         r_mem_rden[0]           = 0;
          q0_count_next           = 0;
-         st0_rd_next             = (w_q0_start && ~fifo_nearly_full[0] && (q0_replay_count != 0)) ? `ST0_RD : `ST0_RD_IDLE;
+         st0_rd_next             = `ST0_RD_IDLE;
+      end 
+      else if (fifo_nearly_full[0]) begin
+         // fifo nearly full, pause
+         r_mem_rd_addr_next[0]   = r_mem_rd_addr[0];
+         r_mem_rden[0]           = 0;
+         q0_count_next           = q0_count;
+         st0_rd_next             = `ST0_RD;
       end
-      `ST0_RD : begin
-         if (sw_rst) begin
+      else if (dina0[MEM_TVALID_POS+1] || (r_mem_rd_addr[0] + 1 == tmp0_last_addr)) begin
+         // Reached the end of pcap
+         if ((q0_count + 1) < q0_replay_count) begin
+            // go back to start and keep reading
             r_mem_rd_addr_next[0]   = 1;
-            r_mem_rden[0]           = 0;
-            q0_count_next           = 0;
-            st0_rd_next             = `ST0_RD_IDLE;
-         end 
-         else if (dina0[MEM_TVALID_POS+1] && ~fifo_nearly_full[0]) begin
-            if ((q0_count + 1) < q0_replay_count) begin
-               r_mem_rd_addr_next[0]   = 1;
-               r_mem_rden[0]           = 1;
-               q0_count_next           = q0_count + 1;
-               st0_rd_next             = `ST0_RD;
-            end
-            else begin
-               r_mem_rd_addr_next[0]   = 1;
-               r_mem_rden[0]           = 1;
-               q0_count_next           = 0;
-               st0_rd_next             = `ST0_RD_IDLE;
-            end
-         end 
-         else if (~fifo_nearly_full[0]) begin
-            r_mem_rd_addr_next[0]   = r_mem_rd_addr[0] + 1;
             r_mem_rden[0]           = 1;
-            q0_count_next           = q0_count;
-            st0_rd_next             = `ST0_RD;
-         end 
-         else begin
-            r_mem_rd_addr_next[0]   = r_mem_rd_addr[0];
-            r_mem_rden[0]           = 0;
-            q0_count_next           = q0_count;
+            q0_count_next           = q0_count + 1;
             st0_rd_next             = `ST0_RD;
          end
+         else begin
+            // finished replay, read the last word and stop
+            r_mem_rd_addr_next[0]   = 1;
+            r_mem_rden[0]           = 1;
+            q0_count_next           = 0;
+            st0_rd_next             = `ST0_RD_IDLE;
+         end
+      end 
+      else begin
+         // keep reading, still in pcap
+         r_mem_rd_addr_next[0]   = r_mem_rd_addr[0] + 1;
+         r_mem_rden[0]           = 1;
+         q0_count_next           = q0_count;
+         st0_rd_next             = `ST0_RD;
       end
-   endcase
+   end
 end
 
-reg   r_rden0;
-always @(posedge axis_aclk)
-   if (~axis_aresetn) begin
-      r_rden0                 <= 0;
-      r_fifo_nearly_full[0]   <= 0;
-   end
-   else begin
-      r_rden0                 <= r_mem_rden[0];
-      r_fifo_nearly_full[0]   <= fifo_nearly_full[0];
-   end
+// reg   r_rden0;
+// always @(posedge axis_aclk)
+//    if (~axis_aresetn) begin
+//       r_rden0                 <= 0;
+//       r_fifo_nearly_full[0]   <= 0;
+//    end
+//    else begin
+//       r_rden0                 <= r_mem_rden[0];
+//       r_fifo_nearly_full[0]   <= fifo_nearly_full[0];
+//    end
 
-wire  w_fifo_nearly_full0 = ~fifo_nearly_full[0] & r_fifo_nearly_full[0];
+// wire  w_fifo_nearly_full0 = ~fifo_nearly_full[0] & r_fifo_nearly_full[0];
 
 
 
@@ -599,67 +638,71 @@ always @(*) begin
    r_mem_rd_addr_next[1]   = 1;
    r_mem_rden[1]           = 0;
    q1_count_next           = 0;
-   st1_rd_next             = 0;
-   case (st1_rd_current)
-      `ST1_RD_IDLE : begin
-         r_mem_rd_addr_next[1]   = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0)) ? r_mem_rd_addr[1] + 1 : 1;
-         r_mem_rden[1]           = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0)) ? 1 : 0;
+   st1_rd_next             = `ST1_RD_IDLE;
+   if (st1_rd_current == `ST1_RD_IDLE && (!w_q1_start || (q1_replay_count == 0))) begin
+      // idle
+      r_mem_rd_addr_next[1]   = 1;
+      r_mem_rden[1]           = 0;
+      q1_count_next           = 0;
+      st1_rd_next             = `ST1_RD_IDLE;
+   end 
+   else begin
+      if (sw_rst) begin
+         r_mem_rd_addr_next[1]   = 1;
+         r_mem_rden[1]           = 0;
          q1_count_next           = 0;
-         st1_rd_next             = (w_q1_start && ~fifo_nearly_full[1] && (q1_replay_count != 0)) ? `ST1_RD : `ST1_RD_IDLE;
+         st1_rd_next             = `ST1_RD_IDLE;
+      end 
+      else if (fifo_nearly_full[1]) begin
+         // fifo nearly full, pause
+         r_mem_rd_addr_next[1]   = r_mem_rd_addr[1];
+         r_mem_rden[1]           = 0;
+         q1_count_next           = q1_count;
+         st1_rd_next             = `ST1_RD;
       end
-      `ST1_RD : begin
-         if (sw_rst) begin
+      else if (dina1[MEM_TVALID_POS+1] || (r_mem_rd_addr[1] + 1 == tmp1_last_addr)) begin
+         // Reached the end of pcap
+         if ((q1_count + 1) < q1_replay_count) begin
+            // go back to start and keep reading
             r_mem_rd_addr_next[1]   = 1;
-            r_mem_rden[1]           = 0;
-            q1_count_next           = 0;
-            st1_rd_next             = `ST1_RD_IDLE;
-         end 
-         else if (dina1[MEM_TVALID_POS+1] && ~fifo_nearly_full[1]) begin
-            if ((q1_count + 1) < q1_replay_count) begin
-               r_mem_rd_addr_next[1]   = 1;
-               r_mem_rden[1]           = 1;
-               q1_count_next           = q1_count + 1;
-               st1_rd_next             = `ST1_RD;
-            end
-            else begin
-               r_mem_rd_addr_next[1]   = 1;
-               r_mem_rden[1]           = 1;
-               q1_count_next           = 0;
-               st1_rd_next             = `ST1_RD_IDLE;
-            end
-         end 
-         else if (~fifo_nearly_full[1]) begin
-            r_mem_rd_addr_next[1]   = r_mem_rd_addr[1] + 1;
             r_mem_rden[1]           = 1;
-            q1_count_next           = q1_count;
-            st1_rd_next             = `ST1_RD;
-         end 
-         else begin
-            r_mem_rd_addr_next[1]   = r_mem_rd_addr[1];
-            r_mem_rden[1]           = 0;
-            q1_count_next           = q1_count;
+            q1_count_next           = q1_count + 1;
             st1_rd_next             = `ST1_RD;
          end
+         else begin
+            // finished replay, read the last word and stop
+            r_mem_rd_addr_next[1]   = 1;
+            r_mem_rden[1]           = 1;
+            q1_count_next           = 0;
+            st1_rd_next             = `ST1_RD_IDLE;
+         end
+      end 
+      else begin
+         // keep reading, still in pcap
+         r_mem_rd_addr_next[1]   = r_mem_rd_addr[1] + 1;
+         r_mem_rden[1]           = 1;
+         q1_count_next           = q1_count;
+         st1_rd_next             = `ST1_RD;
       end
-   endcase
+   end
 end
 
-reg   r_rden1;
-always @(posedge axis_aclk)
-   if (~axis_aresetn) begin
-      r_rden1                 <= 0;
-      r_fifo_nearly_full[1]   <= 0;
-   end
-   else begin
-      r_rden1                 <= r_mem_rden[1];
-      r_fifo_nearly_full[1]   <= fifo_nearly_full[1];
-   end
+// reg   r_rden1;
+// always @(posedge axis_aclk)
+//    if (~axis_aresetn) begin
+//       r_rden1                 <= 0;
+//       r_fifo_nearly_full[1]   <= 0;
+//    end
+//    else begin
+//       r_rden1                 <= r_mem_rden[1];
+//       r_fifo_nearly_full[1]   <= fifo_nearly_full[1];
+//    end
 
-wire  w_fifo_nearly_full1 = ~fifo_nearly_full[1] & r_fifo_nearly_full[1];
+// wire  w_fifo_nearly_full1 = ~fifo_nearly_full[1] & r_fifo_nearly_full[1];
 
-// bypass mode state machine
-`define     ST_DIR_IDLE       0
-`define     ST_DIR_WR         1
+// // bypass mode state machine
+// `define     ST_DIR_IDLE       0
+// `define     ST_DIR_WR         1
 
 reg   [C_M_AXIS_DATA_WIDTH-1:0]        fifo_dir_tdata[0:NUM_QUEUES-1];
 reg   [(C_M_AXIS_DATA_WIDTH/8)-1:0]    fifo_dir_tkeep[0:NUM_QUEUES-1];
@@ -710,18 +753,66 @@ assign dst_port[1] = 8'h04;
 //endgenerate
 
 
-assign fifo_in_tdata[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[0+:C_M_AXIS_DATA_WIDTH] : 0;
-assign fifo_in_tkeep[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
-assign fifo_in_tuser[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
-assign fifo_in_tlast[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS] : 0;
-assign fifo_in_tvalid[0] = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS+1] : 0;
+// assign fifo_in_tdata[0]  = dina0[0+:C_M_AXIS_DATA_WIDTH];
+// assign fifo_in_tdata[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? {dina0[(C_M_AXIS_DATA_WIDTH - 1):(DEBUG_PAYLOAD_POS+208)], tmp0_last_addr[7:0], tmp0_last_addr[10:8], 5'h0, time_counter[7:0], time_counter[15:8], time_counter[23:16], time_counter[31:24], q0_count_next[7:0], q0_count_next[15:8], q0_count_next[23:16], q0_count_next[31:24], q0_count[7:0], q0_count[15:8], q0_count[23:16], q0_count[31:24], st0_rd_current, st0_rd_next, r_mem_rd_addr_next[0][7:0], r_mem_rd_addr[0][3:0], 1'b0, r_mem_rd_addr_next[0][10:8], 1'b0, r_mem_rd_addr[0][10:4], dina0[0+:(DEBUG_PAYLOAD_POS+64)]} : 0;
+// assign fifo_in_tkeep[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
+// assign fifo_in_tuser[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
+// assign fifo_in_tlast[0]  = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TLAST_POS] : 0;
+// assign fifo_in_tvalid[0] = ((r_rden0 && r_mem_rden[0]) || w_fifo_nearly_full0) ? dina0[MEM_TVALID_POS] : 0;
 
-assign fifo_in_tdata[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[0+:C_M_AXIS_DATA_WIDTH] : 0;
-assign fifo_in_tkeep[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)] : 0;
-assign fifo_in_tuser[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH] : 0;
-assign fifo_in_tlast[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[MEM_TLAST_POS] : 0;
-assign fifo_in_tvalid[1] = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? dina1[MEM_TLAST_POS+1] : 0;
+// pipeline to fix timing
+reg [C_M_AXIS_DATA_WIDTH-1:0] fifo_in_tdata_0_r, fifo_in_tdata_1_r;  
+reg [(C_M_AXIS_DATA_WIDTH/8)-1:0] fifo_in_tkeep_0_r, fifo_in_tkeep_1_r;  
+reg [C_M_AXIS_TUSER_WIDTH-1:0]  fifo_in_tuser_0_r, fifo_in_tuser_1_r;  
+reg fifo_in_tlast_0_r, fifo_in_tlast_1_r;
+reg fifo_in_tvalid_0_r, fifo_in_tvalid_1_r;
 
+always @(posedge axis_aclk)
+   if (~axis_aresetn) begin
+      fifo_in_tdata_0_r <= 0;
+      fifo_in_tkeep_0_r <= 0;
+      fifo_in_tuser_0_r <= 0;
+      fifo_in_tlast_0_r <= 0;
+      fifo_in_tvalid_0_r <= 0;
+   end
+   else begin
+      fifo_in_tdata_0_r  <= dina0[0+:C_M_AXIS_DATA_WIDTH];
+      // fifo_in_tdata_0_r  <= {dina0[(C_M_AXIS_DATA_WIDTH - 1):(DEBUG_PAYLOAD_POS+208)], tmp0_last_addr[7:0], tmp0_last_addr[10:8], 5'h0, time_counter[7:0], time_counter[15:8], time_counter[23:16], time_counter[31:24], q0_count_next[7:0], q0_count_next[15:8], q0_count_next[23:16], q0_count_next[31:24], q0_count[7:0], q0_count[15:8], q0_count[23:16], q0_count[31:24], st0_rd_current, st0_rd_next, r_mem_rd_addr_next[0][7:0], r_mem_rd_addr[0][3:0], 1'b0, r_mem_rd_addr_next[0][10:8], 1'b0, r_mem_rd_addr[0][10:4], dina0[0+:(DEBUG_PAYLOAD_POS+64)]};
+      fifo_in_tkeep_0_r  <= dina0[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)];
+      fifo_in_tuser_0_r  <= dina0[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH];
+      fifo_in_tlast_0_r  <= dina0[MEM_TLAST_POS];
+      fifo_in_tvalid_0_r <= dina0[MEM_TVALID_POS];
+   end
+
+assign fifo_in_tdata[0]  = fifo_in_tdata_0_r; 
+assign fifo_in_tkeep[0]  = fifo_in_tkeep_0_r; 
+assign fifo_in_tuser[0]  = fifo_in_tuser_0_r; 
+assign fifo_in_tlast[0]  = fifo_in_tlast_0_r; 
+assign fifo_in_tvalid[0] = fifo_in_tvalid_0_r;
+
+always @(posedge axis_aclk)
+   if (~axis_aresetn) begin
+      fifo_in_tdata_1_r <= 0;
+      fifo_in_tkeep_1_r <= 0;
+      fifo_in_tuser_1_r <= 0;
+      fifo_in_tlast_1_r <= 0;
+      fifo_in_tvalid_1_r <= 0;
+   end
+   else begin
+      fifo_in_tdata_1_r  <= dina1[0+:C_M_AXIS_DATA_WIDTH];
+      fifo_in_tkeep_1_r  <= dina1[C_M_AXIS_DATA_WIDTH+:(C_M_AXIS_DATA_WIDTH/8)];
+      fifo_in_tuser_1_r  <= dina1[(C_M_AXIS_DATA_WIDTH+(C_M_AXIS_DATA_WIDTH/8))+:C_M_AXIS_TUSER_WIDTH];
+      fifo_in_tlast_1_r  <= dina1[MEM_TLAST_POS];
+      fifo_in_tvalid_1_r <= dina1[MEM_TVALID_POS];
+   end
+
+assign fifo_in_tdata[1]  = fifo_in_tdata_1_r; 
+assign fifo_in_tkeep[1]  = fifo_in_tkeep_1_r; 
+assign fifo_in_tuser[1]  = fifo_in_tuser_1_r; 
+assign fifo_in_tlast[1]  = fifo_in_tlast_1_r; 
+assign fifo_in_tvalid[1] = fifo_in_tvalid_1_r;
+
+// assign fifo_in_tdata[1]  = ((r_rden1 && r_mem_rden[1]) || w_fifo_nearly_full1) ? {dina1[(C_M_AXIS_DATA_WIDTH - 1):(DEBUG_PAYLOAD_POS+192 + 48)], q0_replay_count, 3'h0, fifo_nearly_full[0], fifo_in_tvalid[0], fifo_rden[0], fifo_empty[0], m0_axis_tready, m0_st_next, m0_st_current, time_counter[7:0], time_counter[15:8], time_counter[23:16], time_counter[31:24], q1_count_next[7:0], q1_count_next[15:8], q1_count_next[23:16], q1_count_next[31:24], q1_count[7:0], q1_count[15:8], q1_count[23:16], q1_count[31:24], st1_rd_current, st1_rd_next, r_mem_rd_addr_next[1][7:0], r_mem_rd_addr[1][3:0], 1'b0, r_mem_rd_addr_next[1][10:8], 1'b0, r_mem_rd_addr[1][10:4], dina1[0+:(DEBUG_PAYLOAD_POS+64)]} : 0;
 
 
 generate
@@ -730,23 +821,77 @@ generate
          fallthrough_small_fifo
          #(
             .WIDTH            (  1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH               ),
-            .MAX_DEPTH_BITS   (  IN_FIFO_DEPTH_BIT                                                                )
+            .MAX_DEPTH_BITS   (  IN_FIFO_DEPTH_BIT                                                                ),
+            .PROG_FULL_THRESHOLD (2**IN_FIFO_DEPTH_BIT - 10) // use prog_full to detect nearly full early (because several cycles delay in previous pipeline)
          )
          pcap_fifo
          (
             //Outputs
             .dout             (  {fifo_out_tlast[i], fifo_out_tuser[i], fifo_out_tkeep[i], fifo_out_tdata[i]}     ),
             .full             (                                                                                   ),
-            .nearly_full      (  fifo_nearly_full[i]                                                              ),
-            .prog_full        (                                                                                   ),
+            .nearly_full      (                                                                                   ),
+            .prog_full        (  fifo_nearly_full[i]                                                              ),
             .empty            (  fifo_empty[i]                                                                    ),
             //Inputs
             .din              (  {fifo_in_tlast[i], fifo_in_tuser[i], fifo_in_tkeep[i], fifo_in_tdata[i]}         ),
-            .wr_en            (  fifo_in_tvalid[i] & ~fifo_nearly_full[i]                                         ),
+            .wr_en            (  fifo_in_tvalid[i]                                                                ),
             .rd_en            (  fifo_rden[i]                                                                     ),
             .reset            (  ~axis_aresetn                                                                     ),
             .clk              (  axis_aclk                                                                        )
          );
+         // xpm_fifo_sync #(
+         //    .FIFO_MEMORY_TYPE     ("auto"),
+         //    .ECC_MODE             ("no_ecc"),
+         //    .FIFO_WRITE_DEPTH     (IN_FIFO_DEPTH),
+         //    .WRITE_DATA_WIDTH     (1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH),
+         //    .WR_DATA_COUNT_WIDTH  (1),
+         //    .PROG_FULL_THRESH     (IN_FIFO_DEPTH - 12),
+         //    .FULL_RESET_VALUE     (0),
+         //    .USE_ADV_FEATURES     ("0707"),
+         //    .READ_MODE            ("fwft"),
+         //    .FIFO_READ_LATENCY    (0),
+         //    // .FIFO_READ_LATENCY    (1),
+         //    .READ_DATA_WIDTH      (1+C_M_AXIS_TUSER_WIDTH+(C_M_AXIS_DATA_WIDTH/8)+C_M_AXIS_DATA_WIDTH),
+         //    .RD_DATA_COUNT_WIDTH  (1),
+         //    .PROG_EMPTY_THRESH    (10),
+         //    .DOUT_RESET_VALUE     ("0"),
+         //    .WAKEUP_TIME          (0)
+         // ) u_xpm_fifo_sync (
+         //    // Common module ports
+         //    .sleep           (),
+         //    .rst             (~axis_aresetn),
+            
+         //    // Write Domain ports
+         //    .wr_clk          (axis_aclk),
+         //    .wr_en           (fifo_in_tvalid[i]),
+         //    .din             ({fifo_in_tlast[i], fifo_in_tuser[i], fifo_in_tkeep[i], fifo_in_tdata[i]}),
+         //    .full            (),
+         //    .prog_full       (fifo_nearly_full[i]),
+         //    // .prog_full       (),
+         //    .wr_data_count   (),
+         //    .overflow        (),
+         //    .wr_rst_busy     (),
+         //    .almost_full     (),
+         //    // .almost_full     (almost_full),
+         //    .wr_ack          (),
+            
+         //    // Read Domain ports
+         //    .rd_en           (fifo_rden[i]),
+         //    .dout            ({fifo_out_tlast[i], fifo_out_tuser[i], fifo_out_tkeep[i], fifo_out_tdata[i]}),
+         //    .empty           (fifo_empty[i]),
+         //    .prog_empty      (),
+         //    .rd_data_count   (),
+         //    .underflow       (),
+         //    .rd_rst_busy     (),
+         //    .almost_empty    (),
+         //    .data_valid      (),
+            
+         //    // ECC Related ports
+         //    .injectsbiterr   (),
+         //    .injectdbiterr   (),
+         //    .sbiterr         (),
+         //    .dbiterr         () 
+         // );
       end
 endgenerate
 
@@ -761,35 +906,78 @@ always @(posedge axis_aclk)
       m1_st_current  <= m1_st_next;
    end
 
+// always @(*) begin
+//    m0_axis_tdata        = 0;
+//    m0_axis_tkeep        = 0;
+//    m0_axis_tuser        = 0;
+//    m0_axis_tlast        = 0;
+//    m0_axis_tvalid       = 0;
+//    fifo_rden[0]         = 0;
+//    m0_st_next           = `M0_IDLE;
+//    case (m0_st_current)
+//       `M0_IDLE : begin
+//          m0_axis_tdata        = 0;
+//          m0_axis_tkeep        = 0;
+//          m0_axis_tuser        = 0;
+//          m0_axis_tlast        = 0;
+//          m0_axis_tvalid       = 0;
+//          fifo_rden[0]         = 0;
+//          m0_st_next           = (m0_axis_tready & ~fifo_empty[0] & (q0_replay_count != 0)) ? `M0_SEND : `M0_IDLE;
+//       end
+//       `M0_SEND : begin
+//          m0_axis_tdata        = fifo_out_tdata[0];
+//          m0_axis_tkeep        = fifo_out_tkeep[0];
+//          m0_axis_tuser        = {fifo_out_tuser[0][127:32],16'h0102,16'h0};
+//          m0_axis_tlast        = fifo_out_tlast[0];
+//          m0_axis_tvalid       = ~fifo_empty[0];
+//          fifo_rden[0]         = (m0_axis_tready & ~fifo_empty[0]);
+//          m0_st_next           = (m0_axis_tready & ~fifo_empty[0]) ? `M0_SEND : `M0_IDLE;
+//       end
+//    endcase
+// end
+
+// reg   [C_M_AXIS_DATA_WIDTH-1:0]              m0_axis_tdata_next;
+// reg   [((C_M_AXIS_DATA_WIDTH/8))-1:0]        m0_axis_tkeep_next;
+// reg   [C_M_AXIS_TUSER_WIDTH-1:0]             m0_axis_tuser_next;
+// reg                                          m0_axis_tvalid_next;
+// reg                                          m0_axis_tlast_next;
+
+// reg   [C_M_AXIS_DATA_WIDTH-1:0]              m1_axis_tdata_next;
+// reg   [((C_M_AXIS_DATA_WIDTH/8))-1:0]        m1_axis_tkeep_next;
+// reg   [C_M_AXIS_TUSER_WIDTH-1:0]             m1_axis_tuser_next;
+// reg                                          m1_axis_tvalid_next;
+// reg                                          m1_axis_tlast_next;
+
+// reg   [NUM_QUEUES-1:0]  		fifo_rden_next;
+  
+// always @(*) begin
+//    m0_axis_tdata_next = fifo_out_tdata[0];
+//    m0_axis_tkeep_next = fifo_out_tkeep[0];
+//    m0_axis_tuser_next = {fifo_out_tuser[0][127:32],16'h0102,16'h0};
+//    m0_axis_tvalid_next = ~fifo_empty[0] & m0_axis_tready;
+//    m0_axis_tlast_next = fifo_out_tlast[0]; 
+//    fifo_rden_next[0] = m0_axis_tready & ~fifo_empty[0] & (q0_replay_count != 0);
+// end
+
+
 always @(*) begin
-   m0_axis_tdata        = 0;
-   m0_axis_tkeep        = 0;
-   m0_axis_tuser        = 0;
-   m0_axis_tlast        = 0;
-   m0_axis_tvalid       = 0;
-   fifo_rden[0]         = 0;
-   m0_st_next           = `M0_IDLE;
-   case (m0_st_current)
-      `M0_IDLE : begin
-         m0_axis_tdata        = 0;
-         m0_axis_tkeep        = 0;
-         m0_axis_tuser        = 0;
-         m0_axis_tlast        = 0;
-         m0_axis_tvalid       = 0;
-         fifo_rden[0]         = 0;
-         m0_st_next           = (m0_axis_tready & ~fifo_empty[0] & (q0_replay_count != 0)) ? `M0_SEND : `M0_IDLE;
-      end
-      `M0_SEND : begin
-         m0_axis_tdata        = fifo_out_tdata[0];
-         m0_axis_tkeep        = fifo_out_tkeep[0];
-         m0_axis_tuser        = {fifo_out_tuser[0][127:32],16'h0102,16'h0};
-         m0_axis_tlast        = fifo_out_tlast[0];
-         m0_axis_tvalid       = ~fifo_empty[0];
-         fifo_rden[0]         = (m0_axis_tready & ~fifo_empty[0]);
-         m0_st_next           = (m0_axis_tready & ~fifo_empty[0] & m0_axis_tlast) ? `M0_IDLE : `M0_SEND;
-      end
-   endcase
+   m0_axis_tdata = fifo_out_tdata[0];
+   m0_axis_tkeep = fifo_out_tkeep[0];
+   m0_axis_tuser = {fifo_out_tuser[0][127:32],16'h0102,16'h0};
+   m0_axis_tvalid = ~fifo_empty[0] & m0_axis_tready;
+   m0_axis_tlast = fifo_out_tlast[0]; 
+   fifo_rden[0] = m0_axis_tready & ~fifo_empty[0] & (q0_replay_count != 0);
 end
+
+
+// always @(*) begin
+//    m1_axis_tdata = fifo_out_tdata[1];
+//    m1_axis_tkeep = fifo_out_tkeep[1];
+//    m1_axis_tuser = {fifo_out_tuser[1][127:32],16'h0408,16'h0};
+//    m1_axis_tvalid = ~fifo_empty[1] & m1_axis_tready;
+//    m1_axis_tlast = fifo_out_tlast[1]; 
+//    fifo_rden[1] = m1_axis_tready & ~fifo_empty[1] & (q1_replay_count != 0);
+// end
 
 always @(*) begin
    m1_axis_tdata        = 0;
@@ -816,7 +1004,7 @@ always @(*) begin
          m1_axis_tlast        = fifo_out_tlast[1];
          m1_axis_tvalid       = ~fifo_empty[1];
          fifo_rden[1]         = (m1_axis_tready & ~fifo_empty[1]);
-         m1_st_next           = (m1_axis_tready & ~fifo_empty[1] & m1_axis_tlast) ? `M1_IDLE : `M1_SEND;
+         m1_st_next           = (m1_axis_tready & ~fifo_empty[1]) ? `M1_SEND : `M1_IDLE;
       end
    endcase
 end

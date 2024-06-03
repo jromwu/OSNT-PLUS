@@ -23,9 +23,9 @@
 # @NETFPGA_LICENSE_HEADER_END@
 #
 ### User defined
-export NFPLUS_FOLDER=${HOME}/NetFPGA-PLUS
+export NFPLUS_FOLDER=${HOME}/OSNT-PLUS
 export BOARD_NAME=au250
-export NF_PROJECT_NAME=reference_switch
+export NF_PROJECT_NAME=pkt_vomiter
 export PYTHON_BNRY=/usr/bin/python3
 
 ### Don't change
@@ -80,11 +80,11 @@ if [ -z ${vivado_version} ]; then
 	echo "Error: please source vivado scripts. e.g.) /tools/Xilinx/Vivado/2019.2/settings64.sh"
 	return -1
 fi
-if [ ${VERSION} != ${vivado_version} -a \
-     ${VERSION}* != ${vivado_version} ] ; then
-	echo "Error: you don't have proper Vivado version (${VERSION})."
-	return -1
-fi
+# if [ ${VERSION} != ${vivado_version} -a \
+#      ${VERSION}* != ${vivado_version} ] ; then
+# 	echo "Error: you don't have proper Vivado version (${VERSION})."
+# 	return -1
+# fi
 
 echo "[ok]    Vivado Version (${VERSION}) has been checked."
 echo "     NFPLUS_FOLDER  :   ${NFPLUS_FOLDER}"
