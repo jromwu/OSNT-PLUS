@@ -45,7 +45,7 @@ module pkt_vomiter_mac_attachment #(
     parameter C_DEFAULT_VALUE_ENABLE    = 1,
     parameter C_DEFAULT_SRC_PORT        = 0,
     parameter C_DEFAULT_DST_PORT        = 0,
-    parameter C_TIMESTAMP_WIDTH		= 64,
+    parameter C_TIMESTAMP_WIDTH	    = 32,
     parameter C_RX_TIMESTAMP_ENABLE	= 0,
     parameter C_TX_TIMESTAMP_ENABLE	= 0
 ) (
@@ -120,19 +120,137 @@ module pkt_vomiter_mac_attachment #(
 reg [C_TIMESTAMP_WIDTH-1:0]			 stamp_counter_reg;
 wire [C_TIMESTAMP_WIDTH-1:0]			 stamp_counter_w;
 wire [C_TIMESTAMP_WIDTH-1:0]			 stamp_counter_cmac; 
+wire [C_TIMESTAMP_WIDTH-1:0]			 stamp_counter_cmac_w; 
+reg [C_TIMESTAMP_WIDTH-1:0]			 stamp_counter_cmac_reg[0:1]; 
 assign stamp_counter_w = stamp_counter_reg;
 always @ (posedge axis_aclk) begin
     stamp_counter_reg <= stamp_counter;	
 end
 
-// stamp_counter in CMAC clock	
-xpm_cdc_array_single # (
-      .WIDTH(C_TIMESTAMP_WIDTH)
-) i1 ( 
-      .src_clk  (axis_aclk),
-      .src_in   (stamp_counter_w),
-      .dest_clk (clk156),
-      .dest_out (stamp_counter_cmac)
+assign stamp_counter_cmac = stamp_counter_cmac_reg[1];
+always @ (posedge clk156) begin
+    if ((stamp_counter_cmac_reg[0] < stamp_counter_cmac_w) || ((stamp_counter_cmac_reg[0] & 32'hfffffff0) == 32'hfffffff0)) begin
+        stamp_counter_cmac_reg[0] <= stamp_counter_cmac_w;
+    end
+    stamp_counter_cmac_reg[1] <= stamp_counter_cmac_reg[0];
+end
+
+// stamp_counter in CMAC clock
+
+wire rd_rst_busy, wr_rst_busy;
+
+xpm_fifo_async #(
+   .CDC_SYNC_STAGES(8),       // DECIMAL
+   .DOUT_RESET_VALUE("0"),    // String
+   .ECC_MODE("no_ecc"),       // String
+   .FIFO_MEMORY_TYPE("auto"), // String
+   .FIFO_READ_LATENCY(1),     // DECIMAL
+   .FIFO_WRITE_DEPTH(32),   // DECIMAL
+   .FULL_RESET_VALUE(0),      // DECIMAL
+   .PROG_EMPTY_THRESH(0),    // DECIMAL
+   .PROG_FULL_THRESH(0),     // DECIMAL
+   .RD_DATA_COUNT_WIDTH(1),   // DECIMAL
+   .READ_DATA_WIDTH(C_TIMESTAMP_WIDTH),      // DECIMAL
+   .READ_MODE("std"),         // String
+   .RELATED_CLOCKS(0),        // DECIMAL
+   .SIM_ASSERT_CHK(0),        // DECIMAL; 0=disable simulation messages, 1=enable simulation messages
+   .USE_ADV_FEATURES("0000"), // String
+   .WAKEUP_TIME(0),           // DECIMAL
+   .WRITE_DATA_WIDTH(C_TIMESTAMP_WIDTH),     // DECIMAL
+   .WR_DATA_COUNT_WIDTH(1)    // DECIMAL
+)
+xpm_fifo_async_inst (
+   .almost_empty(),   // 1-bit output: Almost Empty : When asserted, this signal indicates that
+                                  // only one more read can be performed before the FIFO goes to empty.
+
+   .almost_full(),     // 1-bit output: Almost Full: When asserted, this signal indicates that
+                                  // only one more write can be performed before the FIFO is full.
+
+   .data_valid(),       // 1-bit output: Read Data Valid: When asserted, this signal indicates
+                                  // that valid data is available on the output bus (dout).
+
+   .dbiterr(),             // 1-bit output: Double Bit Error: Indicates that the ECC decoder detected
+                                  // a double-bit error and data in the FIFO core is corrupted.
+
+   .dout(stamp_counter_cmac_w),                   // READ_DATA_WIDTH-bit output: Read Data: The output data bus is driven
+                                  // when reading the FIFO.
+
+   .empty(),                 // 1-bit output: Empty Flag: When asserted, this signal indicates that the
+                                  // FIFO is empty. Read requests are ignored when the FIFO is empty,
+                                  // initiating a read while empty is not destructive to the FIFO.
+
+   .full(),                   // 1-bit output: Full Flag: When asserted, this signal indicates that the
+                                  // FIFO is full. Write requests are ignored when the FIFO is full,
+                                  // initiating a write when the FIFO is full is not destructive to the
+                                  // contents of the FIFO.
+
+   .overflow(),           // 1-bit output: Overflow: This signal indicates that a write request
+                                  // (wren) during the prior clock cycle was rejected, because the FIFO is
+                                  // full. Overflowing the FIFO is not destructive to the contents of the
+                                  // FIFO.
+
+   .prog_empty(),       // 1-bit output: Programmable Empty: This signal is asserted when the
+                                  // number of words in the FIFO is less than or equal to the programmable
+                                  // empty threshold value. It is de-asserted when the number of words in
+                                  // the FIFO exceeds the programmable empty threshold value.
+
+   .prog_full(),         // 1-bit output: Programmable Full: This signal is asserted when the
+                                  // number of words in the FIFO is greater than or equal to the
+                                  // programmable full threshold value. It is de-asserted when the number of
+                                  // words in the FIFO is less than the programmable full threshold value.
+
+   .rd_data_count(), // RD_DATA_COUNT_WIDTH-bit output: Read Data Count: This bus indicates the
+                                  // number of words read from the FIFO.
+
+   .rd_rst_busy(rd_rst_busy),     // 1-bit output: Read Reset Busy: Active-High indicator that the FIFO read
+                                  // domain is currently in a reset state.
+
+   .sbiterr(),             // 1-bit output: Single Bit Error: Indicates that the ECC decoder detected
+                                  // and fixed a single-bit error.
+
+   .underflow(),         // 1-bit output: Underflow: Indicates that the read request (rd_en) during
+                                  // the previous clock cycle was rejected because the FIFO is empty. Under
+                                  // flowing the FIFO is not destructive to the FIFO.
+
+   .wr_ack(),               // 1-bit output: Write Acknowledge: This signal indicates that a write
+                                  // request (wr_en) during the prior clock cycle is succeeded.
+
+   .wr_data_count(), // WR_DATA_COUNT_WIDTH-bit output: Write Data Count: This bus indicates
+                                  // the number of words written into the FIFO.
+
+   .wr_rst_busy(wr_rst_busy),     // 1-bit output: Write Reset Busy: Active-High indicator that the FIFO
+                                  // write domain is currently in a reset state.
+
+   .din(stamp_counter_w),                     // WRITE_DATA_WIDTH-bit input: Write Data: The input data bus used when
+                                  // writing the FIFO.
+
+   .injectdbiterr(), // 1-bit input: Double Bit Error Injection: Injects a double bit error if
+                                  // the ECC feature is used on block RAMs or UltraRAM macros.
+
+   .injectsbiterr(), // 1-bit input: Single Bit Error Injection: Injects a single bit error if
+                                  // the ECC feature is used on block RAMs or UltraRAM macros.
+
+   .rd_clk(clk156),               // 1-bit input: Read clock: Used for read operation. rd_clk must be a free
+                                  // running clock.
+
+   .rd_en(~rd_rst_busy),                 // 1-bit input: Read Enable: If the FIFO is not empty, asserting this
+                                  // signal causes data (on dout) to be read from the FIFO. Must be held
+                                  // active-low when rd_rst_busy is active high.
+
+   .rst(~axis_aresetn),                     // 1-bit input: Reset: Must be synchronous to wr_clk. The clock(s) can be
+                                  // unstable at the time of applying reset, but reset must be released only
+                                  // after the clock(s) is/are stable.
+
+   .sleep(),                 // 1-bit input: Dynamic power saving: If sleep is High, the memory/fifo
+                                  // block is in power saving mode.
+
+   .wr_clk(axis_aclk),               // 1-bit input: Write clock: Used for write operation. wr_clk must be a
+                                  // free running clock.
+
+   .wr_en(~wr_rst_busy && axis_aresetn)                  // 1-bit input: Write Enable: If the FIFO is not full, asserting this
+                                  // signal causes data (on din) to be written to the FIFO. Must be held
+                                  // active-low when rst or wr_rst_busy is active high.
+
 );
 
 
@@ -171,34 +289,6 @@ xpm_cdc_array_single # (
  wire                                           s_axis_fifo_tvalid;
  wire                                           s_axis_fifo_tready;
  wire                                           s_axis_fifo_tlast;   
-
-//  wire [511:0] m_axis_mac_tdata_temp;
-//  wire [63:0]  m_axis_mac_tkeep_temp;
-//  wire         m_axis_mac_tvalid_temp;
-//  wire         m_axis_mac_tuser_err_temp;
-//  wire [C_M_AXIS_TUSER_WIDTH-1:0] m_axis_mac_tuser_temp;
-//  wire         m_axis_mac_tlast_temp;
-
-//  wire [511:0] m_axis_mac_tdata_next;
-//  wire [63:0]  m_axis_mac_tkeep_next;
-//  wire         m_axis_mac_tvalid_next;
-//  wire         m_axis_mac_tuser_err_next;
-//  wire [C_M_AXIS_TUSER_WIDTH-1:0] m_axis_mac_tuser_next;
-//  wire         m_axis_mac_tlast_next;
- 
-//  wire [511:0] s_axis_mac_tdata_temp;
-//  wire [63:0]  s_axis_mac_tkeep_temp;
-//  wire         s_axis_mac_tvalid_temp;
-//  wire         s_axis_mac_tuser_err_temp;
-//  wire [C_M_AXIS_TUSER_WIDTH-1:0] s_axis_mac_tuser_temp;
-//  wire         s_axis_mac_tlast_temp;
- 
-//  wire [511:0] s_axis_mac_tdata_next;
-//  wire [63:0]  s_axis_mac_tkeep_next;
-//  wire         s_axis_mac_tvalid_next;
-//  wire         s_axis_mac_tuser_err_next;
-//  wire [C_M_AXIS_TUSER_WIDTH-1:0] s_axis_mac_tuser_next;
-//  wire         s_axis_mac_tlast_next;
 
  ////////////////////////////////////////////////////////////////
  // 10g interface statistics
@@ -279,7 +369,9 @@ xpm_cdc_array_single # (
 //     .rx_good_frame                        (rx_good_frame)  
 //    ); 
    osnt_rx_queue #(
-     .AXI_DATA_WIDTH                      (C_M_AXIS_DATA_WIDTH_INTERNAL)
+     .AXI_DATA_WIDTH                      (C_M_AXIS_DATA_WIDTH_INTERNAL),
+     .TIMESTAMP_WIDTH                     (C_TIMESTAMP_WIDTH),
+     .TIMESTAMP_POS                       (208)
     ) rx_fifo_intf (
     // MAC input 64b@clk156
     .clk156                               (clk156),
@@ -434,9 +526,11 @@ xpm_cdc_array_single # (
     // IMPORTANT: FIFO36_72 requires rst to be asserted for at least 5 clks. 
     // RDEN and WREN should be ONLY 1'b0 at that time. 
     //------------------------------------------------------------------------- 
-    tx_queue #(
+    osnt_tx_queue #(
      .AXI_DATA_WIDTH                     (C_S_AXIS_DATA_WIDTH_INTERNAL), 
-     .C_S_AXIS_TUSER_WIDTH               (C_S_AXIS_TUSER_WIDTH)
+     .C_S_AXIS_TUSER_WIDTH               (C_S_AXIS_TUSER_WIDTH),
+     .TIMESTAMP_WIDTH                    (C_TIMESTAMP_WIDTH),
+     .TIMESTAMP_POS                      (144)
     ) tx_fifo_intf (    
       // AXIS input 64b @axis_clk    
      .clk                                (axis_aclk),
@@ -465,9 +559,9 @@ xpm_cdc_array_single # (
      .tx_dequeued_pkt                    (tx_dequeued_pkt),
      .be                                 (be),  
      .tx_pkts_enqueued_signal            (tx_pkts_enqueued_signal),
-     .tx_bytes_enqueued                  (tx_bytes_enqueued)
+     .tx_bytes_enqueued                  (tx_bytes_enqueued),
 
-//      .stamp_counter                      (stamp_counter_w)    
+     .stamp_counter                      (stamp_counter_cmac)    
      );
 //     tx_queue #(
 //      .AXI_DATA_WIDTH                     (C_S_AXIS_DATA_WIDTH_INTERNAL), 

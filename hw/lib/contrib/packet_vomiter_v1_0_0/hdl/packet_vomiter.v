@@ -76,7 +76,7 @@ module packet_vomiter
     parameter C_BASEADDR            = 32'h00000000,
 
     parameter TIMESTAMP_POS = 240,
-    parameter TIMESTAMP_WIDTH = 64
+    parameter TIMESTAMP_WIDTH = 32
 )
 (
     // Part 1: System side signals
@@ -116,8 +116,8 @@ module packet_vomiter
     output                                    S_AXI_AWREADY
 
 );
-  reg     [C_M_AXIS_DATA_WIDTH - 1:0] packet_content;
-  // wire     [C_M_AXIS_DATA_WIDTH - 1:0] packet_content;
+  // reg     [C_M_AXIS_DATA_WIDTH - 1:0] packet_content;
+  wire     [C_M_AXIS_DATA_WIDTH - 1:0] packet_content;
   reg      [C_M_AXIS_TUSER_WIDTH - 1:0] tuser_content;
   reg      [31:0] time_counter;
   reg      [31:0] packet_counter;
@@ -136,43 +136,111 @@ module packet_vomiter
   wire enable = enable_reg[0]; // normal packets are 60 bytes
   wire full_pkt = enable_reg[1]; // 64 bytes
   wire short_pkt = enable_reg[2]; // 56 bytes, does not work
+  wire [5:0] pkt_len = enable_reg[9:4]; // how many additional words to send (one word is C_M_AXIS_DATA_WIDTH bits)
 
   wire [TIMESTAMP_WIDTH-1:0] flipped_stamp_counter;
 
   genvar i;
-  generate for (i = 0; i < TIMESTAMP_WIDTH; i = i + 8) begin : KEEP_GEN
+  generate for (i = 0; i < TIMESTAMP_WIDTH; i = i + 8) begin
     // flip endianness
     assign flipped_stamp_counter[TIMESTAMP_WIDTH - i - 1:TIMESTAMP_WIDTH - i - 8] = stamp_counter[i +: 8];
   end endgenerate;
 
-  always @(*) begin
-    packet_content = {64'h0001020304050607, {(C_M_AXIS_DATA_WIDTH - 256 - 64 - 32 - 32){1'b0}}, 144'h0e0f101112131415161718191a1b1c1d1e1f, 
-                            time_counter[7:0], time_counter[15:8], time_counter[23:16], time_counter[31:24],
-                            packet_counter[7:0], packet_counter[15:8], packet_counter[23:16], packet_counter[31:24],
-                            16'h0d0c, ETH_ADDR, 48'hffffffffffff};
-    // packet_content[112+:(8+C_M_AXIS_TUSER_WIDTH+C_M_AXIS_DATA_WIDTH/8)] = {7'b0, m_axis_tlast, m_axis_tkeep, tuser_content};
-    packet_content[TIMESTAMP_POS +: TIMESTAMP_WIDTH] = flipped_stamp_counter;
-  end
+`define  ST_IDLE         0
+`define  ST_SEND_META    1
+`define  ST_SEND_BODY    2
+
+reg [1:0] state, state_next;
+reg [5:0] remaining_words, remaining_words_next;
+
+always @(posedge axis_aclk)
+   if (~axis_resetn) begin
+      state <= `ST_IDLE;
+      remaining_words <= 0;
+   end
+   else if (m_axis_tready) begin
+      state <= state_next;
+      remaining_words <= remaining_words_next;
+   end
+
+always @(*) begin
+  // packet_content = {64'h0001020304050607, {(C_M_AXIS_DATA_WIDTH - 256 - 64 - 32 - 32 - 128){1'b0}}, 144'h0e0f101112131415161718191a1b1c1d1e1f, 
+  //                           time_counter[7:0], time_counter[15:8], time_counter[23:16], time_counter[31:24],
+  //                           packet_counter[7:0], packet_counter[15:8], packet_counter[23:16], packet_counter[31:24],
+  //                           64'hffffffffffffffff, 64'hffffffffffffffff,
+  //                           16'h0d0c, ETH_ADDR, 48'hffffffffffff};
+  // packet_content[112+:(8+C_M_AXIS_TUSER_WIDTH+C_M_AXIS_DATA_WIDTH/8)] = {7'b0, m_axis_tlast, m_axis_tkeep, tuser_content};
+  // packet_content[TIMESTAMP_POS +: TIMESTAMP_WIDTH] = flipped_stamp_counter;
+  case (state)
+    `ST_IDLE: begin
+      if (enable) begin
+        state_next = `ST_SEND_META;
+        remaining_words_next = pkt_len;
+      end
+      else begin
+        state_next = `ST_IDLE;
+        remaining_words_next = 0;
+      end
+    end
+    `ST_SEND_META: begin
+      if (pkt_len == 4'b0) begin
+        state_next = enable ? `ST_SEND_META : `ST_IDLE;
+        remaining_words_next = enable ? pkt_len : 4'b0;
+      end
+      else begin
+        state_next = `ST_SEND_BODY;
+        remaining_words_next = pkt_len;
+      end
+    end
+    `ST_SEND_BODY: begin
+      if (remaining_words == 4'b1) begin
+        state_next = enable ? `ST_SEND_META : `ST_IDLE;
+        remaining_words_next = enable ? pkt_len : 4'b0;
+      end
+      else begin
+        state_next = `ST_SEND_BODY;
+        remaining_words_next = (remaining_words - 1);
+      end
+    end
+  endcase
+end
+  assign packet_content = (state == `ST_SEND_META) ? 
+                          {m_axis_tkeep, {(C_M_AXIS_DATA_WIDTH - 64 - 128 - 16 - 32 - 128 - 112){1'b0}}, m_axis_tuser, 7'b0, m_axis_tvalid, 7'b0, m_axis_tlast,
+                            flipped_stamp_counter,
+                            64'hffffffffffffffff, 64'hffffffffffffffff,
+                            16'h0d0c, ETH_ADDR, 48'hffffffffffff} :
+                          {m_axis_tkeep, {(C_M_AXIS_DATA_WIDTH - 64 - 128 - 16 - 32 - 128 - 112){1'b0}}, m_axis_tuser, 7'b0, m_axis_tvalid, 7'b0, m_axis_tlast, flipped_stamp_counter, {240{1'b1}}};
+  assign m_axis_tvalid = (m_axis_tready && (state != `ST_IDLE)) ? 1 : 0;
+  assign m_axis_tlast = (m_axis_tready && (((state == `ST_SEND_META) && (remaining_words == 4'h0)) || ((state == `ST_SEND_BODY) && (remaining_words == 4'h1)))) ? 1 : 0;
+  assign m_axis_tdata = (m_axis_tready) ? packet_content : {C_M_AXIS_DATA_WIDTH{1'b0}};
+  assign m_axis_tkeep = (m_axis_tready) ? (full_pkt ? {(C_M_AXIS_DATA_WIDTH / 8){1'b1}} : 
+                        (short_pkt ? {8'h00, {(C_M_AXIS_DATA_WIDTH / 8 - 8){1'b1}}} : 
+                        {4'b0000, {(C_M_AXIS_DATA_WIDTH / 8 - 4){1'b1}}})) : 
+                        {(C_M_AXIS_DATA_WIDTH / 8){1'b0}};
+  wire [15:0] pkt_len_wire;
+  assign pkt_len_wire = 8'h40 * pkt_len + 16'h0040;
+  assign m_axis_tuser = (m_axis_tready) ? {{(C_M_AXIS_TUSER_WIDTH - 32){1'b0}}, DST_PORT_VALUE, SRC_PORT_VALUE, (full_pkt ? pkt_len_wire : (short_pkt ? 16'h0038 : 16'h003c))} : 0;
+
 
   // assign packet_content = {64'h0001020304050607, {(C_M_AXIS_DATA_WIDTH - 256 - 64 - 32 - 32){1'b0}}, 144'h0e0f101112131415161718191a1b1c1d1e1f, 
   //                           time_counter[7:0], time_counter[15:8], time_counter[23:16], time_counter[31:24],
   //                           packet_counter[7:0], packet_counter[15:8], packet_counter[23:16], packet_counter[31:24],
   //                           16'h0d0c, ETH_ADDR, 48'hffffffffffff};
-  assign m_axis_tvalid = (m_axis_tready && enable) ? 1 : 0;
-  assign m_axis_tlast = (m_axis_tready && enable) ? 1 : 0;
-  assign m_axis_tdata = (m_axis_tready && enable) ? packet_content : {C_M_AXIS_DATA_WIDTH{1'b0}};
-  assign m_axis_tkeep = (m_axis_tready && enable) ? (full_pkt ? {(C_M_AXIS_DATA_WIDTH / 8){1'b1}} : 
-                        (short_pkt ? {8'h00, {(C_M_AXIS_DATA_WIDTH / 8 - 8){1'b1}}} : 
-                        {4'b0000, {(C_M_AXIS_DATA_WIDTH / 8 - 4){1'b1}}})) : 
-                        {(C_M_AXIS_DATA_WIDTH / 8){1'b0}};
-  assign m_axis_tuser = (m_axis_tready && enable) ? tuser_content : 0;
+  // assign m_axis_tvalid = (m_axis_tready && enable) ? 1 : 0;
+  // assign m_axis_tlast = (m_axis_tready && enable) ? 1 : 0;
+  // assign m_axis_tdata = (m_axis_tready && enable) ? packet_content : {C_M_AXIS_DATA_WIDTH{1'b0}};
+  // assign m_axis_tkeep = (m_axis_tready && enable) ? (full_pkt ? {(C_M_AXIS_DATA_WIDTH / 8){1'b1}} : 
+  //                       (short_pkt ? {8'h00, {(C_M_AXIS_DATA_WIDTH / 8 - 8){1'b1}}} : 
+  //                       {4'b0000, {(C_M_AXIS_DATA_WIDTH / 8 - 4){1'b1}}})) : 
+  //                       {(C_M_AXIS_DATA_WIDTH / 8){1'b0}};
+  // assign m_axis_tuser = (m_axis_tready && enable) ? tuser_content : 0;
 
-  always @(*) begin
-    tuser_content = {C_M_AXIS_TUSER_WIDTH{1'b0}};
-    tuser_content[15:0] = full_pkt ? 16'h0040 : (short_pkt ? 16'h0038 : 16'h003c); // packet length
-    tuser_content[DST_PORT_POS+7:DST_PORT_POS] = DST_PORT_VALUE;
-    tuser_content[SRC_PORT_POS+7:SRC_PORT_POS] = SRC_PORT_VALUE;
-	end
+  // always @(*) begin
+  //   tuser_content = {C_M_AXIS_TUSER_WIDTH{1'b0}};
+  //   tuser_content[15:0] = full_pkt ? 16'h0040 : (short_pkt ? 16'h0038 : 16'h003c); // packet length
+  //   tuser_content[DST_PORT_POS+7:DST_PORT_POS] = DST_PORT_VALUE;
+  //   tuser_content[SRC_PORT_POS+7:SRC_PORT_POS] = SRC_PORT_VALUE;
+	// end
   // assign m_axis_tuser = full_pkt ? {{(C_M_AXIS_TUSER_WIDTH - 16){1'b0}}, 16'h0040} : (short_pkt ? {{(C_M_AXIS_TUSER_WIDTH - 16){1'b0}}, 16'h0038} : {{(C_M_AXIS_TUSER_WIDTH - 16){1'b0}}, 16'h003c});
 
   wire clear_counters;

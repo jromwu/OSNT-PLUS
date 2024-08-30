@@ -1,3 +1,15 @@
+15: add larger packet support
+    14_4: remove endianness conversion
+    14_3: fix timing closure by adding a pipelining reg
+    14_2: add a guard to keep timestamp increasing, got a timing closure problem
+    14_1: try if adding ff pipeline helps
+14: change to use async fifo
+    13_2: change back to single_array
+    13_1: change back 250 mhz
+13: change to increment stamp per 4 cycles
+12: change to use cmac clk
+11: change array to gray
+10: add large packets
     7_10: remove pipelining
     7_9: tried to fix timing by pipelining (broken)
     7_8: reenable timestamping in nf_datapath.v

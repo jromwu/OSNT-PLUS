@@ -42,8 +42,9 @@ set_param synth.elaboration.rodinMoreOptions "rt::set_parameter max_loop_limit 2
 # Design Parameters on NF_DATAPATH
 #####################################
 set datapath_width_bit    512
+# datapath core_clk
 set datapath_freq_mhz     250
-set timestamp_width_bit   64
+set timestamp_width_bit   32
 #####################################
 # Project Settings
 #####################################
@@ -144,6 +145,15 @@ set_property generate_synth_checkpoint false [get_files xilinx_shell_ip.xci]
 reset_target all [get_ips xilinx_shell_ip]
 generate_target all [get_ips xilinx_shell_ip]
 
+create_ip -name pkt_vomiter_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_ip
+set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
+set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
+set_property CONFIG.C_TX_TIMESTAMP_ENABLE 1 [get_ips nf_mac_attachment_ip]
+set_property CONFIG.C_RX_TIMESTAMP_ENABLE 1 [get_ips nf_mac_attachment_ip]
+set_property generate_synth_checkpoint false [get_files nf_mac_attachment_ip.xci]
+reset_target all [get_ips nf_mac_attachment_ip]
+generate_target all [get_ips nf_mac_attachment_ip]
+
 # create_ip -name pkt_vomiter_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf0_mac_attachment_ip
 # set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf0_mac_attachment_ip]
 # set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf0_mac_attachment_ip]
@@ -163,12 +173,12 @@ generate_target all [get_ips xilinx_shell_ip]
 # reset_target all [get_ips nf1_mac_attachment_ip]
 # generate_target all [get_ips nf1_mac_attachment_ip]
 
-create_ip -name nf_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_ip
-set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
-set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
-set_property generate_synth_checkpoint false [get_files nf_mac_attachment_ip.xci]
-reset_target all [get_ips nf_mac_attachment_ip]
-generate_target all [get_ips nf_mac_attachment_ip]
+# create_ip -name nf_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_ip
+# set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
+# set_property CONFIG.C_S_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_ip]
+# set_property generate_synth_checkpoint false [get_files nf_mac_attachment_ip.xci]
+# reset_target all [get_ips nf_mac_attachment_ip]
+# generate_target all [get_ips nf_mac_attachment_ip]
 
 create_ip -name nf_mac_attachment -vendor NetFPGA -library NetFPGA -module_name nf_mac_attachment_dma_ip
 set_property CONFIG.C_M_AXIS_DATA_WIDTH ${datapath_width_bit} [get_ips nf_mac_attachment_dma_ip]
@@ -318,7 +328,7 @@ if {[string match "${datapath_freq_mhz}" "200"]} {
 		CONFIG.MMCM_CLKIN2_PERIOD {10.0} \
 		CONFIG.MMCM_CLKOUT0_DIVIDE_F {4.625} \
 		CONFIG.CLKOUT1_JITTER {182.359} \
-		CONFIG.CLKOUT1_PHASE_ERROR {351.991}] [get_ips clk_wiz_10]
+		CONFIG.CLKOUT1_PHASE_ERROR {351.991}] [get_ips clk_wiz_1]
 } elseif {[string match "${datapath_freq_mhz}" "280"]} {
 #280MHz clock
 	set_property -dict [list \

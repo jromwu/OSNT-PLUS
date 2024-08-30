@@ -145,8 +145,9 @@ module osnt_rx_queue
                                (i_tvalid && state == IDLE && !rx_good_frame);
     assign rx_pkt_drop_frame = rx_pkt_drop || rx_pkt_drop_reg;
     assign fifo_wr_en        = i_tvalid && !rx_pkt_drop_frame;
-    assign insert_stamp_counter = (i_tvalid && state == IDLE && !rx_pkt_drop_frame);
-    assign tdata_rx_fifo = (insert_stamp_counter) ? {i_tdata[AXI_DATA_WIDTH-1:TIMESTAMP_POS+TIMESTAMP_WIDTH], stamp_counter, i_tdata[TIMESTAMP_POS-1:0]} : i_tdata;
+    assign tdata_rx_fifo = {i_tdata[AXI_DATA_WIDTH-1:TIMESTAMP_POS+TIMESTAMP_WIDTH], stamp_counter, i_tdata[TIMESTAMP_POS-1:0]};
+    // assign insert_stamp_counter = (i_tvalid && state == IDLE && !rx_pkt_drop_frame);
+    // assign tdata_rx_fifo = (insert_stamp_counter) ? {i_tdata[AXI_DATA_WIDTH-1:TIMESTAMP_POS+TIMESTAMP_WIDTH], stamp_counter, i_tdata[TIMESTAMP_POS-1:0]} : i_tdata;
     assign tkeep_rx_fifo = i_tkeep;
     assign tlast_rx_fifo = i_tlast;
     assign tuser_rx_fifo = i_tuser;

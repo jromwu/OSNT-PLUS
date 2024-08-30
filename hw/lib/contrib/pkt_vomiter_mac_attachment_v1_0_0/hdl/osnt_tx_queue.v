@@ -97,21 +97,17 @@ module osnt_tx_queue
 
     wire [2:0]                          zero_padding;
 
-
-    wire [C_S_AXIS_TUSER_WIDTH-1:0]    i_tuser_fifo;
-    wire [AXI_DATA_WIDTH-1:0]          i_tdata_fifo;
-    wire [(AXI_DATA_WIDTH/8)-1:0]      i_tkeep_fifo;
-
     ////////////////////////////////////////////////
     ////////////////////////////////////////////////
     assign fifo_wr_en  = (i_tvalid & i_tready);
     assign info_fifo_wr_en = i_tlast & i_tvalid & i_tready;
     assign i_tready    = ~fifo_almost_full & ~info_fifo_full;
     assign tlast_axi_i = i_tlast;
-    assign insert_stamp_counter = (i_tvalid && state == METADATA);
-    assign i_tdata_fifo = (insert_stamp_counter) ? {i_tdata[AXI_DATA_WIDTH-1:TIMESTAMP_POS+TIMESTAMP_WIDTH], stamp_counter, i_tdata[TIMESTAMP_POS-1:0]} : i_tdata;
-    assign i_tkeep_fifo = i_tkeep;
-    assign i_tuser_fifo = i_tuser;
+
+    wire [AXI_DATA_WIDTH-1:0]          o_tdata_fifo;
+    assign o_tdata = {o_tdata_fifo[AXI_DATA_WIDTH-1:TIMESTAMP_POS+TIMESTAMP_WIDTH], stamp_counter, o_tdata_fifo[TIMESTAMP_POS-1:0]};
+    // assign insert_stamp_counter = 1'b1; // todo: only add to the first word of the packet
+    // assign o_tdata = (insert_stamp_counter) ? {o_tdata_fifo[AXI_DATA_WIDTH-1:TIMESTAMP_POS+TIMESTAMP_WIDTH], stamp_counter, o_tdata_fifo[TIMESTAMP_POS-1:0]} : o_tdata_fifo;
 
     xpm_fifo_async # (
        // Common module parameters
@@ -132,7 +128,7 @@ module osnt_tx_queue
        // Write Domain ports
        .wr_clk       (clk),
        .wr_en        (fifo_wr_en),
-       .din          ({tlast_axi_i , i_tkeep_fifo, i_tdata_fifo, i_tuser_fifo}),
+       .din          ({tlast_axi_i, i_tkeep, i_tdata, i_tuser}),
        .full         (),
        .prog_full    (fifo_almost_full),
        .wr_data_count(),
@@ -143,7 +139,7 @@ module osnt_tx_queue
        // Read Domain ports
        .rd_clk       (clk156),
        .rd_en        (fifo_rd_en),
-       .dout         ({tlast_axi_o, o_tkeep, o_tdata, o_tuser}),
+       .dout         ({tlast_axi_o, o_tkeep, o_tdata_fifo, o_tuser}),
        .empty        (fifo_empty),
        .prog_empty   (),
        .rd_data_count(),

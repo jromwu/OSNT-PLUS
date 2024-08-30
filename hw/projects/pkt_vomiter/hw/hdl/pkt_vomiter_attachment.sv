@@ -188,23 +188,10 @@ module pkt_vomiter_attachment #(
   localparam NF_TUSER_DSTPORT_QDMA1 = NF_TUSER_DSTPORT_START + 3;
 
   // TODO: Add the following parameters to tcl
-  // localparam TIMESTAMP_WIDTH = 64;
+  localparam TIMESTAMP_WIDTH = 32;
 
-  // wire [TIMESTAMP_WIDTH-1:0] stamp_counter;
-  // wire [TIMESTAMP_WIDTH-1:0] stamp_counter_little_endian;
-
-  // stamp_counter_ip stamp_counter_0 (
-  //   .ACLK(core_clk), 
-  //   .ARESETN(!core_rst), 
-  //   .STAMP_COUNTER(stamp_counter_little_endian)
-  // );
-
-  // generate
-  //   genvar i;
-  //   for (i = 0; i < TIMESTAMP_WIDTH; i = i + 8) begin
-  //     assign stamp_counter[TIMESTAMP_WIDTH-i-1: TIMESTAMP_WIDTH-i-8] = stamp_counter_little_endian[i+7:i];
-  //   end
-  // endgenerate
+  wire [TIMESTAMP_WIDTH-1:0] stamp_counter;
+  wire [TIMESTAMP_WIDTH-1:0] stamp_counter_little_endian;
 
 
   // Reset
@@ -220,6 +207,20 @@ module pkt_vomiter_attachment #(
   wire   cmac0_rst = cmac0_rst_reg;
   wire   cmac1_rst = cmac1_rst_reg;
   wire   core_rst  = core_rst_reg;
+
+  stamp_counter_ip stamp_counter_0 (
+    .ACLK(core_clk), 
+    .ARESETN(!core_rst), 
+    .STAMP_COUNTER(stamp_counter_little_endian)
+  );
+
+  assign stamp_counter = stamp_counter_little_endian;
+  // generate
+  //   genvar i;
+  //   for (i = 0; i < TIMESTAMP_WIDTH; i = i + 8) begin
+  //     assign stamp_counter[TIMESTAMP_WIDTH-i-1: TIMESTAMP_WIDTH-i-8] = stamp_counter_little_endian[i+7:i];
+  //   end
+  // endgenerate
 
   always @ (posedge cmac_clk[0]) begin
     if (cmac0_rst_cnt != 10'h3ff) begin
@@ -462,7 +463,8 @@ module pkt_vomiter_attachment #(
     .m_axis_pipe_tlast     (axis_i_0_tlast),
     .m_axis_pipe_tuser     (axis_i_0_tuser),
     .m_axis_pipe_tvalid    (axis_i_0_tvalid),
-    .m_axis_pipe_tready    (axis_i_0_tready)
+    .m_axis_pipe_tready    (axis_i_0_tready),
+    .stamp_counter         (stamp_counter)
   );
 
   nf_mac_attachment_ip u_nf_attachment_1 (
@@ -523,7 +525,8 @@ module pkt_vomiter_attachment #(
     .m_axis_pipe_tlast     (axis_i_1_tlast),
     .m_axis_pipe_tuser     (axis_i_1_tuser),
     .m_axis_pipe_tvalid    (axis_i_1_tvalid),
-    .m_axis_pipe_tready    (axis_i_1_tready)
+    .m_axis_pipe_tready    (axis_i_1_tready),
+    .stamp_counter         (stamp_counter)
   );
 
   reg arb_0, arb_1;
